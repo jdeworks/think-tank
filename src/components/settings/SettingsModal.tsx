@@ -195,7 +195,7 @@ function ProviderFields({
           className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
         <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
-          Stored locally in your browser. Never sent anywhere except your chosen provider.
+          Not stored — you'll need to enter it each session. Only sent to your chosen provider.
         </p>
       </div>
 

@@ -21,7 +21,7 @@ export function useStartConversation() {
   const hasStarted = useRef(false)
 
   useEffect(() => {
-    if (hasStarted.current || !idea || messages.length > 0 || !providerConfig) return
+    if (hasStarted.current || !idea || messages.length > 0 || !providerConfig?.apiKey) return
     hasStarted.current = true
 
     const run = async () => {

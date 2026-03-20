@@ -15,7 +15,7 @@ export function HomePage() {
 
   const handleStart = () => {
     if (!idea.trim()) return
-    if (!provider) {
+    if (!provider?.apiKey) {
       setSettingsOpen(true)
       return
     }
@@ -55,7 +55,7 @@ export function HomePage() {
         {/* Status bar */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-3">
           <div className="flex items-center gap-3 text-sm flex-wrap">
-            {provider ? (
+            {provider?.apiKey ? (
               <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                 <span className="w-2 h-2 bg-emerald-500 rounded-full inline-block animate-pulse" />
                 {provider.name} ({provider.model})

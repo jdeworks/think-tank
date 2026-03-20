@@ -29,6 +29,13 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: 'think-tank-settings',
+      partialize: (state) => ({
+        // Persist everything EXCEPT the API key
+        provider: state.provider ? { ...state.provider, apiKey: '' } : null,
+        personality: state.personality,
+        voiceInputEnabled: state.voiceInputEnabled,
+        voiceOutputEnabled: state.voiceOutputEnabled,
+      }),
     },
   ),
 )

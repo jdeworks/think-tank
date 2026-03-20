@@ -32,7 +32,7 @@ export function ChatPanel() {
   useStartConversation()
 
   const handleSend = async (content: string) => {
-    if (!providerConfig) return
+    if (!providerConfig?.apiKey) return
     addUserMessage(content)
     setLoading(true)
     setError(null)
