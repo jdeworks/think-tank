@@ -218,27 +218,24 @@ function ProviderFields({
         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
           Model
         </label>
+        <input
+          type="text"
+          list={selectedPreset?.models.length ? 'model-suggestions' : undefined}
+          value={model}
+          onChange={(e) => onModelChange(e.target.value)}
+          placeholder="Type or select a model name"
+          className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
         {selectedPreset?.models.length ? (
-          <select
-            value={model}
-            onChange={(e) => onModelChange(e.target.value)}
-            className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
+          <datalist id="model-suggestions">
             {selectedPreset.models.map((m) => (
-              <option key={m} value={m}>
-                {m}
-              </option>
+              <option key={m} value={m} />
             ))}
-          </select>
-        ) : (
-          <input
-            type="text"
-            value={model}
-            onChange={(e) => onModelChange(e.target.value)}
-            placeholder="llama3, mistral, etc."
-            className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        )}
+          </datalist>
+        ) : null}
+        <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+          Pick a suggestion or type any model ID your provider supports.
+        </p>
       </div>
 
       <div className="flex items-center gap-3">
