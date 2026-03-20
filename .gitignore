@@ -1,5 +1,4 @@
-# Build output
-docs
+# Build output (docs/ is committed for GitHub Pages)
 dist
 dist-ssr
 
