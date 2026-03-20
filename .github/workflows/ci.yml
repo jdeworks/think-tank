@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [dev, main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Format check
+        run: npx prettier --check "src/**/*.{ts,tsx}" "cli/**/*.ts"
+
+      - name: Lint (includes complexity checks)
+        run: npx eslint .
+
+      - name: Type check
+        run: npx tsc -b
+
+      - name: Dead code detection (Knip)
+        run: npx knip
+
+      - name: Tests (includes code health checks)
+        run: npm test
+
+      - name: Build
+        run: npm run build
