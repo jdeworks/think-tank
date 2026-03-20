@@ -5,7 +5,6 @@ import { useUIStore } from '@/stores/ui-store'
 import { PERSONALITY_INFO } from '@/schema/settings'
 import { EXAMPLE_TEMPLATES } from '@/data/example-templates'
 import { ProjectList } from './ProjectList'
-import { ImportButton } from '@/components/export/ImportButton'
 import { Button } from '@/components/common/Button'
 
 export function HomePage() {
@@ -14,22 +13,21 @@ export function HomePage() {
   const { provider, personality } = useSettingsStore()
   const { setView, setSettingsOpen } = useUIStore()
 
-  const handleStart = (text?: string) => {
-    const projectIdea = text || idea.trim()
-    if (!projectIdea) return
+  const handleStart = () => {
+    if (!idea.trim()) return
     if (!provider) {
       setSettingsOpen(true)
       return
     }
-    startNewProject(projectIdea)
+    startNewProject(idea.trim())
     setView('chat')
   }
 
   const personalityInfo = PERSONALITY_INFO[personality]
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-start pt-8 sm:pt-16 px-4 lg:px-8 pb-8 bg-[var(--bg)]">
-      <div className="max-w-2xl w-full">
+    <div className="flex-1 overflow-y-auto">
+      <div className="max-w-2xl w-full mx-auto pt-8 sm:pt-16 px-4 lg:px-8 pb-8">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-slate-100 mb-4 tracking-tight">
@@ -65,7 +63,7 @@ export function HomePage() {
             ) : (
               <button
                 onClick={() => setSettingsOpen(true)}
-                className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 font-medium"
+                className="text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 font-medium cursor-pointer"
               >
                 Set up your AI provider to get started
               </button>
@@ -75,12 +73,9 @@ export function HomePage() {
               {personalityInfo.emoji} {personalityInfo.label}
             </span>
           </div>
-          <div className="flex gap-3">
-            <ImportButton />
-            <Button onClick={() => handleStart()} disabled={!idea.trim()} size="lg">
-              Start Planning
-            </Button>
-          </div>
+          <Button onClick={handleStart} disabled={!idea.trim()} size="lg">
+            Start Planning
+          </Button>
         </div>
 
         {/* How it works */}
@@ -102,17 +97,17 @@ export function HomePage() {
           ))}
         </div>
 
-        {/* Example templates */}
+        {/* Example templates — paste into input, don't start */}
         <div className="mb-10">
           <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">
-            Or start from an example
+            Or try an example
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {EXAMPLE_TEMPLATES.map((template) => (
               <button
                 key={template.id}
-                onClick={() => handleStart(template.idea)}
-                className="group text-left p-5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:shadow-lg hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200"
+                onClick={() => setIdea(template.idea)}
+                className="cursor-pointer group text-left p-5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:shadow-lg hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200"
               >
                 <div className="font-semibold text-slate-900 dark:text-slate-100 text-sm group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                   {template.title}

@@ -17,7 +17,7 @@ describe('estimateCost', () => {
 
   it('calculates costs for different models', () => {
     expect(estimateCost('gpt-4.1-nano', 10_000_000)).toBe('~$2.00')
-    expect(estimateCost('claude-sonnet-4-6', 1_000_000)).toBe('~$6.00')
+    expect(estimateCost('claude-sonnet-4-20250514', 1_000_000)).toBe('~$6.00')
   })
 })
 

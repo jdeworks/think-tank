@@ -1,12 +1,13 @@
 // Rough cost estimates per 1M tokens (input/output averaged)
 const COST_PER_MILLION: Record<string, number> = {
-  'gpt-4o': 5,
-  'gpt-4o-mini': 0.3,
   'gpt-4.1': 4,
   'gpt-4.1-mini': 0.8,
   'gpt-4.1-nano': 0.2,
-  'claude-sonnet-4-6': 6,
-  'claude-haiku-4-5-20251001': 2,
+  'gpt-4o': 5,
+  'gpt-4o-mini': 0.3,
+  'claude-sonnet-4-20250514': 6,
+  'claude-haiku-4-5-20250514': 2,
+  'claude-opus-4-20250514': 30,
 }
 
 export function estimateCost(model: string, totalTokens: number): string {

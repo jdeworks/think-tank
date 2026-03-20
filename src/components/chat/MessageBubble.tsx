@@ -11,9 +11,9 @@ interface MessageBubbleProps {
 export function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === 'user'
   const { isSupported: ttsSupported, isSpeaking, speak, stop } = useSpeechSynthesis()
-  const voiceEnabled = useSettingsStore((s) => s.voiceEnabled)
+  const voiceOutputEnabled = useSettingsStore((s) => s.voiceOutputEnabled)
 
-  const showSpeaker = !isUser && voiceEnabled && ttsSupported
+  const showSpeaker = !isUser && voiceOutputEnabled && ttsSupported
 
   const handleSpeak = () => {
     if (isSpeaking) {

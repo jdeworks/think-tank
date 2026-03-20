@@ -218,7 +218,7 @@ describe('AnthropicProvider', () => {
       }),
     })
 
-    const provider = new AnthropicProvider('sk-ant-test', 'claude-sonnet-4-6')
+    const provider = new AnthropicProvider('sk-ant-test', 'claude-sonnet-4-20250514')
     await provider.chat({
       messages: [
         { role: 'system', content: 'You are helpful' },
@@ -241,7 +241,7 @@ describe('AnthropicProvider', () => {
       }),
     })
 
-    const provider = new AnthropicProvider('sk-ant-key', 'claude-sonnet-4-6')
+    const provider = new AnthropicProvider('sk-ant-key', 'claude-sonnet-4-20250514')
     await provider.chat({
       messages: [{ role: 'user', content: 'Hi' }],
       model: '',
@@ -269,7 +269,7 @@ describe('AnthropicProvider', () => {
       }),
     })
 
-    const provider = new AnthropicProvider('key', 'claude-sonnet-4-6')
+    const provider = new AnthropicProvider('key', 'claude-sonnet-4-20250514')
     const result = await provider.chat({
       messages: [{ role: 'user', content: 'Hi' }],
       model: '',
@@ -293,7 +293,7 @@ describe('AnthropicProvider', () => {
       }),
     })
 
-    const provider = new AnthropicProvider('key', 'claude-sonnet-4-6')
+    const provider = new AnthropicProvider('key', 'claude-sonnet-4-20250514')
     const result = await provider.chat({
       messages: [{ role: 'user', content: 'Hi' }],
       model: '',
@@ -309,7 +309,7 @@ describe('AnthropicProvider', () => {
       text: async () => 'Rate limited',
     })
 
-    const provider = new AnthropicProvider('key', 'claude-sonnet-4-6')
+    const provider = new AnthropicProvider('key', 'claude-sonnet-4-20250514')
     await expect(
       provider.chat({ messages: [{ role: 'user', content: 'Hi' }], model: '' }),
     ).rejects.toThrow('Anthropic API error (429)')
@@ -334,7 +334,7 @@ describe('createProvider', () => {
       type: 'anthropic',
       name: 'Anthropic',
       apiKey: 'key',
-      model: 'claude-sonnet-4-6',
+      model: 'claude-sonnet-4-20250514',
     })
     expect(provider.id).toBe('anthropic')
   })

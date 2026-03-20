@@ -16,8 +16,16 @@ interface SettingsModalProps {
 }
 
 export function SettingsModal({ open, onClose }: SettingsModalProps) {
-  const { provider, personality, voiceEnabled, setProvider, setPersonality, setVoiceEnabled } =
-    useSettingsStore()
+  const {
+    provider,
+    personality,
+    voiceInputEnabled,
+    voiceOutputEnabled,
+    setProvider,
+    setPersonality,
+    setVoiceInputEnabled,
+    setVoiceOutputEnabled,
+  } = useSettingsStore()
   const [providerType, setProviderType] = useState(provider?.type || 'openai')
   const [apiKey, setApiKey] = useState(provider?.apiKey || '')
   const [model, setModel] = useState(provider?.model || '')
@@ -101,7 +109,18 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
 
         <hr className="border-slate-200 dark:border-slate-700" />
 
-        <VoiceToggle enabled={voiceEnabled} onToggle={setVoiceEnabled} />
+        <VoiceToggle
+          label="Voice Input (Mic)"
+          description="Speak your answers instead of typing"
+          enabled={voiceInputEnabled}
+          onToggle={setVoiceInputEnabled}
+        />
+        <VoiceToggle
+          label="Voice Output (Listen)"
+          description="Hear AI responses read aloud"
+          enabled={voiceOutputEnabled}
+          onToggle={setVoiceOutputEnabled}
+        />
 
         <div className="flex justify-end gap-2 pt-2">
           <Button variant="secondary" onClick={onClose}>
@@ -244,17 +263,25 @@ interface PersonalitySelectorProps {
   onSelect: (personality: Personality) => void
 }
 
-function VoiceToggle({ enabled, onToggle }: { enabled: boolean; onToggle: (v: boolean) => void }) {
+function VoiceToggle({
+  label,
+  description,
+  enabled,
+  onToggle,
+}: {
+  label: string
+  description: string
+  enabled: boolean
+  onToggle: (v: boolean) => void
+}) {
   return (
     <div>
       <div className="flex items-center justify-between">
         <div>
           <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-            Voice Mode
+            {label}
           </label>
-          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
-            Speak your answers and listen to AI responses
-          </p>
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{description}</p>
         </div>
         <button
           onClick={() => onToggle(!enabled)}
@@ -267,12 +294,6 @@ function VoiceToggle({ enabled, onToggle }: { enabled: boolean; onToggle: (v: bo
           />
         </button>
       </div>
-      {enabled && (
-        <p className="text-xs text-slate-500 mt-2">
-          Uses your browser&apos;s built-in speech recognition (Chrome/Edge) and text-to-speech.
-          Free, no API key needed.
-        </p>
-      )}
     </div>
   )
 }

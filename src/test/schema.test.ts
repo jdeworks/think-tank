@@ -141,7 +141,7 @@ describe('ProviderConfigSchema', () => {
       type: 'anthropic',
       name: 'Claude',
       apiKey: 'sk-ant-test',
-      model: 'claude-sonnet-4-6',
+      model: 'claude-sonnet-4-20250514',
     }
     const result = ProviderConfigSchema.safeParse(config)
     expect(result.success).toBe(true)

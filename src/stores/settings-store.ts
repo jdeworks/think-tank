@@ -5,10 +5,12 @@ import type { ProviderConfig, Personality } from '@/schema/settings'
 interface SettingsState {
   provider: ProviderConfig | null
   personality: Personality
-  voiceEnabled: boolean
+  voiceInputEnabled: boolean
+  voiceOutputEnabled: boolean
   setProvider: (provider: ProviderConfig) => void
   setPersonality: (personality: Personality) => void
-  setVoiceEnabled: (enabled: boolean) => void
+  setVoiceInputEnabled: (enabled: boolean) => void
+  setVoiceOutputEnabled: (enabled: boolean) => void
   clearProvider: () => void
 }
 
@@ -17,10 +19,12 @@ export const useSettingsStore = create<SettingsState>()(
     (set) => ({
       provider: null,
       personality: 'friendly',
-      voiceEnabled: false,
+      voiceInputEnabled: false,
+      voiceOutputEnabled: false,
       setProvider: (provider) => set({ provider }),
       setPersonality: (personality) => set({ personality }),
-      setVoiceEnabled: (voiceEnabled) => set({ voiceEnabled }),
+      setVoiceInputEnabled: (voiceInputEnabled) => set({ voiceInputEnabled }),
+      setVoiceOutputEnabled: (voiceOutputEnabled) => set({ voiceOutputEnabled }),
       clearProvider: () => set({ provider: null }),
     }),
     {

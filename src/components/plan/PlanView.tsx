@@ -3,13 +3,12 @@ import { PLAN_SECTIONS, SECTION_LABELS } from '@/schema/project-plan'
 import { getSectionCompleteness } from '@/engine/section-map'
 import { Badge } from '@/components/common/Badge'
 import { Button } from '@/components/common/Button'
-import { ImportButton } from '@/components/export/ImportButton'
 import { useUIStore } from '@/stores/ui-store'
 import { ArchitectureDiagram } from './ArchitectureDiagram'
 import { MermaidDiagram } from './MermaidDiagram'
 import { DiagramSection } from './DiagramSection'
 import { componentsToMermaid, dataModelToMermaid, timelineToMermaid } from '@/utils/mermaid-helpers'
-import { exportAsJSON, exportAsMarkdown, createShareUrl } from '@/utils/export'
+import { exportAsJSON, exportAsMarkdown, exportAsZip, createShareUrl } from '@/utils/export'
 import { useState } from 'react'
 
 export function PlanView() {
@@ -18,8 +17,10 @@ export function PlanView() {
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [diagramView, setDiagramView] = useState<'flow' | 'interactive'>('interactive')
 
-  const handleExportJSON = () => exportAsJSON(plan, name || 'project-plan')
-  const handleExportMD = () => exportAsMarkdown(plan, name || 'project-plan')
+  const projectName = name || 'project-plan'
+  const handleExportJSON = () => exportAsJSON(plan, projectName)
+  const handleExportMD = () => exportAsMarkdown(plan, projectName)
+  const handleExportZip = () => exportAsZip(plan, projectName)
   const handleShare = () => {
     const url = createShareUrl(plan)
     navigator.clipboard.writeText(url)
@@ -41,6 +42,7 @@ export function PlanView() {
           onShare={handleShare}
           onExportMD={handleExportMD}
           onExportJSON={handleExportJSON}
+          onExportZip={handleExportZip}
         />
 
         {hasComponents && (
@@ -105,6 +107,7 @@ function PlanHeader({
   onShare,
   onExportMD,
   onExportJSON,
+  onExportZip,
 }: {
   name: string
   shareUrl: string | null
@@ -112,26 +115,29 @@ function PlanHeader({
   onShare: () => void
   onExportMD: () => void
   onExportJSON: () => void
+  onExportZip: () => void
 }) {
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
       <div className="flex items-center gap-3">
-        <button onClick={onBack} className="text-slate-400 hover:text-slate-600">
+        <button onClick={onBack} className="text-slate-400 hover:text-slate-600 cursor-pointer">
           &larr; Back to Chat
         </button>
         <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">{name}</h1>
       </div>
       <div className="flex flex-wrap gap-2">
         <Button variant="ghost" size="sm" onClick={onShare}>
-          {shareUrl ? 'Copied!' : 'Share Link'}
+          {shareUrl ? 'Copied!' : 'Share'}
         </Button>
-        <Button variant="secondary" size="sm" onClick={onExportMD}>
-          Export MD
+        <Button variant="secondary" size="sm" onClick={onExportZip}>
+          Download ZIP
         </Button>
-        <Button variant="secondary" size="sm" onClick={onExportJSON}>
-          Export JSON
+        <Button variant="ghost" size="sm" onClick={onExportMD}>
+          .md
         </Button>
-        <ImportButton />
+        <Button variant="ghost" size="sm" onClick={onExportJSON}>
+          .json
+        </Button>
       </div>
     </div>
   )

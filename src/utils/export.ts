@@ -5,6 +5,9 @@ import {
   type PlanSectionKey,
 } from '@/schema/project-plan'
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
+import JSZip from 'jszip'
+import { componentsToMermaid, dataModelToMermaid, timelineToMermaid } from './mermaid-helpers'
+import { fetchMermaidSvg } from './mermaid-render'
 
 export function exportAsJSON(plan: ProjectPlan, filename: string) {
   const json = JSON.stringify(plan, null, 2)
@@ -16,6 +19,30 @@ export function exportAsMarkdown(plan: ProjectPlan, filename: string) {
   const md = planToMarkdown(plan)
   const blob = new Blob([md], { type: 'text/markdown' })
   downloadBlob(blob, `${filename}.md`)
+}
+
+export async function exportAsZip(plan: ProjectPlan, filename: string) {
+  const zip = new JSZip()
+
+  zip.file('plan.json', JSON.stringify(plan, null, 2))
+  zip.file('plan.md', planToMarkdown(plan))
+
+  // Generate and add SVG diagrams
+  if (plan.architecture.components?.length) {
+    const svg = await fetchMermaidSvg(componentsToMermaid(plan.architecture.components))
+    if (svg) zip.file('architecture.svg', svg)
+  }
+  if (plan.architecture.dataModel?.length) {
+    const svg = await fetchMermaidSvg(dataModelToMermaid(plan.architecture.dataModel))
+    if (svg) zip.file('data-model.svg', svg)
+  }
+  if (plan.timeline.phases?.length) {
+    const svg = await fetchMermaidSvg(timelineToMermaid(plan.timeline.phases))
+    if (svg) zip.file('timeline.svg', svg)
+  }
+
+  const blob = await zip.generateAsync({ type: 'blob' })
+  downloadBlob(blob, `${filename}.zip`)
 }
 
 function downloadBlob(blob: Blob, filename: string) {

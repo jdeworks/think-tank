@@ -54,7 +54,7 @@ export function ChatInput({
 }: ChatInputProps) {
   const [value, setValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const voiceEnabled = useSettingsStore((s) => s.voiceEnabled)
+  const voiceInputEnabled = useSettingsStore((s) => s.voiceInputEnabled)
   const prevListeningRef = useRef(false)
 
   const {
@@ -102,7 +102,7 @@ export function ChatInput({
     }
   }
 
-  const showMic = voiceEnabled && voiceSupported
+  const showMic = voiceInputEnabled && voiceSupported
 
   return (
     <div className="border-t border-[var(--border)] p-4 bg-white dark:bg-slate-800">
