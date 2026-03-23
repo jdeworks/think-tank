@@ -2356,50 +2356,6 @@ until foundation is complete.
 - [ ] Test: "Could someone implement this with zero follow-up questions?"
 </file>
 
-<file path="src/components/chat/ChatInput.tsx">
-import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
-import { useSpeechRecognition } from '@/hooks/useSpeechRecognition'
-import { useSettingsStore } from '@/stores/settings-store'
-⋮----
-interface ChatInputProps {
-  onSend: (message: string) => void
-  disabled?: boolean
-  placeholder?: string
-}
-⋮----
-const MAX_FILE_SIZE = 500_000 // 500KB
-⋮----
-function MicButton({
-  isListening,
-  disabled,
-  onClick,
-}: {
-  isListening: boolean
-  disabled: boolean
-  onClick: () => void
-})
-⋮----
-function AttachButton({
-  disabled,
-  onFileContent,
-}: {
-  disabled: boolean
-  onFileContent: (name: string, content: string) => void
-})
-⋮----
-onClick=
-⋮----
-// When recording stops, copy transcript into the editable value
-⋮----
-// eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally excludes setValue
-⋮----
-const handleSubmit = () =>
-⋮----
-const handleKeyDown = (e: React.KeyboardEvent) =>
-⋮----
-disabled=
-</file>
-
 <file path="src/engine/prompts.ts">
 import type { Personality } from '@/schema/settings'
 import {
@@ -2731,6 +2687,50 @@ function applyPlanUpdate(plan: ProjectPlan, section: string, data: Record<string
 function savePlan(plan: ProjectPlan, outputDir: string)
 ⋮----
 // ── Run ───────────────────────────────────────────────────────────────
+</file>
+
+<file path="src/components/chat/ChatInput.tsx">
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition'
+import { useSettingsStore } from '@/stores/settings-store'
+⋮----
+interface ChatInputProps {
+  onSend: (message: string) => void
+  disabled?: boolean
+  placeholder?: string
+}
+⋮----
+const MAX_FILE_SIZE = 500_000 // 500KB
+⋮----
+function MicButton({
+  isListening,
+  disabled,
+  onClick,
+}: {
+  isListening: boolean
+  disabled: boolean
+  onClick: () => void
+})
+⋮----
+function AttachButton({
+  disabled,
+  onFileContent,
+}: {
+  disabled: boolean
+  onFileContent: (name: string, content: string) => void
+})
+⋮----
+onClick=
+⋮----
+// When recording stops, copy transcript into the editable value
+⋮----
+// eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally excludes setValue
+⋮----
+const handleSubmit = () =>
+⋮----
+const handleKeyDown = (e: React.KeyboardEvent) =>
+⋮----
+disabled=
 </file>
 
 <file path="src/components/project/HomePage.tsx">
