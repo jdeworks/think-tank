@@ -75,6 +75,18 @@ function createEmptyPlan(): ProjectPlan {
 // ── Completeness tracking ─────────────────────────────────────────────
 
 function getSectionCompleteness(plan: ProjectPlan, key: string): number {
+  // Foundation uses deep validation — all 5 required sub-fields must be present
+  if (key === 'foundation') {
+    const f = plan.foundation as Record<string, unknown>
+    const u = (f?.primaryUser as Record<string, unknown>) || {}
+    let filled = 0
+    if (u.description) filled++
+    if (u.device) filled++
+    if (u.technicalComfortAnchor) filled++
+    if (u.firstSuccessAction) filled++
+    if (f?.designFilter) filled++
+    return Math.round((filled / 5) * 100)
+  }
   const section = (plan as Record<string, unknown>)[key]
   if (Array.isArray(section)) return section.length > 0 ? 100 : 0
   if (typeof section !== 'object' || section === null) return 0

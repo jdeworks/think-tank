@@ -1196,207 +1196,6 @@ You are a budget-conscious planner who focuses on costs, ROI, and resource effic
 - Funding strategies — bootstrapping, sponsors, grants, pre-sales
 </file>
 
-<file path="prompts/sections/00-foundation.md">
-# Section 00 — Foundation: Who Is This For?
-
-## Why this section exists
-
-Every downstream decision — architecture, tech stack, hosting, UI design, pricing —
-is constrained by who will actually use what you are building.
-
-This section must be completed before any technical discussion begins.
-The AI should not ask about databases, frameworks, or deployment until it has
-a concrete answer to: who is the first person who will use this, and what does
-success look like for them?
-
-This applies to any kind of project — software, a physical store, a service,
-a community, an event, a product line. If it has a user or customer, this section applies.
-
----
-
-## What the AI must establish
-
-### 1. The primary user — make them real
-
-**Do NOT accept vague demographics. Challenge immediately:**
-
-| Vague answer | Challenge |
-|---|---|
-| "developers" | "What kind of developer? Junior or senior? What language? What context?" |
-| "small businesses" | "What kind? Who in the business actually uses it — owner, employee, manager?" |
-| "non-technical users" | "What does non-technical mean here — can they use Gmail? Notion? A smartphone?" |
-| "general users" | "Who is the first specific person who will try this? Paint me a picture." |
-| "anyone who wants to..." | "Who wants to? Where are they? What's their situation?" |
-| "customers" | "What kind of customer? Walk-in, online, referred? What's their day like?" |
-| "fitness enthusiasts" / "foodies" / "gamers" | "That's an interest, not a person. Who specifically? What's their situation?" |
-
-**DO accept descriptions that pass this test: could you put this person in a room and recognise them?**
-
-Examples of acceptable answers:
-- "A 28-year-old freelance graphic designer in Manila who tracks client projects in a WhatsApp group and wants to send professional invoices."
-- "A store manager at a 3-person hardware shop in Lagos who uses a Samsung Galaxy phone, WhatsApp, and Facebook — never used a web app."
-- "A junior backend developer, 1-2 years experience, comfortable with the terminal but never set up CI/CD. Probably on macOS."
-- "A retired couple in their 60s looking for a neighbourhood bakery with gluten-free options. They drive, use Google Maps, and read Facebook reviews."
-
-### 2. Their device and context
-
-Ask:
-- "How does this person interact with your product? Phone, laptop, walking into a store, attending an event — or a mix?"
-- "What's their context — at a desk, on the go, in a store, at home, at an event?"
-- "If digital: what's their connection — fast WiFi, mobile data, slow or unreliable?"
-- "If in-person: how do they discover you and get there?"
-
-The `device` field captures their primary interaction channel:
-- `phone`, `tablet`, `laptop`, `desktop` — for digital products
-- `in-person` — for physical businesses, stores, events
-- `mixed` — when they discover online but interact in person (or vice versa)
-
-**Why it matters:** A "simple" web app that requires a laptop and fast WiFi is not simple for someone who is phone-only on mobile data. A physical store needs foot traffic and discovery context, not bandwidth.
-
-### 3. Their technical comfort — anchor to a tool, not a label
-
-**Do NOT ask:** "Are they technical or non-technical?"
-
-**DO ask:** "What existing tool, app, or process do they use every day that gives me a sense of their comfort level?"
-
-This establishes a baseline without abstract labels:
-- "They use WhatsApp and Facebook" → very different from
-- "They're comfortable with GitHub and the terminal" → very different from
-- "They use Notion and manage a team of 20" → very different from
-- "They use a paper ledger and a calculator"
-
-The anchor tells you everything about the acceptable complexity ceiling.
-
-### 4. Their current solution and frustration
-
-Ask:
-- "What do they use right now to solve this problem — even if it's a workaround?"
-- "What is the specific thing that makes the current solution painful or insufficient?"
-
-**Why it matters:** The current solution defines the real competition and the minimum bar the product must clear. "They use a spreadsheet" sets a very different bar than "nothing — this problem goes unsolved."
-
-### 5. First success — a concrete action, not a feeling
-
-Ask: "Describe what this person does in their first interaction with your product. What is the one thing they need to accomplish for it to feel worth it?"
-
-**Do NOT accept:**
-- "They feel like it's intuitive"
-- "They understand the product"
-- "They get the value"
-
-**DO accept:**
-- "They create their first invoice and share it with a client within 5 minutes, without asking for help."
-- "They walk in, find the gluten-free section, and leave with a purchase in under 10 minutes."
-- "They deploy their app to a live URL using only the README."
-
-The test: **can an outside observer watch this happen and confirm it occurred?**
-
----
-
-## The design filter sentence
-
-After collecting all of the above, synthesise one sentence:
-
-```
-"If [name or role], [key context], cannot [first success action] without help, [consequence]."
-```
-
-**Examples:**
-- "If Maria, a non-technical mobile-only business owner in Davao City, cannot publish her site within 10 minutes without asking anyone for help, the UX is not acceptable."
-- "If a first-time walk-in customer cannot find what they need and check out within 10 minutes, the store layout has failed."
-- "If Sara, a junior developer unfamiliar with CI/CD, cannot deploy to staging using the README alone, the setup is too complex."
-
-This sentence is written into the plan. It is used to evaluate every subsequent decision.
-
----
-
-## Questions to ask (in order — wait for each answer before continuing)
-
-**Question 1:**
-> "Before we get into the details, let's nail down who this is for. Tell me about the first specific person who will use this — not a demographic, but a real person you can picture. Who are they? What's their situation?"
-
-*If the answer is abstract, push back:*
-> "Can you be more specific? [repeat their category] covers a huge range. What kind of [their category], doing what, where, with what context?"
-
-**Question 2:**
-> "What's their context when they interact with this? Are they at a desk, on their phone, walking into a store, browsing at home? And if it's digital — what kind of connection and device?"
-
-**Question 3:**
-> "What's a tool, app, or process they use every day that gives me a sense of their comfort level? Something similar in complexity to what you're building."
-
-*If they say "non-technical", push back:*
-> "What does that mean in practice? Can they use Gmail? A spreadsheet? Notion? WhatsApp? I'm looking for an anchor."
-
-**Question 4:**
-> "What do they currently use to solve this problem — even if it's messy or incomplete? A spreadsheet, a WhatsApp group, a competitor, nothing at all?"
-
-**Question 5:**
-> "Walk me through what this person does in their first interaction with your product. What do they need to accomplish for it to feel worth it?"
-
-*If they give a feeling ("feel confident"), push back:*
-> "What would that look like as a specific action? What would I observe happening?"
-
----
-
-## Required output before moving on
-
-The foundation section must contain all of the following before any section about architecture, tech stack, design, or hosting is started:
-
-```json
-{
-  "foundation": {
-    "primaryUser": {
-      "description": "[specific person — at least a sentence, not a category]",
-      "device": "[phone | tablet | laptop | desktop | in-person | mixed]",
-      "context": "[where and how they interact]",
-      "technicalComfortAnchor": "[a specific tool or process they use, not an abstract label]",
-      "currentSolution": "[what they use now — can be 'nothing']",
-      "firstSuccessAction": "[specific observable action, not a feeling]",
-      "firstSuccessTimeframe": "[e.g. 'within 10 minutes of first use']"
-    },
-    "designFilter": "If [person], [context], cannot [action] without help, [consequence]."
-  }
-}
-```
-
----
-
-## Red flags — do not move on if any are true
-
-- Primary user is described as a category without a scenario ("developers", "SMBs")
-- Device/context is "any" or unspecified
-- Technical comfort uses abstract labels without an anchor
-- First success is a feeling, not an observable action
-- Design filter sentence has not been written
-
----
-
-## How this section constrains downstream sections
-
-This is not just a data collection exercise. The foundation actively constrains later decisions:
-
-**Overview (01):** Goals must be achievable by the primary user in their context.
-Non-goals should exclude things requiring more than the primary user has.
-
-**Competitors (02):** Frame competitors through the primary user's eyes — what do they use today?
-
-**Requirements (03):** Every requirement should map to something the primary user needs.
-
-**Architecture (04):** Every component must be reachable by the primary user.
-
-**Tech Stack (05):** Complexity ceiling = what the primary user's anchor requires of them.
-
-**Hosting (06):** Performance and access must match the primary user's context.
-
-**Security (07):** Protect the data and access patterns of the primary user.
-
-**Design (08):** Experience complexity must not exceed what the primary user can navigate.
-
-**Budget (09):** Value is defined by whether first success is achievable at the price point.
-
-The design filter sentence should be quoted verbatim whenever a major decision is being evaluated.
-</file>
-
 <file path="prompts/sections/01-overview.md">
 # Section: Project Overview
 
@@ -1462,7 +1261,8 @@ The design filter sentence should be quoted verbatim whenever a major decision i
 <file path="prompts/sections/04-architecture.md">
 # Section: Architecture
 
-> **Adapt to the project type.** For software: system architecture, components, data model.
+> **Adapt to the project type.** For web/mobile apps: system architecture, components, data model.
+> For developer tools/CLIs/APIs: command structure, plugin model, distribution, integration points.
 > For physical businesses/services/events: operational structure, process flow, key systems.
 
 ## What to Capture
@@ -1474,12 +1274,19 @@ The design filter sentence should be quoted verbatim whenever a major decision i
 
 ## Questions to Ask
 
-### For digital products:
-1. What type of system is this? (Web app? Mobile? API? CLI?)
+### For web/mobile apps:
+1. What type of system is this? (Web app? Mobile? PWA? Hybrid?)
 2. Does it need real-time features? (Chat, live updates, collaboration)
 3. What data does it store? What are the main entities?
 4. How do those things relate to each other?
 5. Does it need to integrate with external services?
+
+### For developer tools, CLIs, and APIs:
+1. What's the command/endpoint structure? (Subcommands? REST resources? GraphQL schema?)
+2. How is it distributed? (npm global? Homebrew? Docker? Binary download? API hosted where?)
+3. Does it need local state or config between runs? (Config files? Cache? Database?)
+4. Does it support plugins or extensions?
+5. What existing tools or APIs does it integrate with?
 
 ### For physical businesses/services/events:
 1. What's the structure? (Single location? Multiple? Mobile? Online+offline?)
@@ -1630,59 +1437,6 @@ The design filter sentence should be quoted verbatim whenever a major decision i
 - Ignoring data privacy regulations until it's too late
 - For digital: storing secrets in frontend code or git repos
 - For physical: no inventory controls or cash handling procedures
-</file>
-
-<file path="prompts/sections/08-design.md">
-# Section: Design & Experience
-
-> **Adapt to the project type.** For software UIs: UI/UX design, responsive strategy.
-> For developer tools/APIs: developer experience (DX), docs, error messages.
-> For physical businesses: customer experience, layout, branding.
-
-## What to Capture
-- Design approach or system
-- Key user/customer journeys (the 3-5 most important paths)
-- How the experience adapts to different contexts (devices, locations, situations)
-- Accessibility considerations
-- Brand guidelines (if any)
-
-## Questions to Ask
-
-### For all projects:
-1. What are the 3 most important things a user/customer does? Walk me through each.
-2. Do you have existing brand colors, style, or guidelines?
-3. How important is accessibility? (Legal requirement? Ethical choice? Nice-to-have?)
-4. Are there businesses or products whose look and feel you admire?
-
-### For software with a UI (add):
-5. Will this be used more on mobile or desktop?
-6. What design system or component library will you use?
-
-### For developer tools, CLIs, and APIs (add):
-5. What does the `--help` output or API reference look like? Walk me through the first command or request.
-6. How are errors communicated? (Exit codes? HTTP status codes? Structured error objects?)
-7. What does the onboarding path look like? (README? Interactive setup wizard? API quickstart?)
-
-### For physical businesses (add):
-5. What should the space/environment feel like? Walk me through a customer visit.
-
-## Quality Tips
-- Design the journey BEFORE the details. Know where people go before deciding what it looks like.
-- For UIs: mobile-first is almost always right for consumer products.
-- For developer tools: the README and error messages ARE the design. Invest in them.
-- For APIs: time-to-first-successful-call is the key metric — optimize for it.
-- For physical: the first 10 seconds of a customer's visit set expectations — what do they see?
-- Accessibility is not optional — it's both ethical and often legally required.
-- Not testing with real users early is the most common and costly mistake.
-
-## Common Mistakes
-- Too many paths at launch — pick 3 and nail them
-- Ignoring accessibility until "later" (it's 10x harder to add)
-- Designing for the builder's preferences instead of the primary user's context
-- For developer tools: no interactive examples, unclear error messages, no `--help`
-- For APIs: requiring account creation before the first API call
-- Not considering the design filter: does this work for [primary user] in [their context]?
-- Skipping user/customer testing before committing to a design
 </file>
 
 <file path="prompts/sections/10-timeline.md">
@@ -2007,50 +1761,6 @@ async function loadCurrentSectionGuide(plan: ProjectPlan): Promise<string>
 // All sections complete — load implementation review
 </file>
 
-<file path="src/engine/prompts.ts">
-import type { Personality } from '@/schema/settings'
-import {
-  SECTION_LABELS,
-  PLAN_SECTIONS,
-  type ProjectPlan,
-  type PlanSectionKey,
-} from '@/schema/project-plan'
-⋮----
-export function getUpdatePlanTool()
-⋮----
-export function buildSystemPrompt(
-  personality: Personality,
-  plan: ProjectPlan,
-  incompleteSections: PlanSectionKey[],
-  sectionGuide?: string,
-): string
-⋮----
-function addField(parts: string[], label: string, value: string | undefined | null): void
-⋮----
-function buildPlanSummary(plan: ProjectPlan): string
-⋮----
-export function buildInitialPrompt(idea: string, personality: Personality): string
-</file>
-
-<file path="src/engine/section-map.ts">
-import {
-  type ProjectPlan,
-  type PlanSectionKey,
-  PLAN_SECTIONS,
-  isFoundationComplete,
-} from '@/schema/project-plan'
-⋮----
-export function getSectionCompleteness(plan: ProjectPlan, key: PlanSectionKey): number
-⋮----
-// Foundation uses deep validation — all required sub-fields must be present
-⋮----
-export function getOverallCompleteness(plan: ProjectPlan): number
-⋮----
-export function getIncompleteSections(plan: ProjectPlan): PlanSectionKey[]
-⋮----
-export function getNextSection(plan: ProjectPlan): PlanSectionKey | null
-</file>
-
 <file path="src/hooks/useStartConversation.ts">
 import { useEffect, useRef } from 'react'
 import { useProjectStore } from '@/stores/project-store'
@@ -2322,6 +2032,8 @@ function createEmptyPlan(): ProjectPlan
 ⋮----
 function getSectionCompleteness(plan: ProjectPlan, key: string): number
 ⋮----
+// Foundation uses deep validation — all 5 required sub-fields must be present
+⋮----
 function getOverallCompleteness(plan: ProjectPlan): number
 ⋮----
 // ── Personality prompts ───────────────────────────────────────────────
@@ -2463,6 +2175,260 @@ function applyPlanUpdate(plan: ProjectPlan, section: string, data: Record<string
 function savePlan(plan: ProjectPlan, outputDir: string)
 ⋮----
 // ── Run ───────────────────────────────────────────────────────────────
+</file>
+
+<file path="prompts/sections/00-foundation.md">
+# Section 00 — Foundation: Who Is This For?
+
+## Why this section exists
+
+Every downstream decision — architecture, tech stack, hosting, UI design, pricing —
+is constrained by who will actually use what you are building.
+
+This section must be completed before any technical discussion begins.
+The AI should not ask about databases, frameworks, or deployment until it has
+a concrete answer to: who is the first person who will use this, and what does
+success look like for them?
+
+This applies to any kind of project — software, a physical store, a service,
+a community, an event, a product line. If it has a user or customer, this section applies.
+
+---
+
+## What the AI must establish
+
+### 1. The primary user — make them real
+
+**Do NOT accept vague demographics. Challenge immediately:**
+
+| Vague answer | Challenge |
+|---|---|
+| "developers" | "What kind of developer? Junior or senior? What language? What context?" |
+| "small businesses" | "What kind? Who in the business actually uses it — owner, employee, manager?" |
+| "non-technical users" | "What does non-technical mean here — can they use Gmail? Notion? A smartphone?" |
+| "general users" | "Who is the first specific person who will try this? Paint me a picture." |
+| "anyone who wants to..." | "Who wants to? Where are they? What's their situation?" |
+| "customers" | "What kind of customer? Walk-in, online, referred? What's their day like?" |
+| "fitness enthusiasts" / "foodies" / "gamers" | "That's an interest, not a person. Who specifically? What's their situation?" |
+
+**DO accept descriptions that pass this test: could you put this person in a room and recognise them?**
+
+Examples of acceptable answers:
+- "A 28-year-old freelance graphic designer in Manila who tracks client projects in a WhatsApp group and wants to send professional invoices."
+- "A store manager at a 3-person hardware shop in Lagos who uses a Samsung Galaxy phone, WhatsApp, and Facebook — never used a web app."
+- "A junior backend developer, 1-2 years experience, comfortable with the terminal but never set up CI/CD. Probably on macOS."
+- "A retired couple in their 60s looking for a neighbourhood bakery with gluten-free options. They drive, use Google Maps, and read Facebook reviews."
+
+### 2. Their device and context
+
+Ask:
+- "How does this person interact with your product? Phone, laptop, walking into a store, attending an event — or a mix?"
+- "What's their context — at a desk, on the go, in a store, at home, at an event?"
+- "If digital: what's their connection — fast WiFi, mobile data, slow or unreliable?"
+- "If in-person: how do they discover you and get there?"
+
+The `device` field captures their primary interaction channel:
+- `phone`, `tablet`, `laptop`, `desktop` — for digital products
+- `in-person` — for physical businesses, stores, events
+- `mixed` — when they discover online but interact in person (or vice versa)
+
+**Why it matters:** A "simple" web app that requires a laptop and fast WiFi is not simple for someone who is phone-only on mobile data. A physical store needs foot traffic and discovery context, not bandwidth.
+
+### 3. Their technical comfort — anchor to a tool, not a label
+
+**Do NOT ask:** "Are they technical or non-technical?"
+
+**DO ask:** "What existing tool, app, or process do they use every day that gives me a sense of their comfort level?"
+
+This establishes a baseline without abstract labels:
+- "They use WhatsApp and Facebook" → very different from
+- "They're comfortable with GitHub and the terminal" → very different from
+- "They use Notion and manage a team of 20" → very different from
+- "They use a paper ledger and a calculator"
+
+The anchor tells you everything about the acceptable complexity ceiling.
+
+### 4. Their current solution and frustration
+
+Ask:
+- "What do they use right now to solve this problem — even if it's a workaround?"
+- "What is the specific thing that makes the current solution painful or insufficient?"
+
+**Why it matters:** The current solution defines the real competition and the minimum bar the product must clear. "They use a spreadsheet" sets a very different bar than "nothing — this problem goes unsolved."
+
+### 5. First success — a concrete action, not a feeling
+
+Ask: "Describe what this person does in their first interaction with your product. What is the one thing they need to accomplish for it to feel worth it?"
+
+**Do NOT accept:**
+- "They feel like it's intuitive"
+- "They understand the product"
+- "They get the value"
+
+**DO accept:**
+- "They create their first invoice and share it with a client within 5 minutes, without asking for help."
+- "They walk in, find the gluten-free section, and leave with a purchase in under 10 minutes."
+- "They deploy their app to a live URL using only the README."
+
+The test: **can an outside observer watch this happen and confirm it occurred?**
+
+---
+
+## The design filter sentence
+
+After collecting all of the above, synthesise one sentence:
+
+```
+"If [name or role], [key context], cannot [first success action] without help, [consequence]."
+```
+
+**Examples:**
+- "If Maria, a non-technical mobile-only business owner in Davao City, cannot publish her site within 10 minutes without asking anyone for help, the UX is not acceptable."
+- "If a first-time walk-in customer cannot find what they need and check out within 10 minutes, the store layout has failed."
+- "If Sara, a junior developer unfamiliar with CI/CD, cannot deploy to staging using the README alone, the setup is too complex."
+
+This sentence is written into the plan. It is used to evaluate every subsequent decision.
+
+---
+
+## Questions to ask (in order — wait for each answer before continuing)
+
+**Question 1:**
+> "Before we get into the details, let's nail down who this is for. Tell me about the first specific person who will use this — not a demographic, but a real person you can picture. Who are they? What's their situation?"
+
+*If the answer is abstract, push back:*
+> "Can you be more specific? [repeat their category] covers a huge range. What kind of [their category], doing what, where, with what context?"
+
+**Question 2:**
+> "What's their context when they interact with this? Are they at a desk, on their phone, walking into a store, browsing at home? And if it's digital — what kind of connection and device?"
+
+**Question 3:**
+> "What's a tool, app, or process they use every day that gives me a sense of their comfort level? Something similar in complexity to what you're building."
+
+*If they say "non-technical", push back:*
+> "What does that mean in practice? Can they use Gmail? A spreadsheet? Notion? WhatsApp? I'm looking for an anchor."
+
+**Question 4:**
+> "What do they currently use to solve this problem — even if it's messy or incomplete? A spreadsheet, a WhatsApp group, a competitor, nothing at all?"
+
+**Question 5:**
+> "Walk me through what this person does in their first interaction with your product. What do they need to accomplish for it to feel worth it?"
+
+*If they give a feeling ("feel confident"), push back:*
+> "What would that look like as a specific action? What would I observe happening?"
+
+---
+
+## Required output before moving on
+
+The foundation section must contain all of the following before any section about architecture, tech stack, design, or hosting is started:
+
+```json
+{
+  "foundation": {
+    "primaryUser": {
+      "description": "[specific person — at least a sentence, not a category]",
+      "device": "[phone | tablet | laptop | desktop | in-person | mixed]",
+      "context": "[where and how they interact]",
+      "technicalComfortAnchor": "[a specific tool or process they use, not an abstract label]",
+      "currentSolution": "[what they use now — can be 'nothing']",
+      "firstSuccessAction": "[specific observable action, not a feeling]",
+      "firstSuccessTimeframe": "[e.g. 'within 10 minutes of first use']"
+    },
+    "designFilter": "If [person], [context], cannot [action] without help, [consequence]."
+  }
+}
+```
+
+---
+
+## Red flags — do not move on if any are true
+
+- Primary user is described as a category without a scenario ("developers", "SMBs")
+- Device/context is "any" or unspecified
+- Technical comfort uses abstract labels without an anchor
+- First success is a feeling, not an observable action
+- Design filter sentence has not been written
+
+---
+
+## How this section constrains downstream sections
+
+This is not just a data collection exercise. The foundation actively constrains later decisions:
+
+**Overview (01):** Goals must be achievable by the primary user in their context.
+Non-goals should exclude things requiring more than the primary user has.
+
+**Competitors (02):** Frame competitors through the primary user's eyes — what do they use today?
+
+**Requirements (03):** Every requirement should map to something the primary user needs.
+
+**Architecture (04):** Every component must be reachable by the primary user.
+
+**Tech Stack (05):** Complexity ceiling = what the primary user's anchor requires of them.
+
+**Hosting (06):** Performance and access must match the primary user's context.
+
+**Security (07):** Protect the data and access patterns of the primary user.
+
+**Design (08):** Experience complexity must not exceed what the primary user can navigate.
+
+**Budget (09):** Value is defined by whether first success is achievable at the price point.
+
+The design filter sentence should be quoted verbatim whenever a major decision is being evaluated.
+</file>
+
+<file path="prompts/sections/08-design.md">
+# Section: Design & Experience
+
+> **Adapt to the project type.** For software UIs: UI/UX design, responsive strategy.
+> For developer tools/APIs: developer experience (DX), docs, error messages.
+> For physical businesses: customer experience, layout, branding.
+
+## What to Capture
+- Design approach or system
+- Key user/customer journeys (the 3-5 most important paths)
+- How the experience adapts to different contexts (devices, locations, situations)
+- Accessibility considerations
+- Brand guidelines (if any)
+
+## Questions to Ask
+
+### For all projects:
+1. What are the 3 most important things a user/customer does? Walk me through each.
+2. Do you have existing brand colors, style, or guidelines?
+3. How important is accessibility? (Legal requirement? Ethical choice? Nice-to-have?)
+4. Are there businesses or products whose look and feel you admire?
+
+### For software with a UI (add):
+5. Will this be used more on mobile or desktop?
+6. What design system or component library will you use?
+
+### For developer tools, CLIs, and APIs (add):
+5. What does the `--help` output or API reference look like? Walk me through the first command or request.
+6. How are errors communicated? (Exit codes? HTTP status codes? Structured error objects?)
+7. What does the onboarding path look like? (README? Interactive setup wizard? API quickstart?)
+
+### For physical businesses (add):
+5. What should the space/environment feel like? Walk me through a customer visit.
+
+## Quality Tips
+- Design the journey BEFORE the details. Know where people go before deciding what it looks like.
+- For UIs: mobile-first is almost always right for consumer products.
+- For developer tools: the README and error messages ARE the design. Invest in them.
+- For APIs: time-to-first-successful-call is the key metric — optimize for it.
+- For physical: the first 10 seconds of a customer's visit set expectations — what do they see?
+- Accessibility is not optional — it's both ethical and often legally required.
+- Not testing with real users early is the most common and costly mistake.
+
+## Common Mistakes
+- Too many paths at launch — pick 3 and nail them
+- Ignoring accessibility until "later" (it's 10x harder to add)
+- Designing for the builder's preferences instead of the primary user's context
+- For developer tools: no interactive examples, unclear error messages, no `--help`
+- For APIs: requiring account creation before the first API call
+- Not considering the design filter: does this work for [primary user] in [their context]?
+- Skipping user/customer testing before committing to a design
 </file>
 
 <file path="prompts/sections/09-budget.md">
@@ -2637,6 +2603,50 @@ onClick=
 {/* Example templates — paste into input, don't start */}
 ⋮----
 {/* Saved projects */}
+</file>
+
+<file path="src/engine/prompts.ts">
+import type { Personality } from '@/schema/settings'
+import {
+  SECTION_LABELS,
+  PLAN_SECTIONS,
+  type ProjectPlan,
+  type PlanSectionKey,
+} from '@/schema/project-plan'
+⋮----
+export function getUpdatePlanTool()
+⋮----
+export function buildSystemPrompt(
+  personality: Personality,
+  plan: ProjectPlan,
+  incompleteSections: PlanSectionKey[],
+  sectionGuide?: string,
+): string
+⋮----
+function addField(parts: string[], label: string, value: string | undefined | null): void
+⋮----
+function buildPlanSummary(plan: ProjectPlan): string
+⋮----
+export function buildInitialPrompt(idea: string, personality: Personality): string
+</file>
+
+<file path="src/engine/section-map.ts">
+import {
+  type ProjectPlan,
+  type PlanSectionKey,
+  PLAN_SECTIONS,
+  isFoundationComplete,
+} from '@/schema/project-plan'
+⋮----
+export function getSectionCompleteness(plan: ProjectPlan, key: PlanSectionKey): number
+⋮----
+// Foundation uses deep validation — all required sub-fields must be present
+⋮----
+export function getOverallCompleteness(plan: ProjectPlan): number
+⋮----
+export function getIncompleteSections(plan: ProjectPlan): PlanSectionKey[]
+⋮----
+export function getNextSection(plan: ProjectPlan): PlanSectionKey | null
 </file>
 
 <file path="src/schema/project-plan.ts">

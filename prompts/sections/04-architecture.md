@@ -1,6 +1,7 @@
 # Section: Architecture
 
-> **Adapt to the project type.** For software: system architecture, components, data model.
+> **Adapt to the project type.** For web/mobile apps: system architecture, components, data model.
+> For developer tools/CLIs/APIs: command structure, plugin model, distribution, integration points.
 > For physical businesses/services/events: operational structure, process flow, key systems.
 
 ## What to Capture
@@ -12,12 +13,19 @@
 
 ## Questions to Ask
 
-### For digital products:
-1. What type of system is this? (Web app? Mobile? API? CLI?)
+### For web/mobile apps:
+1. What type of system is this? (Web app? Mobile? PWA? Hybrid?)
 2. Does it need real-time features? (Chat, live updates, collaboration)
 3. What data does it store? What are the main entities?
 4. How do those things relate to each other?
 5. Does it need to integrate with external services?
+
+### For developer tools, CLIs, and APIs:
+1. What's the command/endpoint structure? (Subcommands? REST resources? GraphQL schema?)
+2. How is it distributed? (npm global? Homebrew? Docker? Binary download? API hosted where?)
+3. Does it need local state or config between runs? (Config files? Cache? Database?)
+4. Does it support plugins or extensions?
+5. What existing tools or APIs does it integrate with?
 
 ### For physical businesses/services/events:
 1. What's the structure? (Single location? Multiple? Mobile? Online+offline?)
