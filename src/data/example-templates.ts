@@ -42,4 +42,16 @@ export const EXAMPLE_TEMPLATES: ExampleTemplate[] = [
     description: 'A discussion forum or community site',
     idea: 'I want to create a community platform for local gardeners to share tips, post photos of their gardens, ask questions, and organize local meetups. It should have user profiles, discussion threads, photo galleries, and event management.',
   },
+  {
+    id: 'local-business',
+    title: 'Local Business',
+    description: 'A physical store, restaurant, or service business',
+    idea: 'I want to open a specialty coffee shop in a neighbourhood with a lot of foot traffic. It should have a small menu focused on quality, a cozy atmosphere for remote workers, and a loyalty program. I need to figure out location, equipment, permits, and how to stand out from chain cafes.',
+  },
+  {
+    id: 'community-event',
+    title: 'Community Event',
+    description: 'A recurring meetup, workshop, or community gathering',
+    idea: 'I want to organize a monthly coding meetup for beginners in my city. It should be welcoming for people who have never been to a tech event, include hands-on pair programming, and help people build a local network. I need to figure out venues, format, promotion, and how to keep people coming back.',
+  },
 ]

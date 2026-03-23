@@ -46,7 +46,7 @@ export function HomePage() {
           <textarea
             value={idea}
             onChange={(e) => setIdea(e.target.value)}
-            placeholder='Describe your project idea... e.g. "I want to build a recipe sharing app where users can upload photos of their meals and get AI-generated recipes"'
+            placeholder='Describe your idea... e.g. "I want to build a website for local restaurants" or "I want to open a bakery" or "I want to create a CLI tool for developers"'
             rows={4}
             className="w-full border border-slate-300 dark:border-slate-600 rounded-xl px-4 py-3 text-base bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none min-h-[120px] transition-colors"
           />

@@ -144,28 +144,6 @@ README.md
 <files>
 This section contains the contents of the repository's files.
 
-<file path="src/utils/export-extras.ts">
-import { type ProjectPlan, isFoundationComplete } from '@/schema/project-plan'
-⋮----
-type Lines = string[]
-⋮----
-function section(lines: Lines, heading: string, body: () => void)
-⋮----
-function field(lines: Lines, label: string, value: string | undefined)
-⋮----
-function list(lines: Lines, items: string[] | undefined, prefix = '- ')
-⋮----
-/** One-page summary — the essentials for stakeholders or a pitch. */
-export function generateOnePageSummary(plan: ProjectPlan): string
-⋮----
-/** Implementation handoff — everything an agent or developer needs to start. */
-export function generateHandoff(plan: ProjectPlan): string
-⋮----
-function renderUserFields(lines: Lines, u: NonNullable<ProjectPlan['foundation']>['primaryUser'])
-⋮----
-function renderTechStack(lines: Lines, plan: ProjectPlan)
-</file>
-
 <file path="cli/README.md">
 # Think Tank — Local CLI Instructions
 
@@ -1030,40 +1008,26 @@ interface UIState {
 }
 </file>
 
-<file path="src/utils/mermaid-helpers.ts">
-// Helper: generate Mermaid flowchart from architecture components
-export function componentsToMermaid(
-  components: Array<{ name: string; description: string; connections?: string[] }>,
-): string
+<file path="src/utils/export-extras.ts">
+import { type ProjectPlan, isFoundationComplete } from '@/schema/project-plan'
 ⋮----
-const sanitizeId = (s: string)
+type Lines = string[]
 ⋮----
-// Helper: generate Mermaid ER diagram from data model
-export function dataModelToMermaid(
-  entities: Array<{ entity: string; fields: string[]; relationships?: string[] }>,
-): string
+function section(lines: Lines, heading: string, body: () => void)
 ⋮----
-// Helper: generate user journey diagram from foundation + design
-export function userJourneyToMermaid(
-  primaryUser: string,
-  flows: string[],
-  firstSuccess: string,
-): string
+function field(lines: Lines, label: string, value: string | undefined)
 ⋮----
-// Helper: generate risk matrix as quadrant chart
-export function risksToMermaid(
-  risks: Array<{ description: string; impact: string; likelihood: string }>,
-): string
+function list(lines: Lines, items: string[] | undefined, prefix = '- ')
 ⋮----
-const val = (level: string) =>
+/** One-page summary — the essentials for stakeholders or a pitch. */
+export function generateOnePageSummary(plan: ProjectPlan): string
 ⋮----
-// Helper: generate budget breakdown as pie chart
-export function budgetToMermaid(costs: Array<
+/** Implementation handoff — everything an agent or developer needs to start. */
+export function generateHandoff(plan: ProjectPlan): string
 ⋮----
-// Helper: generate timeline Mermaid from phases
-export function timelineToMermaid(
-  phases: Array<{ name: string; duration: string; deliverables: string[] }>,
-): string
+function renderUserFields(lines: Lines, u: NonNullable<ProjectPlan['foundation']>['primaryUser'])
+⋮----
+function renderTechStack(lines: Lines, plan: ProjectPlan)
 </file>
 
 <file path="src/utils/mermaid-render.ts">
@@ -1767,6 +1731,42 @@ import { z } from 'zod/v4'
 export type ProviderConfig = z.infer<typeof ProviderConfigSchema>
 ⋮----
 export type Personality = z.infer<typeof PersonalityType>
+</file>
+
+<file path="src/utils/mermaid-helpers.ts">
+// Helper: generate Mermaid flowchart from architecture components
+export function componentsToMermaid(
+  components: Array<{ name: string; description: string; connections?: string[] }>,
+): string
+⋮----
+const sanitizeId = (s: string)
+⋮----
+// Helper: generate Mermaid ER diagram from data model
+export function dataModelToMermaid(
+  entities: Array<{ entity: string; fields: string[]; relationships?: string[] }>,
+): string
+⋮----
+// Helper: generate user journey diagram from foundation + design
+export function userJourneyToMermaid(
+  primaryUser: string,
+  flows: string[],
+  firstSuccess: string,
+): string
+⋮----
+// Helper: generate risk matrix as quadrant chart
+export function risksToMermaid(
+  risks: Array<{ description: string; impact: string; likelihood: string }>,
+): string
+⋮----
+const val = (level: string) =>
+⋮----
+// Helper: generate budget breakdown as pie chart
+export function budgetToMermaid(costs: Array<
+⋮----
+// Helper: generate timeline Mermaid from phases
+export function timelineToMermaid(
+  phases: Array<{ name: string; duration: string; deliverables: string[] }>,
+): string
 </file>
 
 <file path="src/utils/prompt-loader.ts">
@@ -2503,18 +2503,6 @@ export function getIncompleteSections(plan: ProjectPlan): PlanSectionKey[]
 export function getNextSection(plan: ProjectPlan): PlanSectionKey | null
 </file>
 
-<file path="src/schema/project-plan.ts">
-import { z } from 'zod/v4'
-⋮----
-export type ProjectPlan = z.infer<typeof ProjectPlanSchema>
-⋮----
-export type PlanSectionKey = (typeof PLAN_SECTIONS)[number]
-⋮----
-export function createEmptyPlan(): ProjectPlan
-⋮----
-export function isFoundationComplete(plan: ProjectPlan):
-</file>
-
 <file path="src/stores/settings-store.ts">
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -2805,75 +2793,16 @@ interface ProviderFieldsProps {
 onClick=
 </file>
 
-<file path="src/utils/export.ts">
-import {
-  SECTION_LABELS,
-  ProjectPlanSchema,
-  type ProjectPlan,
-  type PlanSectionKey,
-} from '@/schema/project-plan'
-import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
-import JSZip from 'jszip'
-import {
-  componentsToMermaid,
-  dataModelToMermaid,
-  timelineToMermaid,
-  userJourneyToMermaid,
-  risksToMermaid,
-  budgetToMermaid,
-} from './mermaid-helpers'
-import { fetchMermaidSvg } from './mermaid-render'
-import { generateOnePageSummary, generateHandoff } from './export-extras'
+<file path="src/schema/project-plan.ts">
+import { z } from 'zod/v4'
 ⋮----
-export function exportAsJSON(plan: ProjectPlan, filename: string)
+export type ProjectPlan = z.infer<typeof ProjectPlanSchema>
 ⋮----
-export function exportAsMarkdown(plan: ProjectPlan, filename: string)
+export type PlanSectionKey = (typeof PLAN_SECTIONS)[number]
 ⋮----
-export async function exportAsZip(plan: ProjectPlan, filename: string)
+export function createEmptyPlan(): ProjectPlan
 ⋮----
-// Core plan files
-⋮----
-// Generate mermaid sources and SVGs
-⋮----
-function addDiagram(diagrams: Array<[string, string]>, name: string, mmd: string)
-⋮----
-function buildDiagramSources(plan: ProjectPlan): Array<[string, string]>
-⋮----
-function extractBudgetItems(plan: ProjectPlan): Array<
-⋮----
-function downloadBlob(blob: Blob, filename: string)
-⋮----
-export function importFromJSON(file: File): Promise<ProjectPlan>
-⋮----
-export function createShareUrl(plan: ProjectPlan): string
-⋮----
-export function loadFromShareUrl(): ProjectPlan | null
-⋮----
-function planToMarkdown(plan: ProjectPlan): string
-⋮----
-function renderFoundation(plan: ProjectPlan): string
-⋮----
-function renderOverview(plan: ProjectPlan): string
-⋮----
-function renderRequirements(plan: ProjectPlan): string
-⋮----
-function renderArchitecture(plan: ProjectPlan): string
-⋮----
-function renderTechStack(plan: ProjectPlan): string
-⋮----
-function renderHosting(plan: ProjectPlan): string
-⋮----
-function renderSecurity(plan: ProjectPlan): string
-⋮----
-function renderDesign(plan: ProjectPlan): string
-⋮----
-function renderBudget(plan: ProjectPlan): string
-⋮----
-function renderTimeline(plan: ProjectPlan): string
-⋮----
-function renderRisks(plan: ProjectPlan): string
-⋮----
-function renderCompetitors(plan: ProjectPlan): string
+export function isFoundationComplete(plan: ProjectPlan):
 </file>
 
 <file path="README.md">
@@ -2941,7 +2870,7 @@ Turn your project idea into a structured, comprehensive plan through AI-guided c
 - **100% client-side** — No backend, no accounts, deployable to GitHub Pages
 - **CLI companion** — Interactive terminal planner using Anthropic SDK
 - **Cloneable** — Run locally with any model including Ollama
-- **6 example templates** — Website, SaaS, Mobile App, E-Commerce, API Service, Community Platform
+- **8 example templates** — Website, SaaS, Mobile App, E-Commerce, API Service, Community Platform, Local Business, Community Event
 
 ---
 
@@ -3103,6 +3032,77 @@ Runs 6 stages in order:
 ## License
 
 MIT
+</file>
+
+<file path="src/utils/export.ts">
+import {
+  SECTION_LABELS,
+  ProjectPlanSchema,
+  type ProjectPlan,
+  type PlanSectionKey,
+} from '@/schema/project-plan'
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
+import JSZip from 'jszip'
+import {
+  componentsToMermaid,
+  dataModelToMermaid,
+  timelineToMermaid,
+  userJourneyToMermaid,
+  risksToMermaid,
+  budgetToMermaid,
+} from './mermaid-helpers'
+import { fetchMermaidSvg } from './mermaid-render'
+import { generateOnePageSummary, generateHandoff } from './export-extras'
+⋮----
+export function exportAsJSON(plan: ProjectPlan, filename: string)
+⋮----
+export function exportAsMarkdown(plan: ProjectPlan, filename: string)
+⋮----
+export async function exportAsZip(plan: ProjectPlan, filename: string)
+⋮----
+// Core plan files
+⋮----
+// Generate mermaid sources and SVGs
+⋮----
+function addDiagram(diagrams: Array<[string, string]>, name: string, mmd: string)
+⋮----
+function buildDiagramSources(plan: ProjectPlan): Array<[string, string]>
+⋮----
+function extractBudgetItems(plan: ProjectPlan): Array<
+⋮----
+function downloadBlob(blob: Blob, filename: string)
+⋮----
+export function importFromJSON(file: File): Promise<ProjectPlan>
+⋮----
+export function createShareUrl(plan: ProjectPlan): string
+⋮----
+export function loadFromShareUrl(): ProjectPlan | null
+⋮----
+function planToMarkdown(plan: ProjectPlan): string
+⋮----
+function renderFoundation(plan: ProjectPlan): string
+⋮----
+function renderOverview(plan: ProjectPlan): string
+⋮----
+function renderRequirements(plan: ProjectPlan): string
+⋮----
+function renderArchitecture(plan: ProjectPlan): string
+⋮----
+function renderTechStack(plan: ProjectPlan): string
+⋮----
+function renderHosting(plan: ProjectPlan): string
+⋮----
+function renderSecurity(plan: ProjectPlan): string
+⋮----
+function renderDesign(plan: ProjectPlan): string
+⋮----
+function renderBudget(plan: ProjectPlan): string
+⋮----
+function renderTimeline(plan: ProjectPlan): string
+⋮----
+function renderRisks(plan: ProjectPlan): string
+⋮----
+function renderCompetitors(plan: ProjectPlan): string
 </file>
 
 </files>

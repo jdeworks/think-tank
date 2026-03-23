@@ -62,7 +62,7 @@ Turn your project idea into a structured, comprehensive plan through AI-guided c
 - **100% client-side** — No backend, no accounts, deployable to GitHub Pages
 - **CLI companion** — Interactive terminal planner using Anthropic SDK
 - **Cloneable** — Run locally with any model including Ollama
-- **6 example templates** — Website, SaaS, Mobile App, E-Commerce, API Service, Community Platform
+- **8 example templates** — Website, SaaS, Mobile App, E-Commerce, API Service, Community Platform, Local Business, Community Event
 
 ---
 
