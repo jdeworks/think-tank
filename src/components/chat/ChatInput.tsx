@@ -149,31 +149,24 @@ export function ChatInput({
     stop: stopListening,
   } = useSpeechRecognition()
 
-  const displayValue = useMemo(() => {
-    if (isListening) return `${transcript} ${interimTranscript}`.trim()
-    return value
-  }, [isListening, transcript, interimTranscript, value])
-
-  const sendWithAttachment = useCallback(
-    (text: string) => {
-      if (!text && !attachedFile) return
-      let message = text
-      if (attachedFile) {
-        message = `[Attached file: ${attachedFile.name}]\n\`\`\`\n${attachedFile.content}\n\`\`\`\n\n${text}`
-        setAttachedFile(null)
-      }
-      onSend(message)
-    },
-    [attachedFile, onSend],
-  )
-
+  // When recording stops, copy transcript into the editable value
+  const lastTranscriptRef = useRef('')
   useEffect(() => {
     if (prevListeningRef.current && !isListening && transcript.trim()) {
-      const timer = setTimeout(() => sendWithAttachment(transcript.trim()), 500)
-      return () => clearTimeout(timer)
+      const t = transcript.trim()
+      if (t !== lastTranscriptRef.current) {
+        lastTranscriptRef.current = t
+        setValue((prev) => (prev ? `${prev} ${t}` : t))
+      }
     }
     prevListeningRef.current = isListening
-  }, [isListening, transcript, sendWithAttachment])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally excludes setValue
+  }, [isListening, transcript])
+
+  const displayValue = useMemo(() => {
+    if (isListening) return `${value} ${transcript} ${interimTranscript}`.trim()
+    return value
+  }, [isListening, transcript, interimTranscript, value])
 
   useEffect(() => {
     if (!disabled && textareaRef.current) textareaRef.current.focus()
@@ -182,7 +175,12 @@ export function ChatInput({
   const handleSubmit = () => {
     const trimmed = value.trim()
     if ((!trimmed && !attachedFile) || disabled) return
-    sendWithAttachment(trimmed)
+    let message = trimmed
+    if (attachedFile) {
+      message = `[Attached file: ${attachedFile.name}]\n\`\`\`\n${attachedFile.content}\n\`\`\`\n\n${trimmed}`
+      setAttachedFile(null)
+    }
+    onSend(message)
     setValue('')
   }
 

@@ -1730,28 +1730,6 @@ export function estimateCost(model: string, totalTokens: number): string
 export function formatTokens(tokens: number): string
 </file>
 
-<file path="src/App.tsx">
-import { useEffect, useState } from 'react'
-import { useUIStore } from '@/stores/ui-store'
-import { useProjectStore } from '@/stores/project-store'
-import { useSettingsStore } from '@/stores/settings-store'
-import { HomePage } from '@/components/project/HomePage'
-import { ChatPanel } from '@/components/chat/ChatPanel'
-import { PlanSidebar } from '@/components/plan/PlanSidebar'
-import { PlanView } from '@/components/plan/PlanView'
-import { SettingsModal } from '@/components/settings/SettingsModal'
-import { loadFromShareUrl } from '@/utils/export'
-import { createEmptyPlan } from '@/schema/project-plan'
-⋮----
-{/* Top bar */}
-⋮----
-onClick=
-⋮----
-const v = e.target.value.trim()
-if (v) setName(v)
-setEditingName(false)
-</file>
-
 <file path="CLAUDE.md">
 # Think Tank — Agent Instructions
 
@@ -2411,6 +2389,10 @@ function AttachButton({
 ⋮----
 onClick=
 ⋮----
+// When recording stops, copy transcript into the editable value
+⋮----
+// eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally excludes setValue
+⋮----
 const handleSubmit = () =>
 ⋮----
 const handleKeyDown = (e: React.KeyboardEvent) =>
@@ -2499,6 +2481,28 @@ export async function loadSectionGuide(
   sectionNumber: number,
   sectionName: string,
 ): Promise<string>
+</file>
+
+<file path="src/App.tsx">
+import { useEffect, useState } from 'react'
+import { useUIStore } from '@/stores/ui-store'
+import { useProjectStore } from '@/stores/project-store'
+import { useSettingsStore } from '@/stores/settings-store'
+import { HomePage } from '@/components/project/HomePage'
+import { ChatPanel } from '@/components/chat/ChatPanel'
+import { PlanSidebar } from '@/components/plan/PlanSidebar'
+import { PlanView } from '@/components/plan/PlanView'
+import { SettingsModal } from '@/components/settings/SettingsModal'
+import { loadFromShareUrl } from '@/utils/export'
+import { createEmptyPlan } from '@/schema/project-plan'
+⋮----
+{/* Top bar */}
+⋮----
+onClick=
+⋮----
+const v = e.target.value.trim()
+if (v) setName(v)
+setEditingName(false)
 </file>
 
 <file path=".gitignore">
