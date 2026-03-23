@@ -1,5 +1,5 @@
 import { useProjectStore } from '@/stores/project-store'
-import { PLAN_SECTIONS, SECTION_LABELS } from '@/schema/project-plan'
+import { PLAN_SECTIONS, getAdaptiveLabels } from '@/schema/project-plan'
 import { getSectionCompleteness, getOverallCompleteness } from '@/engine/section-map'
 import { Badge } from '@/components/common/Badge'
 import { useUIStore } from '@/stores/ui-store'
@@ -8,6 +8,7 @@ export function PlanSidebar() {
   const { plan, name } = useProjectStore()
   const { sidebarOpen, toggleSidebar, setView } = useUIStore()
   const overall = getOverallCompleteness(plan)
+  const labels = getAdaptiveLabels(plan)
 
   return (
     <>
@@ -74,7 +75,7 @@ export function PlanSidebar() {
                       : 'text-slate-400 dark:text-slate-500'
                   }
                 >
-                  {SECTION_LABELS[key]}
+                  {labels[key]}
                 </span>
                 <Badge value={completeness} />
               </button>

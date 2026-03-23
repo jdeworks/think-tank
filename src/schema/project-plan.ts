@@ -249,6 +249,25 @@ export function createEmptyPlan(): ProjectPlan {
   }
 }
 
+/** Returns context-aware section labels based on the project type inferred from foundation. */
+export function getAdaptiveLabels(plan: ProjectPlan): Record<PlanSectionKey, string> {
+  const device = plan.foundation?.primaryUser?.device || ''
+  const isPhysical = device === 'in-person'
+  const isMixed = device === 'mixed'
+
+  if (isPhysical || isMixed) {
+    return {
+      ...SECTION_LABELS,
+      architecture: 'Structure & Processes',
+      techStack: 'Tools & Equipment',
+      hosting: 'Location & Operations',
+      security: 'Security & Compliance',
+      design: 'Customer Experience',
+    }
+  }
+  return SECTION_LABELS
+}
+
 export function isFoundationComplete(plan: ProjectPlan): {
   complete: boolean
   missing: string[]

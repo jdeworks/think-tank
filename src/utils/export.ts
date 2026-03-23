@@ -1,5 +1,5 @@
 import {
-  SECTION_LABELS,
+  getAdaptiveLabels,
   ProjectPlanSchema,
   type ProjectPlan,
   type PlanSectionKey,
@@ -174,10 +174,11 @@ function planToMarkdown(plan: ProjectPlan): string {
     ['competitors', renderCompetitors],
   ]
 
+  const labels = getAdaptiveLabels(plan)
   for (const [key, renderer] of sections) {
     const content = renderer(plan)
     if (content) {
-      lines.push(`## ${SECTION_LABELS[key]}`)
+      lines.push(`## ${labels[key]}`)
       lines.push('')
       lines.push(content)
       lines.push('')

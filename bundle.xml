@@ -688,7 +688,7 @@ export function MermaidDiagram(
 
 <file path="src/components/plan/PlanSidebar.tsx">
 import { useProjectStore } from '@/stores/project-store'
-import { PLAN_SECTIONS, SECTION_LABELS } from '@/schema/project-plan'
+import { PLAN_SECTIONS, getAdaptiveLabels } from '@/schema/project-plan'
 import { getSectionCompleteness, getOverallCompleteness } from '@/engine/section-map'
 import { Badge } from '@/components/common/Badge'
 import { useUIStore } from '@/stores/ui-store'
@@ -1554,29 +1554,6 @@ After foundation is complete, the plan contains a design filter sentence. Use it
 - Never skip a section — each one matters for a complete plan
 </file>
 
-<file path="src/components/chat/ChatPanel.tsx">
-import { useEffect, useRef } from 'react'
-import { useProjectStore } from '@/stores/project-store'
-import { useSettingsStore } from '@/stores/settings-store'
-import { createProvider } from '@/providers/registry'
-import { continueConversation } from '@/engine/conversation-engine'
-import { MessageBubble } from './MessageBubble'
-import { ChatInput } from './ChatInput'
-import { formatTokens, estimateCost } from '@/utils/tokens'
-import { useStartConversation } from '@/hooks/useStartConversation'
-⋮----
-const handleSend = async (content: string) =>
-⋮----
-{/* Token counter */}
-⋮----
-<span>Tokens:
-<span>Cost:
-⋮----
-{/* Messages */}
-⋮----
-{/* Input */}
-</file>
-
 <file path="src/components/chat/MessageBubble.tsx">
 import type { Message } from '@/schema/conversation'
 import Markdown from 'react-markdown'
@@ -1595,7 +1572,7 @@ const handleSpeak = () =>
 
 <file path="src/components/plan/PlanView.tsx">
 import { useProjectStore } from '@/stores/project-store'
-import { PLAN_SECTIONS, SECTION_LABELS } from '@/schema/project-plan'
+import { PLAN_SECTIONS, getAdaptiveLabels } from '@/schema/project-plan'
 import { getSectionCompleteness } from '@/engine/section-map'
 import { Badge } from '@/components/common/Badge'
 import { Button } from '@/components/common/Button'
@@ -2356,6 +2333,29 @@ until foundation is complete.
 - [ ] Test: "Could someone implement this with zero follow-up questions?"
 </file>
 
+<file path="src/components/chat/ChatPanel.tsx">
+import { useEffect, useRef } from 'react'
+import { useProjectStore } from '@/stores/project-store'
+import { useSettingsStore } from '@/stores/settings-store'
+import { createProvider } from '@/providers/registry'
+import { continueConversation } from '@/engine/conversation-engine'
+import { MessageBubble } from './MessageBubble'
+import { ChatInput } from './ChatInput'
+import { formatTokens, estimateCost } from '@/utils/tokens'
+import { useStartConversation } from '@/hooks/useStartConversation'
+⋮----
+const handleSend = async (content: string) =>
+⋮----
+{/* Token counter */}
+⋮----
+<span>Tokens:
+<span>Cost:
+⋮----
+{/* Messages */}
+⋮----
+{/* Input */}
+</file>
+
 <file path="src/engine/prompts.ts">
 import type { Personality } from '@/schema/settings'
 import {
@@ -2437,29 +2437,6 @@ export async function loadSectionGuide(
   sectionNumber: number,
   sectionName: string,
 ): Promise<string>
-</file>
-
-<file path="src/App.tsx">
-import { useEffect, useState } from 'react'
-import { useUIStore } from '@/stores/ui-store'
-import { useProjectStore } from '@/stores/project-store'
-import { useSettingsStore } from '@/stores/settings-store'
-import { HomePage } from '@/components/project/HomePage'
-import { ChatPanel } from '@/components/chat/ChatPanel'
-import { PlanSidebar } from '@/components/plan/PlanSidebar'
-import { PlanView } from '@/components/plan/PlanView'
-import { SettingsModal } from '@/components/settings/SettingsModal'
-import { loadFromShareUrl } from '@/utils/export'
-import { createEmptyPlan } from '@/schema/project-plan'
-⋮----
-{/* Top bar */}
-⋮----
-onClick=
-⋮----
-const v = e.target.value.trim()
-if (v)
-setName(v)
-persist()
 </file>
 
 <file path=".gitignore">
@@ -2726,7 +2703,33 @@ export type PlanSectionKey = (typeof PLAN_SECTIONS)[number]
 ⋮----
 export function createEmptyPlan(): ProjectPlan
 ⋮----
+/** Returns context-aware section labels based on the project type inferred from foundation. */
+export function getAdaptiveLabels(plan: ProjectPlan): Record<PlanSectionKey, string>
+⋮----
 export function isFoundationComplete(plan: ProjectPlan):
+</file>
+
+<file path="src/App.tsx">
+import { useEffect, useState } from 'react'
+import { useUIStore } from '@/stores/ui-store'
+import { useProjectStore } from '@/stores/project-store'
+import { useSettingsStore } from '@/stores/settings-store'
+import { HomePage } from '@/components/project/HomePage'
+import { ChatPanel } from '@/components/chat/ChatPanel'
+import { PlanSidebar } from '@/components/plan/PlanSidebar'
+import { PlanView } from '@/components/plan/PlanView'
+import { SettingsModal } from '@/components/settings/SettingsModal'
+import { loadFromShareUrl } from '@/utils/export'
+import { createEmptyPlan } from '@/schema/project-plan'
+⋮----
+{/* Top bar */}
+⋮----
+onClick=
+⋮----
+const v = e.target.value.trim()
+if (v)
+setName(v)
+persist()
 </file>
 
 <file path="src/components/chat/ChatInput.tsx">
@@ -2821,7 +2824,7 @@ onClick=
 
 <file path="src/utils/export.ts">
 import {
-  SECTION_LABELS,
+  getAdaptiveLabels,
   ProjectPlanSchema,
   type ProjectPlan,
   type PlanSectionKey,

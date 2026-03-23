@@ -1,5 +1,5 @@
 import { useProjectStore } from '@/stores/project-store'
-import { PLAN_SECTIONS, SECTION_LABELS } from '@/schema/project-plan'
+import { PLAN_SECTIONS, getAdaptiveLabels } from '@/schema/project-plan'
 import { getSectionCompleteness } from '@/engine/section-map'
 import { Badge } from '@/components/common/Badge'
 import { Button } from '@/components/common/Button'
@@ -17,6 +17,7 @@ export function PlanView() {
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [diagramView, setDiagramView] = useState<'flow' | 'interactive'>('interactive')
 
+  const labels = getAdaptiveLabels(plan)
   const projectName = name || 'project-plan'
   const handleExportJSON = () => exportAsJSON(plan, projectName)
   const handleExportMD = () => exportAsMarkdown(plan, projectName)
@@ -71,6 +72,7 @@ export function PlanView() {
 
         {PLAN_SECTIONS.map((key) => {
           const completeness = getSectionCompleteness(plan, key)
+          if (completeness === 0) return null
           const section = plan[key]
           return (
             <div
@@ -78,19 +80,11 @@ export function PlanView() {
               className="mb-6 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden"
             >
               <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
-                <h3 className="font-semibold text-slate-800 dark:text-slate-200">
-                  {SECTION_LABELS[key]}
-                </h3>
+                <h3 className="font-semibold text-slate-800 dark:text-slate-200">{labels[key]}</h3>
                 <Badge value={completeness} size="md" />
               </div>
               <div className="p-4 text-sm text-slate-700 dark:text-slate-300">
-                {completeness === 0 ? (
-                  <p className="text-slate-400 italic">
-                    No data yet — discuss this topic in the chat.
-                  </p>
-                ) : (
-                  <pre className="whitespace-pre-wrap font-sans">{renderSection(section)}</pre>
-                )}
+                <pre className="whitespace-pre-wrap font-sans">{renderSection(section)}</pre>
               </div>
             </div>
           )
