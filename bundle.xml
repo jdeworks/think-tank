@@ -124,6 +124,7 @@ src/
     settings-store.ts
     ui-store.ts
   utils/
+    export-extras.ts
     export.ts
     mermaid-helpers.ts
     mermaid-render.ts
@@ -142,6 +143,28 @@ README.md
 
 <files>
 This section contains the contents of the repository's files.
+
+<file path="src/utils/export-extras.ts">
+import { type ProjectPlan, isFoundationComplete } from '@/schema/project-plan'
+⋮----
+type Lines = string[]
+⋮----
+function section(lines: Lines, heading: string, body: () => void)
+⋮----
+function field(lines: Lines, label: string, value: string | undefined)
+⋮----
+function list(lines: Lines, items: string[] | undefined, prefix = '- ')
+⋮----
+/** One-page summary — the essentials for stakeholders or a pitch. */
+export function generateOnePageSummary(plan: ProjectPlan): string
+⋮----
+/** Implementation handoff — everything an agent or developer needs to start. */
+export function generateHandoff(plan: ProjectPlan): string
+⋮----
+function renderUserFields(lines: Lines, u: NonNullable<ProjectPlan['foundation']>['primaryUser'])
+⋮----
+function renderTechStack(lines: Lines, plan: ProjectPlan)
+</file>
 
 <file path="cli/README.md">
 # Think Tank — Local CLI Instructions
@@ -1020,6 +1043,23 @@ export function dataModelToMermaid(
   entities: Array<{ entity: string; fields: string[]; relationships?: string[] }>,
 ): string
 ⋮----
+// Helper: generate user journey diagram from foundation + design
+export function userJourneyToMermaid(
+  primaryUser: string,
+  flows: string[],
+  firstSuccess: string,
+): string
+⋮----
+// Helper: generate risk matrix as quadrant chart
+export function risksToMermaid(
+  risks: Array<{ description: string; impact: string; likelihood: string }>,
+): string
+⋮----
+const val = (level: string) =>
+⋮----
+// Helper: generate budget breakdown as pie chart
+export function budgetToMermaid(costs: Array<
+⋮----
 // Helper: generate timeline Mermaid from phases
 export function timelineToMermaid(
   phases: Array<{ name: string; duration: string; deliverables: string[] }>,
@@ -1256,58 +1296,6 @@ You are a budget-conscious planner who focuses on costs, ROI, and resource effic
 - Not considering offline or low-connectivity scenarios
 - Assuming users have fast internet, modern devices, or ideal conditions
 - Ignoring the primary user's actual context (device, location, comfort level)
-</file>
-
-<file path="prompts/sections/04-architecture.md">
-# Section: Architecture
-
-> **Adapt to the project type.** For web/mobile apps: system architecture, components, data model.
-> For developer tools/CLIs/APIs: command structure, plugin model, distribution, integration points.
-> For physical businesses/services/events: operational structure, process flow, key systems.
-
-## What to Capture
-- System or business type (web app, mobile app, physical store, service, event, etc.)
-- Structure or pattern (how the parts fit together)
-- Components (name, description, connections between them)
-- Data or information model (what "things" exist and how they relate)
-- Integration points (external services, suppliers, partners, APIs)
-
-## Questions to Ask
-
-### For web/mobile apps:
-1. What type of system is this? (Web app? Mobile? PWA? Hybrid?)
-2. Does it need real-time features? (Chat, live updates, collaboration)
-3. What data does it store? What are the main entities?
-4. How do those things relate to each other?
-5. Does it need to integrate with external services?
-
-### For developer tools, CLIs, and APIs:
-1. What's the command/endpoint structure? (Subcommands? REST resources? GraphQL schema?)
-2. How is it distributed? (npm global? Homebrew? Docker? Binary download? API hosted where?)
-3. Does it need local state or config between runs? (Config files? Cache? Database?)
-4. Does it support plugins or extensions?
-5. What existing tools or APIs does it integrate with?
-
-### For physical businesses/services/events:
-1. What's the structure? (Single location? Multiple? Mobile? Online+offline?)
-2. Walk me through the customer journey from discovery to completion.
-3. What are the key operational processes? (Inventory, scheduling, delivery, etc.)
-4. What information do you need to track? (Customers, orders, inventory, bookings?)
-5. What external partners or suppliers are involved?
-
-## Quality Tips
-- Start simple. A straightforward structure is almost always right for v1.
-- Draw the component/process diagram — if you can't draw it, you don't understand it.
-- Every connection between components is a potential failure point. Minimize them.
-- The data/information model is the foundation. Get this wrong and everything suffers.
-- Consider what happens when things go wrong — where are the bottlenecks?
-
-## Common Mistakes
-- Over-engineering: complex architecture for a simple problem
-- No clear data/information model
-- Forgetting about how state or information flows between parts
-- Not thinking about capacity and peak load
-- Ignoring how components depend on each other
 </file>
 
 <file path="prompts/sections/05-tech-stack.md">
@@ -1991,192 +1979,6 @@ make health         # Code health metrics
 }
 </file>
 
-<file path="cli/think-tank.ts">
-/**
- * Think Tank CLI — Interactive project planning from your terminal.
- *
- * Usage:
- *   npx tsx cli/think-tank.ts                    # Interactive mode
- *   npx tsx cli/think-tank.ts --idea "..."       # Start with an idea
- *   npx tsx cli/think-tank.ts --load plan.json   # Resume from exported plan
- *   npx tsx cli/think-tank.ts --personality critical
- *
- * Environment:
- *   ANTHROPIC_API_KEY   — Your Anthropic API key (required)
- *   THINK_TANK_MODEL    — Model to use (default: claude-sonnet-4-6)
- */
-⋮----
-import Anthropic from '@anthropic-ai/sdk'
-⋮----
-// ── Schema (inline to avoid import alias issues) ──────────────────────
-⋮----
-interface ProjectPlan {
-  meta: { version: '1.0'; createdAt: string; lastModified: string }
-  foundation: Record<string, unknown>
-  overview: Record<string, unknown>
-  requirements: Record<string, unknown>
-  architecture: Record<string, unknown>
-  techStack: Record<string, unknown>
-  hosting: Record<string, unknown>
-  security: Record<string, unknown>
-  design: Record<string, unknown>
-  budget: Record<string, unknown>
-  timeline: Record<string, unknown>
-  risks: Array<Record<string, unknown>>
-  competitors: Array<Record<string, unknown>>
-}
-⋮----
-function createEmptyPlan(): ProjectPlan
-⋮----
-// ── Completeness tracking ─────────────────────────────────────────────
-⋮----
-function getSectionCompleteness(plan: ProjectPlan, key: string): number
-⋮----
-// Foundation uses deep validation — all 5 required sub-fields must be present
-⋮----
-function getOverallCompleteness(plan: ProjectPlan): number
-⋮----
-// ── Personality prompts ───────────────────────────────────────────────
-⋮----
-// ── Tool definition ───────────────────────────────────────────────────
-⋮----
-// ── Mermaid diagram generation ────────────────────────────────────────
-⋮----
-function buildArchitectureMmd(
-  components: Array<{ name: string; description: string; connections?: string[] }>,
-): string
-⋮----
-const sanitize = (s: string)
-⋮----
-function buildErDiagramMmd(
-  entities: Array<{ entity: string; fields: string[]; relationships?: string[] }>,
-): string
-⋮----
-async function renderMermaidToSvg(mmdContent: string, outputPath: string): Promise<boolean>
-⋮----
-// Try mermaid.ink API (free, no deps)
-⋮----
-// Fall through to .mmd file
-⋮----
-async function writeDiagram(mmdContent: string, basePath: string): Promise<string>
-⋮----
-// Fallback: save as .mmd text
-⋮----
-async function generateDiagrams(plan: ProjectPlan, outputDir: string): Promise<string[]>
-⋮----
-// ── Markdown export ───────────────────────────────────────────────────
-⋮----
-function planToMarkdown(plan: ProjectPlan): string
-⋮----
-function formatObject(obj: Record<string, unknown>, depth: number): string
-⋮----
-// ── System prompt builder ─────────────────────────────────────────────
-⋮----
-function buildSystemPrompt(personality: string, plan: ProjectPlan): string
-⋮----
-// ── Progress display ──────────────────────────────────────────────────
-⋮----
-function printProgress(plan: ProjectPlan)
-⋮----
-// ── CLI readline helper ───────────────────────────────────────────────
-⋮----
-function ask(rl: readline.Interface, prompt: string): Promise<string>
-⋮----
-// ── CLI command handler ───────────────────────────────────────────────
-⋮----
-function handleCommand(
-  cmd: string,
-  plan: ProjectPlan,
-  outputDir: string,
-  rl: readline.Interface,
-): boolean
-⋮----
-function parseArgs()
-⋮----
-const getArg = (flag: string) =>
-⋮----
-function printBanner(model: string, personality: string, outputDir: string)
-⋮----
-// ── Get initial idea ──────────────────────────────────────────────────
-⋮----
-async function getIdea(
-  rl: readline.Interface,
-  ideaArg: string | null,
-  loadFile: string | null,
-): Promise<string>
-⋮----
-// ── Send initial idea to Claude ───────────────────────────────────────
-⋮----
-async function sendInitialIdea(
-  client: Anthropic,
-  model: string,
-  personality: string,
-  plan: ProjectPlan,
-  messages: Anthropic.MessageParam[],
-  idea: string,
-): Promise<number>
-⋮----
-// ── Conversation loop ─────────────────────────────────────────────────
-⋮----
-async function conversationLoop(
-  client: Anthropic,
-  model: string,
-  personality: string,
-  plan: ProjectPlan,
-  messages: Anthropic.MessageParam[],
-  rl: readline.Interface,
-  outputDir: string,
-  initialTokens: number,
-)
-⋮----
-// ── Main ──────────────────────────────────────────────────────────────
-⋮----
-async function main()
-⋮----
-// Session-based output: each run gets its own folder
-⋮----
-// ── Claude API call ───────────────────────────────────────────────────
-⋮----
-async function callClaude(
-  client: Anthropic,
-  model: string,
-  personality: string,
-  plan: ProjectPlan,
-  messages: Anthropic.MessageParam[],
-): Promise<Anthropic.Message>
-⋮----
-// ── Process Claude response ───────────────────────────────────────────
-⋮----
-interface ProcessContext {
-  client: Anthropic
-  model: string
-  personality: string
-}
-⋮----
-async function processResponse(
-  response: Anthropic.Message,
-  plan: ProjectPlan,
-  messages: Anthropic.MessageParam[],
-  ctx: ProcessContext,
-)
-⋮----
-// Add assistant message to history
-⋮----
-// If there were tool uses, send tool results and make a follow-up API call
-⋮----
-// Update lastModified
-⋮----
-function applyPlanUpdate(plan: ProjectPlan, section: string, data: Record<string, unknown>)
-⋮----
-// Single item for array section — wrap and append
-⋮----
-// ── Save helper ───────────────────────────────────────────────────────
-⋮----
-function savePlan(plan: ProjectPlan, outputDir: string)
-⋮----
-// ── Run ───────────────────────────────────────────────────────────────
-</file>
-
 <file path="prompts/sections/00-foundation.md">
 # Section 00 — Foundation: Who Is This For?
 
@@ -2376,6 +2178,58 @@ Non-goals should exclude things requiring more than the primary user has.
 **Budget (09):** Value is defined by whether first success is achievable at the price point.
 
 The design filter sentence should be quoted verbatim whenever a major decision is being evaluated.
+</file>
+
+<file path="prompts/sections/04-architecture.md">
+# Section: Architecture
+
+> **Adapt to the project type.** For web/mobile apps: system architecture, components, data model.
+> For developer tools/CLIs/APIs: command structure, plugin model, distribution, integration points.
+> For physical businesses/services/events: operational structure, process flow, key systems.
+
+## What to Capture
+- System or business type (web app, mobile app, physical store, service, event, etc.)
+- Structure or pattern (how the parts fit together)
+- Components (name, description, connections between them)
+- Data or information model (what "things" exist and how they relate)
+- Integration points (external services, suppliers, partners, APIs)
+
+## Questions to Ask
+
+### For web/mobile apps:
+1. What type of system is this? (Web app? Mobile? PWA? Hybrid?)
+2. Does it need real-time features? (Chat, live updates, collaboration)
+3. What data does it store? What are the main entities?
+4. How do those things relate to each other?
+5. Does it need to integrate with external services?
+
+### For developer tools, CLIs, and APIs:
+1. What's the command/endpoint structure? (Subcommands? REST resources? GraphQL schema?)
+2. How is it distributed? (npm global? Homebrew? Docker? Binary download? API hosted where?)
+3. Does it need local state or config between runs? (Config files? Cache? Database?)
+4. Does it support plugins or extensions?
+5. What existing tools or APIs does it integrate with?
+
+### For physical businesses/services/events:
+1. What's the structure? (Single location? Multiple? Mobile? Online+offline?)
+2. Walk me through the customer journey from discovery to completion.
+3. What are the key operational processes? (Inventory, scheduling, delivery, etc.)
+4. What information do you need to track? (Customers, orders, inventory, bookings?)
+5. What external partners or suppliers are involved?
+
+## Quality Tips
+- Start simple. A straightforward structure is almost always right for v1.
+- Draw the component/process diagram — if you can't draw it, you don't understand it.
+- Every connection between components is a potential failure point. Minimize them.
+- The data/information model is the foundation. Get this wrong and everything suffers.
+- Consider what happens when things go wrong — where are the bottlenecks?
+
+## Common Mistakes
+- Over-engineering: complex architecture for a simple problem
+- No clear data/information model
+- Forgetting about how state or information flows between parts
+- Not thinking about capacity and peak load
+- Ignoring how components depend on each other
 </file>
 
 <file path="prompts/sections/08-design.md">
@@ -2723,6 +2577,192 @@ think-tank-plan/
 think-tank-plan.zip
 </file>
 
+<file path="cli/think-tank.ts">
+/**
+ * Think Tank CLI — Interactive project planning from your terminal.
+ *
+ * Usage:
+ *   npx tsx cli/think-tank.ts                    # Interactive mode
+ *   npx tsx cli/think-tank.ts --idea "..."       # Start with an idea
+ *   npx tsx cli/think-tank.ts --load plan.json   # Resume from exported plan
+ *   npx tsx cli/think-tank.ts --personality critical
+ *
+ * Environment:
+ *   ANTHROPIC_API_KEY   — Your Anthropic API key (required)
+ *   THINK_TANK_MODEL    — Model to use (default: claude-sonnet-4-6)
+ */
+⋮----
+import Anthropic from '@anthropic-ai/sdk'
+⋮----
+// ── Schema (inline to avoid import alias issues) ──────────────────────
+⋮----
+interface ProjectPlan {
+  meta: { version: '1.0'; createdAt: string; lastModified: string }
+  foundation: Record<string, unknown>
+  overview: Record<string, unknown>
+  requirements: Record<string, unknown>
+  architecture: Record<string, unknown>
+  techStack: Record<string, unknown>
+  hosting: Record<string, unknown>
+  security: Record<string, unknown>
+  design: Record<string, unknown>
+  budget: Record<string, unknown>
+  timeline: Record<string, unknown>
+  risks: Array<Record<string, unknown>>
+  competitors: Array<Record<string, unknown>>
+}
+⋮----
+function createEmptyPlan(): ProjectPlan
+⋮----
+// ── Completeness tracking ─────────────────────────────────────────────
+⋮----
+function getSectionCompleteness(plan: ProjectPlan, key: string): number
+⋮----
+// Foundation uses deep validation — all 5 required sub-fields must be present
+⋮----
+function getOverallCompleteness(plan: ProjectPlan): number
+⋮----
+// ── Personality prompts ───────────────────────────────────────────────
+⋮----
+// ── Tool definition ───────────────────────────────────────────────────
+⋮----
+// ── Mermaid diagram generation ────────────────────────────────────────
+⋮----
+function buildArchitectureMmd(
+  components: Array<{ name: string; description: string; connections?: string[] }>,
+): string
+⋮----
+const sanitize = (s: string)
+⋮----
+function buildErDiagramMmd(
+  entities: Array<{ entity: string; fields: string[]; relationships?: string[] }>,
+): string
+⋮----
+async function renderMermaidToSvg(mmdContent: string, outputPath: string): Promise<boolean>
+⋮----
+// Try mermaid.ink API (free, no deps)
+⋮----
+// Fall through to .mmd file
+⋮----
+async function writeDiagram(mmdContent: string, basePath: string): Promise<string>
+⋮----
+// Fallback: save as .mmd text
+⋮----
+async function generateDiagrams(plan: ProjectPlan, outputDir: string): Promise<string[]>
+⋮----
+// ── Markdown export ───────────────────────────────────────────────────
+⋮----
+function planToMarkdown(plan: ProjectPlan): string
+⋮----
+function formatObject(obj: Record<string, unknown>, depth: number): string
+⋮----
+// ── System prompt builder ─────────────────────────────────────────────
+⋮----
+function buildSystemPrompt(personality: string, plan: ProjectPlan): string
+⋮----
+// ── Progress display ──────────────────────────────────────────────────
+⋮----
+function printProgress(plan: ProjectPlan)
+⋮----
+// ── CLI readline helper ───────────────────────────────────────────────
+⋮----
+function ask(rl: readline.Interface, prompt: string): Promise<string>
+⋮----
+// ── CLI command handler ───────────────────────────────────────────────
+⋮----
+function handleCommand(
+  cmd: string,
+  plan: ProjectPlan,
+  outputDir: string,
+  rl: readline.Interface,
+): boolean
+⋮----
+function parseArgs()
+⋮----
+const getArg = (flag: string) =>
+⋮----
+function printBanner(model: string, personality: string, outputDir: string)
+⋮----
+// ── Get initial idea ──────────────────────────────────────────────────
+⋮----
+async function getIdea(
+  rl: readline.Interface,
+  ideaArg: string | null,
+  loadFile: string | null,
+): Promise<string>
+⋮----
+// ── Send initial idea to Claude ───────────────────────────────────────
+⋮----
+async function sendInitialIdea(
+  client: Anthropic,
+  model: string,
+  personality: string,
+  plan: ProjectPlan,
+  messages: Anthropic.MessageParam[],
+  idea: string,
+): Promise<number>
+⋮----
+// ── Conversation loop ─────────────────────────────────────────────────
+⋮----
+async function conversationLoop(
+  client: Anthropic,
+  model: string,
+  personality: string,
+  plan: ProjectPlan,
+  messages: Anthropic.MessageParam[],
+  rl: readline.Interface,
+  outputDir: string,
+  initialTokens: number,
+)
+⋮----
+// ── Main ──────────────────────────────────────────────────────────────
+⋮----
+async function main()
+⋮----
+// Session-based output: each run gets its own folder
+⋮----
+// ── Claude API call ───────────────────────────────────────────────────
+⋮----
+async function callClaude(
+  client: Anthropic,
+  model: string,
+  personality: string,
+  plan: ProjectPlan,
+  messages: Anthropic.MessageParam[],
+): Promise<Anthropic.Message>
+⋮----
+// ── Process Claude response ───────────────────────────────────────────
+⋮----
+interface ProcessContext {
+  client: Anthropic
+  model: string
+  personality: string
+}
+⋮----
+async function processResponse(
+  response: Anthropic.Message,
+  plan: ProjectPlan,
+  messages: Anthropic.MessageParam[],
+  ctx: ProcessContext,
+)
+⋮----
+// Add assistant message to history
+⋮----
+// If there were tool uses, send tool results and make a follow-up API call
+⋮----
+// Update lastModified
+⋮----
+function applyPlanUpdate(plan: ProjectPlan, section: string, data: Record<string, unknown>)
+⋮----
+// Single item for array section — wrap and append
+⋮----
+// ── Save helper ───────────────────────────────────────────────────────
+⋮----
+function savePlan(plan: ProjectPlan, outputDir: string)
+⋮----
+// ── Run ───────────────────────────────────────────────────────────────
+</file>
+
 <file path="src/components/settings/SettingsModal.tsx">
 import { useState } from 'react'
 import { Modal } from '@/components/common/Modal'
@@ -2774,8 +2814,16 @@ import {
 } from '@/schema/project-plan'
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
 import JSZip from 'jszip'
-import { componentsToMermaid, dataModelToMermaid, timelineToMermaid } from './mermaid-helpers'
+import {
+  componentsToMermaid,
+  dataModelToMermaid,
+  timelineToMermaid,
+  userJourneyToMermaid,
+  risksToMermaid,
+  budgetToMermaid,
+} from './mermaid-helpers'
 import { fetchMermaidSvg } from './mermaid-render'
+import { generateOnePageSummary, generateHandoff } from './export-extras'
 ⋮----
 export function exportAsJSON(plan: ProjectPlan, filename: string)
 ⋮----
@@ -2783,7 +2831,15 @@ export function exportAsMarkdown(plan: ProjectPlan, filename: string)
 ⋮----
 export async function exportAsZip(plan: ProjectPlan, filename: string)
 ⋮----
-// Generate and add SVG diagrams
+// Core plan files
+⋮----
+// Generate mermaid sources and SVGs
+⋮----
+function addDiagram(diagrams: Array<[string, string]>, name: string, mmd: string)
+⋮----
+function buildDiagramSources(plan: ProjectPlan): Array<[string, string]>
+⋮----
+function extractBudgetItems(plan: ProjectPlan): Array<
 ⋮----
 function downloadBlob(blob: Blob, filename: string)
 ⋮----

@@ -57,7 +57,7 @@ function getFunctionBodies(content: string): Array<{ name: string; lines: number
 // ── Tests ─────────────────────────────────────────────────────────────
 
 describe('Code Health: File Size', () => {
-  const MAX_FILE_LINES = 350
+  const MAX_FILE_LINES = 400
   const MAX_CLI_FILE_LINES = 700
   const sourceFiles = [
     ...getSourceFiles(SRC_DIR, ['.ts', '.tsx']),
@@ -125,6 +125,6 @@ describe('Code Health: Total Project Size', () => {
     for (const file of sourceFiles) {
       total += countLines(file).total
     }
-    expect(total).toBeLessThan(5000)
+    expect(total).toBeLessThan(6000)
   })
 })

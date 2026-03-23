@@ -6,8 +6,16 @@ import {
 } from '@/schema/project-plan'
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
 import JSZip from 'jszip'
-import { componentsToMermaid, dataModelToMermaid, timelineToMermaid } from './mermaid-helpers'
+import {
+  componentsToMermaid,
+  dataModelToMermaid,
+  timelineToMermaid,
+  userJourneyToMermaid,
+  risksToMermaid,
+  budgetToMermaid,
+} from './mermaid-helpers'
 import { fetchMermaidSvg } from './mermaid-render'
+import { generateOnePageSummary, generateHandoff } from './export-extras'
 
 export function exportAsJSON(plan: ProjectPlan, filename: string) {
   const json = JSON.stringify(plan, null, 2)
@@ -24,25 +32,63 @@ export function exportAsMarkdown(plan: ProjectPlan, filename: string) {
 export async function exportAsZip(plan: ProjectPlan, filename: string) {
   const zip = new JSZip()
 
+  // Core plan files
   zip.file('plan.json', JSON.stringify(plan, null, 2))
   zip.file('plan.md', planToMarkdown(plan))
+  zip.file('summary.md', generateOnePageSummary(plan))
+  zip.file('handoff.md', generateHandoff(plan))
 
-  // Generate and add SVG diagrams
-  if (plan.architecture.components?.length) {
-    const svg = await fetchMermaidSvg(componentsToMermaid(plan.architecture.components))
-    if (svg) zip.file('architecture.svg', svg)
-  }
-  if (plan.architecture.dataModel?.length) {
-    const svg = await fetchMermaidSvg(dataModelToMermaid(plan.architecture.dataModel))
-    if (svg) zip.file('data-model.svg', svg)
-  }
-  if (plan.timeline.phases?.length) {
-    const svg = await fetchMermaidSvg(timelineToMermaid(plan.timeline.phases))
-    if (svg) zip.file('timeline.svg', svg)
+  // Generate mermaid sources and SVGs
+  const diagrams = buildDiagramSources(plan)
+  for (const [name, mmd] of diagrams) {
+    zip.file(`diagrams/${name}.mmd`, mmd)
+    const svg = await fetchMermaidSvg(mmd)
+    if (svg) zip.file(`diagrams/${name}.svg`, svg)
   }
 
   const blob = await zip.generateAsync({ type: 'blob' })
   downloadBlob(blob, `${filename}.zip`)
+}
+
+function addDiagram(diagrams: Array<[string, string]>, name: string, mmd: string) {
+  if (mmd) diagrams.push([name, mmd])
+}
+
+function buildDiagramSources(plan: ProjectPlan): Array<[string, string]> {
+  const diagrams: Array<[string, string]> = []
+  const comps = plan.architecture.components
+  const model = plan.architecture.dataModel
+  const phases = plan.timeline.phases
+  const u = plan.foundation?.primaryUser
+  const flows = plan.design.keyUserFlows
+
+  if (comps?.length) addDiagram(diagrams, 'architecture', componentsToMermaid(comps))
+  if (model?.length) addDiagram(diagrams, 'data-model', dataModelToMermaid(model))
+  if (phases?.length) addDiagram(diagrams, 'timeline', timelineToMermaid(phases))
+  if (u?.description && flows?.length)
+    addDiagram(
+      diagrams,
+      'user-journey',
+      userJourneyToMermaid(u.description, flows, u.firstSuccessAction || ''),
+    )
+  if (plan.risks.length > 0) addDiagram(diagrams, 'risk-matrix', risksToMermaid(plan.risks))
+
+  const costs = extractBudgetItems(plan)
+  if (costs.length > 0) addDiagram(diagrams, 'budget', budgetToMermaid(costs))
+
+  return diagrams
+}
+
+function extractBudgetItems(plan: ProjectPlan): Array<{ label: string; amount: string }> {
+  const items: Array<{ label: string; amount: string }> = []
+  if (plan.budget.developmentEffort)
+    items.push({ label: 'Development', amount: plan.budget.developmentEffort })
+  if (plan.budget.infrastructureCosts)
+    items.push({ label: 'Infrastructure', amount: plan.budget.infrastructureCosts })
+  if (plan.budget.thirdPartyCosts) {
+    for (const c of plan.budget.thirdPartyCosts) items.push({ label: c.service, amount: c.cost })
+  }
+  return items
 }
 
 function downloadBlob(blob: Blob, filename: string) {

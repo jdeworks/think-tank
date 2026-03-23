@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { createShareUrl, loadFromShareUrl } from '@/utils/export'
 import { createEmptyPlan } from '@/schema/project-plan'
+import { generateOnePageSummary, generateHandoff } from '@/utils/export-extras'
 
 // Mock window.location
 const mockLocation = {
@@ -81,5 +82,91 @@ describe('importFromJSON', () => {
   it('is a function', async () => {
     const { importFromJSON } = await import('@/utils/export')
     expect(typeof importFromJSON).toBe('function')
+  })
+})
+
+describe('generateOnePageSummary', () => {
+  it('includes project name and description', () => {
+    const plan = createEmptyPlan()
+    plan.overview.name = 'My Bakery'
+    plan.overview.description = 'A gluten-free bakery'
+    const md = generateOnePageSummary(plan)
+    expect(md).toContain('My Bakery')
+    expect(md).toContain('gluten-free bakery')
+  })
+
+  it('includes foundation data', () => {
+    const plan = createEmptyPlan()
+    plan.overview.name = 'Test'
+    plan.foundation = {
+      primaryUser: {
+        description: 'A retired couple in their 60s',
+        firstSuccessAction: 'Find gluten-free bread and buy it',
+      },
+      designFilter: 'If they cannot find it in 10 minutes, the layout failed.',
+    }
+    const md = generateOnePageSummary(plan)
+    expect(md).toContain('retired couple')
+    expect(md).toContain('Design filter')
+  })
+
+  it('includes top risks', () => {
+    const plan = createEmptyPlan()
+    plan.overview.name = 'Test'
+    plan.risks = [
+      {
+        description: 'No customers',
+        category: 'market',
+        impact: 'high',
+        likelihood: 'medium',
+        mitigation: 'Marketing',
+      },
+    ]
+    const md = generateOnePageSummary(plan)
+    expect(md).toContain('No customers')
+  })
+})
+
+describe('generateHandoff', () => {
+  it('includes design filter prominently', () => {
+    const plan = createEmptyPlan()
+    plan.overview.name = 'Test'
+    plan.foundation = { designFilter: 'If Maria cannot do X, the UX failed.' }
+    const md = generateHandoff(plan)
+    expect(md).toContain('Design Filter')
+    expect(md).toContain('Maria cannot do X')
+  })
+
+  it('flags incomplete foundation', () => {
+    const plan = createEmptyPlan()
+    const md = generateHandoff(plan)
+    expect(md).toContain('Foundation Incomplete')
+  })
+
+  it('includes phase 1 deliverables as checklist', () => {
+    const plan = createEmptyPlan()
+    plan.overview.name = 'Test'
+    plan.timeline = {
+      phases: [
+        {
+          name: 'MVP',
+          description: 'Build core',
+          duration: '4 weeks',
+          deliverables: ['Auth', 'Dashboard'],
+        },
+      ],
+    }
+    const md = generateHandoff(plan)
+    expect(md).toContain('- [ ] Auth')
+    expect(md).toContain('- [ ] Dashboard')
+  })
+
+  it('includes non-goals as out-of-scope', () => {
+    const plan = createEmptyPlan()
+    plan.overview.name = 'Test'
+    plan.overview.nonGoals = ['Mobile app', 'Multi-language']
+    const md = generateHandoff(plan)
+    expect(md).toContain('Out of Scope')
+    expect(md).toContain('Mobile app')
   })
 })

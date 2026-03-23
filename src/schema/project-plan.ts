@@ -10,7 +10,17 @@ const CompetitorSchema = z.object({
 
 const RiskSchema = z.object({
   description: z.string(),
-  category: z.enum(['technical', 'resource', 'timeline', 'budget', 'security', 'other']),
+  category: z.enum([
+    'technical',
+    'resource',
+    'timeline',
+    'budget',
+    'security',
+    'market',
+    'legal',
+    'logistics',
+    'other',
+  ]),
   impact: z.enum(['low', 'medium', 'high']),
   likelihood: z.enum(['low', 'medium', 'high']),
   mitigation: z.string(),
