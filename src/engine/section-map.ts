@@ -7,7 +7,8 @@ interface SectionConfig {
 }
 
 const SECTION_CONFIGS: SectionConfig[] = [
-  { key: 'overview', requiredFields: ['name', 'description', 'goals', 'targetUsers'], order: 1 },
+  { key: 'foundation', requiredFields: ['primaryUser', 'designFilter'], order: 0 },
+  { key: 'overview', requiredFields: ['name', 'description', 'goals'], order: 1 },
   { key: 'competitors', requiredFields: [], order: 2 },
   { key: 'requirements', requiredFields: ['functional'], order: 3 },
   { key: 'architecture', requiredFields: ['systemType', 'pattern', 'components'], order: 4 },

@@ -11,7 +11,11 @@ prompts/
 ├── system.md              # How to guide the conversation
 ├── personalities/         # 5 personality styles
 ├── sections/              # Per-section questions, tips, and common mistakes
+│   ├── 00-foundation.md   # Mandatory: who is this for? (must complete before tech sections)
 │   ├── 01-overview.md ... 11-risks.md
+├── config/                # Optional workspace-specific context
+│   ├── README.md
+│   └── workspace.example.md
 └── tips/                  # Quality checklist, best practices, common mistakes
 ```
 
@@ -32,13 +36,14 @@ When a user says anything like:
 ### Step 0: Setup
 1. Read `prompts/system.md` for the overall approach
 2. Read the relevant personality from `prompts/personalities/`
-3. Create the session output directory:
+3. If `prompts/config/` contains workspace files, read them for context
+4. Create the session output directory:
    ```bash
    mkdir -p think-tank-output/<idea-slug>-$(date +%Y-%m-%dT%H-%M-%S)
    ```
 
-### Step 1: Understand the Idea
-Read `prompts/sections/01-overview.md` for the questions to ask. Start with 2-3 questions about the core idea. **Wait for answers.**
+### Step 1: Foundation — Who Is This For?
+Read `prompts/sections/00-foundation.md`. Establish the primary user, their context, and the design filter sentence. **This must complete before any architecture/tech/design sections.** Wait for answers.
 
 ### Step 2: Walk Through Each Section
 For each section (in order 01-11):

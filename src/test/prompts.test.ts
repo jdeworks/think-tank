@@ -111,6 +111,7 @@ describe('getUpdatePlanTool', () => {
     expect(sectionEnum).toContain('architecture')
     expect(sectionEnum).toContain('competitors')
     expect(sectionEnum).toContain('risks')
-    expect(sectionEnum?.length).toBe(11)
+    expect(sectionEnum).toContain('foundation')
+    expect(sectionEnum?.length).toBe(12)
   })
 })

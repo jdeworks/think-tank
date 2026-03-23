@@ -47,6 +47,9 @@ cli/
   README.md
   think-tank.ts
 prompts/
+  config/
+    README.md
+    workspace.example.md
   personalities/
     architect.md
     budget.md
@@ -54,6 +57,7 @@ prompts/
     friendly.md
     researcher.md
   sections/
+    00-foundation.md
     01-overview.md
     02-competitors.md
     03-requirements.md
@@ -137,6 +141,268 @@ README.md
 
 <files>
 This section contains the contents of the repository's files.
+
+<file path="prompts/config/README.md">
+# Workspace Configuration
+
+This directory holds optional workspace-specific context files that are loaded
+at the start of every planning session.
+
+## How it works
+
+- The core prompts in `prompts/system.md` and `prompts/sections/` are universal
+- Files in this directory add workspace context on top — preferred tech stack,
+  existing repos, target markets, cost constraints, etc.
+- If this directory is empty, the planner works the same — it just asks more questions
+
+## How to use
+
+1. Copy `workspace.example.md` to `workspace.md`
+2. Fill in the sections that apply to your workspace
+3. Delete sections that don't apply
+4. The planner will read this file at session start
+
+## Rules
+
+- Core prompts must never reference workspace-specific content
+- Workspace config is additive context, not overrides
+- Keep files focused — one file per workspace or team context
+</file>
+
+<file path="prompts/config/workspace.example.md">
+# Workspace Configuration
+# Copy this file to workspace.md and fill in your details.
+# Delete any sections that don't apply.
+
+## About this workspace
+
+[One paragraph: what kind of products are built here, who builds them, at what stage.]
+
+## Existing repos and their roles
+
+[List repos that new projects should know about or might integrate with.]
+
+| Repo | Role | When to use |
+|------|------|-------------|
+| `[repo-name]` | [what it does] | [when a new plan should use it] |
+
+## Preferred tech stack
+
+[List any non-negotiable choices. Leave blank to keep the planner open.]
+
+**Runtime:**
+**Frontend:**
+**Backend:**
+**Database:**
+**Hosting:**
+**Testing:**
+
+## Target markets and users
+
+[If your workspace consistently builds for a specific market or user type.]
+
+## Cost constraints
+
+[Hard limits on infrastructure, API costs, or time-to-build.]
+
+## Quality standards
+
+[Conventions every project must meet.]
+
+## Common mistakes to avoid
+
+[Patterns that have caused problems before.]
+</file>
+
+<file path="prompts/sections/00-foundation.md">
+# Section 00 — Foundation: Who Is This For?
+
+## Why this section exists
+
+Every downstream decision — architecture, tech stack, hosting, UI design, pricing —
+is constrained by who will actually use what you are building.
+
+This section must be completed before any technical discussion begins.
+The AI should not ask about databases, frameworks, or deployment until it has
+a concrete answer to: who is the first person who will use this, and what does
+success look like for them?
+
+This applies to any kind of project — software, a physical store, a service,
+a community, an event, a product line. If it has a user or customer, this section applies.
+
+---
+
+## What the AI must establish
+
+### 1. The primary user — make them real
+
+**Do NOT accept vague demographics. Challenge immediately:**
+
+| Vague answer | Challenge |
+|---|---|
+| "developers" | "What kind of developer? Junior or senior? What language? What context?" |
+| "small businesses" | "What kind? Who in the business actually uses it — owner, employee, manager?" |
+| "non-technical users" | "What does non-technical mean here — can they use Gmail? Notion? A smartphone?" |
+| "general users" | "Who is the first specific person who will try this? Paint me a picture." |
+| "anyone who wants to..." | "Who wants to? Where are they? What's their situation?" |
+| "customers" | "What kind of customer? Walk-in, online, referred? What's their day like?" |
+
+**DO accept descriptions that pass this test: could you put this person in a room and recognise them?**
+
+Examples of acceptable answers:
+- "A 28-year-old freelance graphic designer in Manila who tracks client projects in a WhatsApp group and wants to send professional invoices."
+- "A store manager at a 3-person hardware shop in Lagos who uses a Samsung Galaxy phone, WhatsApp, and Facebook — never used a web app."
+- "A junior backend developer, 1-2 years experience, comfortable with the terminal but never set up CI/CD. Probably on macOS."
+- "A retired couple in their 60s looking for a neighbourhood bakery with gluten-free options. They drive, use Google Maps, and read Facebook reviews."
+
+### 2. Their device and context
+
+Ask:
+- "What device will they use this on primarily — phone, tablet, laptop, desktop? Or is this not a digital product?"
+- "What is their likely context — at a desk, on the go, in a store, at home?"
+- "If digital: what's their connection — fast WiFi, mobile data, slow or unreliable?"
+
+**Why it matters:** A "simple" web app that requires a laptop and fast WiFi is not simple for someone who is phone-only on mobile data. A physical store concept needs foot traffic context, not bandwidth.
+
+### 3. Their technical comfort — anchor to a tool, not a label
+
+**Do NOT ask:** "Are they technical or non-technical?"
+
+**DO ask:** "What existing tool, app, or process do they use every day that gives me a sense of their comfort level?"
+
+This establishes a baseline without abstract labels:
+- "They use WhatsApp and Facebook" → very different from
+- "They're comfortable with GitHub and the terminal" → very different from
+- "They use Notion and manage a team of 20" → very different from
+- "They use a paper ledger and a calculator"
+
+The anchor tells you everything about the acceptable complexity ceiling.
+
+### 4. Their current solution and frustration
+
+Ask:
+- "What do they use right now to solve this problem — even if it's a workaround?"
+- "What is the specific thing that makes the current solution painful or insufficient?"
+
+**Why it matters:** The current solution defines the real competition and the minimum bar the product must clear. "They use a spreadsheet" sets a very different bar than "nothing — this problem goes unsolved."
+
+### 5. First success — a concrete action, not a feeling
+
+Ask: "Describe what this person does in their first interaction with your product. What is the one thing they need to accomplish for it to feel worth it?"
+
+**Do NOT accept:**
+- "They feel like it's intuitive"
+- "They understand the product"
+- "They get the value"
+
+**DO accept:**
+- "They create their first invoice and share it with a client within 5 minutes, without asking for help."
+- "They walk in, find the gluten-free section, and leave with a purchase in under 10 minutes."
+- "They deploy their app to a live URL using only the README."
+
+The test: **can an outside observer watch this happen and confirm it occurred?**
+
+---
+
+## The design filter sentence
+
+After collecting all of the above, synthesise one sentence:
+
+```
+"If [name or role], [key context], cannot [first success action] without help, [consequence]."
+```
+
+**Examples:**
+- "If Maria, a non-technical mobile-only business owner in Davao City, cannot publish her site within 10 minutes without asking anyone for help, the UX is not acceptable."
+- "If a first-time walk-in customer cannot find what they need and check out within 10 minutes, the store layout has failed."
+- "If Sara, a junior developer unfamiliar with CI/CD, cannot deploy to staging using the README alone, the setup is too complex."
+
+This sentence is written into the plan. It is used to evaluate every subsequent decision.
+
+---
+
+## Questions to ask (in order — wait for each answer before continuing)
+
+**Question 1:**
+> "Before we get into the details, let's nail down who this is for. Tell me about the first specific person who will use this — not a demographic, but a real person you can picture. Who are they? What's their situation?"
+
+*If the answer is abstract, push back:*
+> "Can you be more specific? [repeat their category] covers a huge range. What kind of [their category], doing what, where, with what context?"
+
+**Question 2:**
+> "What's their context when they interact with this? Are they at a desk, on their phone, walking into a store, browsing at home? And if it's digital — what kind of connection and device?"
+
+**Question 3:**
+> "What's a tool, app, or process they use every day that gives me a sense of their comfort level? Something similar in complexity to what you're building."
+
+*If they say "non-technical", push back:*
+> "What does that mean in practice? Can they use Gmail? A spreadsheet? Notion? WhatsApp? I'm looking for an anchor."
+
+**Question 4:**
+> "What do they currently use to solve this problem — even if it's messy or incomplete? A spreadsheet, a WhatsApp group, a competitor, nothing at all?"
+
+**Question 5:**
+> "Walk me through what this person does in their first interaction with your product. What do they need to accomplish for it to feel worth it?"
+
+*If they give a feeling ("feel confident"), push back:*
+> "What would that look like as a specific action? What would I observe happening?"
+
+---
+
+## Required output before moving on
+
+The foundation section must contain all of the following before any section about architecture, tech stack, design, or hosting is started:
+
+```json
+{
+  "foundation": {
+    "primaryUser": {
+      "description": "[specific person — at least a sentence, not a category]",
+      "device": "[phone | tablet | laptop | desktop | in-person | mixed]",
+      "context": "[where and how they interact]",
+      "technicalComfortAnchor": "[a specific tool or process they use, not an abstract label]",
+      "currentSolution": "[what they use now — can be 'nothing']",
+      "firstSuccessAction": "[specific observable action, not a feeling]",
+      "firstSuccessTimeframe": "[e.g. 'within 10 minutes of first use']"
+    },
+    "designFilter": "If [person], [context], cannot [action] without help, [consequence]."
+  }
+}
+```
+
+---
+
+## Red flags — do not move on if any are true
+
+- Primary user is described as a category without a scenario ("developers", "SMBs")
+- Device/context is "any" or unspecified
+- Technical comfort uses abstract labels without an anchor
+- First success is a feeling, not an observable action
+- Design filter sentence has not been written
+
+---
+
+## How this section constrains downstream sections
+
+This is not just a data collection exercise. The foundation actively constrains later decisions:
+
+**Overview (01):** Goals must be achievable by the primary user in their context.
+Non-goals should exclude things requiring more than the primary user has.
+
+**Requirements (02):** Every requirement should map to something the primary user needs.
+
+**Architecture (03):** Every component must be reachable by the primary user.
+
+**Tech Stack (04):** Complexity ceiling = what the primary user's anchor requires of them.
+
+**Hosting (05):** Performance and access must match the primary user's context.
+
+**Design (07):** UI/UX complexity must not exceed what the primary user can navigate.
+
+**Budget (08):** Value is defined by whether first success is achievable at the price point.
+
+The design filter sentence should be quoted verbatim whenever a major decision is being evaluated.
+</file>
 
 <file path="cli/README.md">
 # Think Tank — Local CLI Instructions
@@ -531,30 +797,28 @@ You are a thorough researcher and analyst. You focus on finding competitors, sim
 - Project name
 - One-sentence description
 - Problem statement (what pain does this solve?)
-- Goals (3-5 specific, measurable outcomes)
+- Goals (3-5 specific, measurable outcomes — achievable by the primary user from Section 00)
 - Non-goals (what this project deliberately does NOT do)
-- Target users (be specific — not "everyone")
-- Success metrics (how do you know it's working?)
+- Success metrics (observable actions, not feelings — tied to the primary user's first success)
 
 ## Questions to Ask
 1. Can you describe your idea in one sentence? What does it DO?
 2. What problem does this solve? What's the pain point today?
-3. Who specifically would use this? (Age, role, technical skill level?)
-4. What does success look like 6 months after launch?
-5. What is this project NOT? (Defining boundaries early saves time later)
+3. Given the primary user we defined, what does success look like 6 months after launch? (Use concrete numbers or observable outcomes.)
+4. What is this project NOT? (Defining boundaries early saves time later.)
 
 ## Quality Tips
 - A vague description means a vague product. Push for specificity.
-- "Everyone" is not a target user. The best products serve a specific niche first.
 - Non-goals are as important as goals — they prevent scope creep.
-- Success metrics should be measurable: "100 daily active users" not "people like it."
+- Success metrics should be observable: "100 daily active users" or "first purchase within 10 minutes", not "people like it."
 - If the user can't explain it in one sentence, the idea needs sharpening.
+- Goals should be achievable by the primary user defined in Section 00 — if they aren't, either the goals or the primary user need revisiting.
 
 ## Common Mistakes
 - Skipping non-goals (leads to feature creep later)
 - Setting goals that can't be measured
-- Targeting too broad an audience
 - Confusing features with goals ("add dark mode" is a feature, not a goal)
+- Writing success metrics as feelings instead of actions
 </file>
 
 <file path="prompts/sections/02-competitors.md">
@@ -1003,8 +1267,23 @@ Document the trade-off for each major decision so future-you understands why you
 
 Use this to verify a plan is complete and high-quality before finalizing.
 
+## Gate 0 — Foundation Completeness
+### This gate runs FIRST. All other checks are blocked until this passes.
+
+- [ ] **Primary user description** is a specific person or role scenario
+      (NOT a demographic category like "developers" or "small businesses")
+- [ ] **Device/context** is specified (not "any device" or unspecified)
+- [ ] **Technical comfort** is anchored to a named tool, app, or process
+      (NOT abstract labels like "non-technical" or "tech-savvy")
+- [ ] **First success** is a concrete observable action (NOT a feeling)
+- [ ] **Design filter sentence** is present:
+      "If [person], [context], cannot [action] without help, [consequence]."
+
+If ANY of the above fail, report ONLY the foundation gap. Do not review other sections
+until foundation is complete.
+
 ## Completeness
-- [ ] All 11 planning sections have meaningful content (not just filler)
+- [ ] All planning sections have meaningful content (not just filler)
 - [ ] Implementation review (section 12) has been done
 - [ ] Overview has specific goals AND non-goals
 - [ ] At least 3 competitors analyzed with strengths AND weaknesses
@@ -1034,14 +1313,15 @@ Use this to verify a plan is complete and high-quality before finalizing.
 - [ ] Technology choices are concrete (specific frameworks, not "some JS framework")
 - [ ] Data model is defined enough to create database tables
 
-## Implementation Readiness (NEW — prevents implementer questions)
+## Implementation Readiness
+- [ ] The design filter sentence is actionable — an implementer can test every decision against it
+- [ ] The primary user's device/context is unambiguous
+- [ ] The primary user's first success action is testable
 - [ ] Every "X or Y" choice has been resolved to a single answer
 - [ ] Exact library versions specified (not just "React" but "React 19")
 - [ ] Integration method is explicit (URL reference? npm install? copy files?)
 - [ ] File/folder structure of the output is listed
 - [ ] Build and deployment steps are specific commands, not descriptions
-- [ ] Agent config format decided (.cursorrules vs .cursor/rules/)
-- [ ] CSS strategy per context (CDN for dev? Build for prod?)
 - [ ] Test: "Could an AI agent implement this with zero follow-up questions?"
 </file>
 
@@ -1098,7 +1378,16 @@ This means prompt updates in the repo are immediately reflected in the live app 
 <file path="prompts/system.md">
 # Think Tank — System Prompt
 
-You are helping a user plan a software project from scratch. Your job is to guide them through a structured conversation, asking questions to gather information and build a comprehensive project plan.
+You are helping a user plan a project from scratch. Your job is to guide them through a structured conversation, asking questions to gather information and build a comprehensive project plan.
+
+This works for any kind of project — software, a physical store, a service, a community, an event, a product. The planning structure adapts to what's being built.
+
+## Universal Applicability
+
+This planning system is not tied to any specific technology, company, or domain.
+If a `prompts/config/` directory exists with workspace-specific files, read those
+at session start — they provide context without coupling the core tool to any
+specific environment.
 
 ## How to Work
 
@@ -1114,12 +1403,13 @@ You are helping a user plan a software project from scratch. Your job is to guid
 
 Walk through these in order. Each one builds on the previous:
 
-1. **Overview** — What is it? Who is it for? What problem does it solve?
+0. **Foundation** — Who is this for? (MANDATORY before any technical/structural decisions)
+1. **Overview** — What is it? What problem does it solve?
 2. **Competitors** — What exists? What's the gap? What inspires you?
 3. **Requirements** — Must-haves, should-haves, nice-to-haves, constraints
 4. **Architecture** — System type, components, connections, data model
-5. **Tech Stack** — Languages, frameworks, databases — always explain WHY
-6. **Hosting** — Where to deploy, CI/CD, environments, cost
+5. **Tech Stack** — Languages, frameworks, tools — always explain WHY
+6. **Hosting** — Where to deploy/operate, CI/CD, environments, cost
 7. **Security** — Auth, encryption, compliance, threat model
 8. **Design** — User flows, responsive strategy, accessibility
 9. **Budget** — Dev effort, infrastructure, third-party costs
@@ -1127,10 +1417,32 @@ Walk through these in order. Each one builds on the previous:
 11. **Risks** — What could go wrong, how to mitigate
 12. **Implementation Review** — Review the plan as if you had to BUILD it. Resolve every ambiguity so an implementing agent has zero questions.
 
+### Foundation Gate
+
+Section 00 (Foundation) establishes who the product is for. It MUST be completed
+before sections 04 (Architecture), 05 (Tech Stack), 06 (Hosting), and 08 (Design).
+
+If a user tries to skip ahead to architecture, tech stack, or design, redirect:
+> "Before we design how to build this, let's make sure we know who it's for —
+> that changes everything. It'll take about 5 minutes and will make the rest
+> of the decisions much clearer."
+
+Section 01 (Overview) may run alongside or immediately after Section 00.
+Sections 02-03 (Competitors, Requirements) may follow Overview.
+Sections 04+ require Foundation to be complete.
+
+### The Design Filter
+
+After foundation is complete, the plan contains a design filter sentence. Use it actively:
+
+- When evaluating a decision: "Given that [primary user] in [their context] needs to [first success action], does this help or hinder that?"
+- When scope grows: "This seems to be for a different user than who we defined. Intentional?"
+- The design filter is not a veto — it's a question. The user decides. But always ask.
+
 ## Important Guidelines
 
-- Keep language simple and accessible for non-technical users
-- When recommending technologies, briefly explain WHY
+- Keep language simple and accessible
+- When recommending approaches, briefly explain WHY
 - Always consider budget implications of your suggestions
 - Suggest alternatives when possible (e.g., "You could use X (free) or Y (paid, more features)")
 - If the user seems stuck, provide concrete examples or options to choose from
@@ -1527,6 +1839,8 @@ export type ProjectPlan = z.infer<typeof ProjectPlanSchema>
 export type PlanSectionKey = (typeof PLAN_SECTIONS)[number]
 ⋮----
 export function createEmptyPlan(): ProjectPlan
+⋮----
+export function isFoundationComplete(plan: ProjectPlan):
 </file>
 
 <file path="src/storage/project-db.ts">
@@ -1674,7 +1988,11 @@ prompts/
 ├── system.md              # How to guide the conversation
 ├── personalities/         # 5 personality styles
 ├── sections/              # Per-section questions, tips, and common mistakes
+│   ├── 00-foundation.md   # Mandatory: who is this for? (must complete before tech sections)
 │   ├── 01-overview.md ... 11-risks.md
+├── config/                # Optional workspace-specific context
+│   ├── README.md
+│   └── workspace.example.md
 └── tips/                  # Quality checklist, best practices, common mistakes
 ```
 
@@ -1695,13 +2013,14 @@ When a user says anything like:
 ### Step 0: Setup
 1. Read `prompts/system.md` for the overall approach
 2. Read the relevant personality from `prompts/personalities/`
-3. Create the session output directory:
+3. If `prompts/config/` contains workspace files, read them for context
+4. Create the session output directory:
    ```bash
    mkdir -p think-tank-output/<idea-slug>-$(date +%Y-%m-%dT%H-%M-%S)
    ```
 
-### Step 1: Understand the Idea
-Read `prompts/sections/01-overview.md` for the questions to ask. Start with 2-3 questions about the core idea. **Wait for answers.**
+### Step 1: Foundation — Who Is This For?
+Read `prompts/sections/00-foundation.md`. Establish the primary user, their context, and the design filter sentence. **This must complete before any architecture/tech/design sections.** Wait for answers.
 
 ### Step 2: Walk Through Each Section
 For each section (in order 01-11):
@@ -2020,6 +2339,8 @@ export function loadFromShareUrl(): ProjectPlan | null
 ⋮----
 function planToMarkdown(plan: ProjectPlan): string
 ⋮----
+function renderFoundation(plan: ProjectPlan): string
+⋮----
 function renderOverview(plan: ProjectPlan): string
 ⋮----
 function renderRequirements(plan: ProjectPlan): string
@@ -2105,6 +2426,10 @@ npm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Extension plan (working docs, not committed)
+think-tank-plan/
+think-tank-plan.zip
 </file>
 
 <file path="package.json">
@@ -2171,6 +2496,53 @@ npm-debug.log*
     "vitest": "^4.1.0"
   }
 }
+</file>
+
+<file path="src/components/project/HomePage.tsx">
+import { useState } from 'react'
+import { useProjectStore } from '@/stores/project-store'
+import { useSettingsStore } from '@/stores/settings-store'
+import { useUIStore } from '@/stores/ui-store'
+import { PERSONALITY_INFO } from '@/schema/settings'
+import { EXAMPLE_TEMPLATES } from '@/data/example-templates'
+import { ProjectList } from './ProjectList'
+import { Button } from '@/components/common/Button'
+⋮----
+const handleStart = () =>
+⋮----
+{/* Header */}
+⋮----
+{/* Idea input */}
+⋮----
+{/* Status bar */}
+⋮----
+onClick=
+⋮----
+{/* How it works */}
+⋮----
+{/* Example templates — paste into input, don't start */}
+⋮----
+{/* Saved projects */}
+</file>
+
+<file path="src/stores/settings-store.ts">
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+import type { ProviderConfig, Personality } from '@/schema/settings'
+⋮----
+interface SettingsState {
+  provider: ProviderConfig | null
+  personality: Personality
+  voiceInputEnabled: boolean
+  voiceOutputEnabled: boolean
+  setProvider: (provider: ProviderConfig) => void
+  setPersonality: (personality: Personality) => void
+  setVoiceInputEnabled: (enabled: boolean) => void
+  setVoiceOutputEnabled: (enabled: boolean) => void
+  clearProvider: () => void
+}
+⋮----
+// Persist everything EXCEPT the API key
 </file>
 
 <file path="README.md">
@@ -2399,53 +2771,6 @@ Runs 6 stages in order:
 ## License
 
 MIT
-</file>
-
-<file path="src/components/project/HomePage.tsx">
-import { useState } from 'react'
-import { useProjectStore } from '@/stores/project-store'
-import { useSettingsStore } from '@/stores/settings-store'
-import { useUIStore } from '@/stores/ui-store'
-import { PERSONALITY_INFO } from '@/schema/settings'
-import { EXAMPLE_TEMPLATES } from '@/data/example-templates'
-import { ProjectList } from './ProjectList'
-import { Button } from '@/components/common/Button'
-⋮----
-const handleStart = () =>
-⋮----
-{/* Header */}
-⋮----
-{/* Idea input */}
-⋮----
-{/* Status bar */}
-⋮----
-onClick=
-⋮----
-{/* How it works */}
-⋮----
-{/* Example templates — paste into input, don't start */}
-⋮----
-{/* Saved projects */}
-</file>
-
-<file path="src/stores/settings-store.ts">
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import type { ProviderConfig, Personality } from '@/schema/settings'
-⋮----
-interface SettingsState {
-  provider: ProviderConfig | null
-  personality: Personality
-  voiceInputEnabled: boolean
-  voiceOutputEnabled: boolean
-  setProvider: (provider: ProviderConfig) => void
-  setPersonality: (personality: Personality) => void
-  setVoiceInputEnabled: (enabled: boolean) => void
-  setVoiceOutputEnabled: (enabled: boolean) => void
-  clearProvider: () => void
-}
-⋮----
-// Persist everything EXCEPT the API key
 </file>
 
 <file path="src/components/settings/SettingsModal.tsx">

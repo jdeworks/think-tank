@@ -114,6 +114,7 @@ function planToMarkdown(plan: ProjectPlan): string {
   }
 
   const sections: [PlanSectionKey, (p: ProjectPlan) => string][] = [
+    ['foundation', renderFoundation],
     ['overview', renderOverview],
     ['requirements', renderRequirements],
     ['architecture', renderArchitecture],
@@ -138,6 +139,25 @@ function planToMarkdown(plan: ProjectPlan): string {
   }
 
   return lines.join('\n')
+}
+
+function renderFoundation(plan: ProjectPlan): string {
+  const f = plan.foundation
+  const u = f?.primaryUser
+  const fields: [string, string | undefined][] = [
+    ['Primary User', u?.description],
+    ['Device', u?.device],
+    ['Context', u?.context],
+    ['Technical Comfort', u?.technicalComfortAnchor],
+    ['Current Solution', u?.currentSolution],
+    ['First Success', u?.firstSuccessAction],
+    ['Timeframe', u?.firstSuccessTimeframe],
+    ['Design Filter', f?.designFilter],
+  ]
+  return fields
+    .filter(([, v]) => v)
+    .map(([label, value]) => `**${label}:** ${value}`)
+    .join('\n\n')
 }
 
 function renderOverview(plan: ProjectPlan): string {

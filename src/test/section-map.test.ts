@@ -98,14 +98,15 @@ describe('getIncompleteSections', () => {
   it('returns all sections for an empty plan', () => {
     const plan = createEmptyPlan()
     const incomplete = getIncompleteSections(plan)
-    expect(incomplete.length).toBe(11)
+    expect(incomplete.length).toBe(12)
   })
 
   it('returns sections sorted by order', () => {
     const plan = createEmptyPlan()
     const incomplete = getIncompleteSections(plan)
-    expect(incomplete[0]).toBe('overview')
-    expect(incomplete[1]).toBe('competitors')
+    expect(incomplete[0]).toBe('foundation')
+    expect(incomplete[1]).toBe('overview')
+    expect(incomplete[2]).toBe('competitors')
   })
 
   it('excludes complete sections', () => {
@@ -125,13 +126,26 @@ describe('getIncompleteSections', () => {
 })
 
 describe('getNextSection', () => {
-  it('returns overview first for empty plan', () => {
+  it('returns foundation first for empty plan', () => {
     const plan = createEmptyPlan()
-    expect(getNextSection(plan)).toBe('overview')
+    expect(getNextSection(plan)).toBe('foundation')
   })
 
   it('returns null when all sections are complete', () => {
     const plan = createEmptyPlan()
+    plan.foundation = {
+      primaryUser: {
+        description: 'A freelance designer in Manila',
+        device: 'phone',
+        context: 'on the go, mobile data',
+        technicalComfortAnchor: 'WhatsApp and Facebook',
+        currentSolution: 'Spreadsheet',
+        firstSuccessAction: 'Create and share an invoice',
+        firstSuccessTimeframe: '5 minutes',
+      },
+      designFilter:
+        'If Maria cannot create an invoice on her phone without help, the UX has failed.',
+    }
     plan.overview = {
       name: 'T',
       description: 'D',

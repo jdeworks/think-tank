@@ -7,6 +7,7 @@ import { getIncompleteSections, getNextSection } from './section-map'
 import { loadSectionGuide } from '@/utils/prompt-loader'
 
 const SECTION_SLUG_MAP: Record<string, { num: number; slug: string }> = {
+  foundation: { num: 0, slug: 'foundation' },
   overview: { num: 1, slug: 'overview' },
   competitors: { num: 2, slug: 'competitors' },
   requirements: { num: 3, slug: 'requirements' },

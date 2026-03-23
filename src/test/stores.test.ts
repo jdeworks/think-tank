@@ -11,6 +11,7 @@ describe('useProjectStore', () => {
       idea: '',
       plan: {
         meta: { version: '1.0', createdAt: '', lastModified: '' },
+        foundation: {},
         overview: {},
         requirements: {},
         architecture: {},
@@ -146,6 +147,7 @@ describe('useProjectStore', () => {
       idea: 'stored idea',
       plan: {
         meta: { version: '1.0', createdAt: '2024-01-01', lastModified: '2024-01-01' },
+        foundation: {},
         overview: { name: 'Stored' },
         requirements: {},
         architecture: {},

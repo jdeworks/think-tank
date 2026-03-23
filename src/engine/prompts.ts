@@ -39,6 +39,7 @@ const UPDATE_PLAN_TOOL = {
         section: {
           type: 'string',
           enum: [
+            'foundation',
             'overview',
             'requirements',
             'architecture',
@@ -80,7 +81,7 @@ export function buildSystemPrompt(
   let prompt = `${personalityPrompt}
 
 ## Your Role
-You are helping a user plan a software project from scratch. Your job is to guide them through a structured
+You are helping a user plan a project from scratch. Your job is to guide them through a structured
 conversation, asking questions to gather information and build a comprehensive project plan.
 
 ## How to Work
@@ -122,12 +123,13 @@ function addField(parts: string[], label: string, value: string | undefined | nu
 function buildPlanSummary(plan: ProjectPlan): string {
   const parts: string[] = []
 
+  addField(parts, 'Primary User', plan.foundation?.primaryUser?.description)
+  addField(parts, 'Design Filter', plan.foundation?.designFilter)
   addField(parts, 'Project', plan.overview.name)
   addField(parts, 'Description', plan.overview.description)
   if (plan.overview.goals?.length) {
     parts.push(`**Goals:** ${plan.overview.goals.join(', ')}`)
   }
-  addField(parts, 'Target Users', plan.overview.targetUsers)
   addField(parts, 'System Type', plan.architecture.systemType)
   addField(parts, 'Architecture', plan.architecture.pattern)
   addField(parts, 'Frontend', plan.techStack.frontend?.framework)
@@ -158,8 +160,9 @@ export function buildInitialPrompt(idea: string, personality: Personality): stri
 
   return `The user has this project idea: "${idea}"
 
-${openers[personality]} Start by asking 2-3 key questions to understand the core of what they want to build.
-Focus on: What problem does it solve? Who is it for? What's the most important feature?
+${openers[personality]} Start with the foundation: who is the first specific person who will use this?
+Ask 2-3 questions to understand the primary user — a real person, not a demographic category.
+Refer to the current section guide for the exact questions to ask.
 
 Also use the update_plan tool to set the initial overview with what you can already infer from their idea.`
 }

@@ -16,6 +16,21 @@ const RiskSchema = z.object({
   mitigation: z.string(),
 })
 
+const PrimaryUserSchema = z.object({
+  description: z.optional(z.string()),
+  device: z.optional(z.string()),
+  context: z.optional(z.string()),
+  technicalComfortAnchor: z.optional(z.string()),
+  currentSolution: z.optional(z.string()),
+  firstSuccessAction: z.optional(z.string()),
+  firstSuccessTimeframe: z.optional(z.string()),
+})
+
+const FoundationSection = z.object({
+  primaryUser: z.optional(PrimaryUserSchema),
+  designFilter: z.optional(z.string()),
+})
+
 const OverviewSection = z.object({
   name: z.optional(z.string()),
   description: z.optional(z.string()),
@@ -157,6 +172,7 @@ export const ProjectPlanSchema = z.object({
     createdAt: z.string(),
     lastModified: z.string(),
   }),
+  foundation: FoundationSection,
   overview: OverviewSection,
   requirements: RequirementsSection,
   architecture: ArchitectureSection,
@@ -173,6 +189,7 @@ export const ProjectPlanSchema = z.object({
 export type ProjectPlan = z.infer<typeof ProjectPlanSchema>
 
 export const PLAN_SECTIONS = [
+  'foundation',
   'overview',
   'requirements',
   'architecture',
@@ -189,6 +206,7 @@ export const PLAN_SECTIONS = [
 export type PlanSectionKey = (typeof PLAN_SECTIONS)[number]
 
 export const SECTION_LABELS: Record<PlanSectionKey, string> = {
+  foundation: 'Foundation',
   overview: 'Project Overview',
   requirements: 'Requirements',
   architecture: 'Architecture',
@@ -206,6 +224,7 @@ export function createEmptyPlan(): ProjectPlan {
   const now = new Date().toISOString()
   return {
     meta: { version: '1.0', createdAt: now, lastModified: now },
+    foundation: {},
     overview: {},
     requirements: {},
     architecture: {},
@@ -218,4 +237,20 @@ export function createEmptyPlan(): ProjectPlan {
     risks: [],
     competitors: [],
   }
+}
+
+export function isFoundationComplete(plan: ProjectPlan): {
+  complete: boolean
+  missing: string[]
+} {
+  const missing: string[] = []
+  const user = plan.foundation?.primaryUser
+
+  if (!user?.description) missing.push('primaryUser.description')
+  if (!user?.device) missing.push('primaryUser.device')
+  if (!user?.technicalComfortAnchor) missing.push('primaryUser.technicalComfortAnchor')
+  if (!user?.firstSuccessAction) missing.push('primaryUser.firstSuccessAction')
+  if (!plan.foundation?.designFilter) missing.push('designFilter')
+
+  return { complete: missing.length === 0, missing }
 }

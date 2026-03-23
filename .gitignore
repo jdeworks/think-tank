@@ -33,3 +33,7 @@ npm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Extension plan (working docs, not committed)
+think-tank-plan/
+think-tank-plan.zip
