@@ -1,0 +1,2493 @@
+This file is a merged representation of a subset of the codebase, containing files not matching ignore patterns, combined into a single document by Repomix.
+The content has been processed where content has been compressed (code blocks are separated by ⋮---- delimiter).
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of a subset of the repository's contents that is considered the most important context.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching these patterns are excluded: docs/**, bundle.xml, repomix.config.json, .github/**, .cursorrules, .prettierrc, knip.config.ts, tsconfig.*.json, tsconfig.json, eslint.config.js, vite.config.ts, vitest.config.ts, src/test/**, public/**
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Content has been compressed - code blocks are separated by ⋮---- delimiter
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+cli/
+  README.md
+  think-tank.ts
+prompts/
+  personalities/
+    architect.md
+    budget.md
+    critical.md
+    friendly.md
+    researcher.md
+  sections/
+    01-overview.md
+    02-competitors.md
+    03-requirements.md
+    04-architecture.md
+    05-tech-stack.md
+    06-hosting.md
+    07-security.md
+    08-design.md
+    09-budget.md
+    10-timeline.md
+    11-risks.md
+    12-implementation-review.md
+  tips/
+    best-practices.md
+    common-mistakes.md
+    quality-checklist.md
+  README.md
+  system.md
+src/
+  components/
+    chat/
+      ChatInput.tsx
+      ChatPanel.tsx
+      MessageBubble.tsx
+    common/
+      Badge.tsx
+      Button.tsx
+      Modal.tsx
+    plan/
+      ArchitectureDiagram.tsx
+      DiagramSection.tsx
+      MermaidDiagram.tsx
+      PlanSidebar.tsx
+      PlanView.tsx
+    project/
+      HomePage.tsx
+      ProjectList.tsx
+    settings/
+      SettingsModal.tsx
+  data/
+    example-templates.ts
+  engine/
+    conversation-engine.ts
+    prompts.ts
+    section-map.ts
+  hooks/
+    useSpeechRecognition.ts
+    useSpeechSynthesis.ts
+    useStartConversation.ts
+  providers/
+    anthropic.ts
+    openai.ts
+    registry.ts
+    types.ts
+  schema/
+    conversation.ts
+    project-plan.ts
+    settings.ts
+  storage/
+    project-db.ts
+  stores/
+    project-store.ts
+    settings-store.ts
+    ui-store.ts
+  utils/
+    export.ts
+    mermaid-helpers.ts
+    mermaid-render.ts
+    prompt-loader.ts
+    tokens.ts
+  App.tsx
+  index.css
+  main.tsx
+.gitignore
+CLAUDE.md
+index.html
+Makefile
+package.json
+README.md
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="cli/README.md">
+# Think Tank — Local CLI Instructions
+
+## Quick Start
+
+### Option 1: Interactive CLI (recommended)
+
+```bash
+# Set your API key
+export ANTHROPIC_API_KEY=sk-ant-...
+
+# Run the interactive planner
+npx tsx cli/think-tank.ts
+
+# Or start with an idea directly
+npx tsx cli/think-tank.ts --idea "I want to build a recipe sharing app"
+
+# Choose a personality
+npx tsx cli/think-tank.ts --personality critical
+
+# Resume from a previous plan
+npx tsx cli/think-tank.ts --load think-tank-output/plan.json
+```
+
+**Available personalities:** `friendly` (default), `researcher`, `critical`, `architect`, `budget`
+
+**In-session commands:**
+| Command | What it does |
+|---------|-------------|
+| `/progress` | Show completion % for each plan section |
+| `/save` | Save plan as JSON to `think-tank-output/plan.json` |
+| `/export` | Export plan as Markdown to `think-tank-output/plan.md` |
+| `/diagrams` | Generate Mermaid `.mmd` files (architecture, data model, timeline) |
+| `/plan` | Print raw plan JSON |
+| `/quit` | Save and exit |
+
+**Output files go to `think-tank-output/`:**
+- `plan.json` — Structured plan (importable into the web UI)
+- `plan.md` — Human-readable Markdown
+- `architecture.mmd` — System architecture flowchart
+- `data-model.mmd` — Entity relationship diagram
+- `timeline.mmd` — Gantt chart
+
+### Option 2: Use with Claude Code directly
+
+If you have Claude Code (this CLI), you can use it as the planner itself. Just tell Claude Code:
+
+> "Read CLAUDE.md and help me plan a project. My idea is: ..."
+
+Claude Code will then:
+1. Read the plan schema from `src/schema/project-plan.ts`
+2. Ask you questions iteratively
+3. Build the plan JSON progressively
+4. Save it to `think-tank-output/plan.json`
+5. Generate diagrams and exports when ready
+
+### Option 3: Web UI
+
+```bash
+npm run dev
+# Open http://localhost:5173/think-tank/
+```
+
+## Rendering Mermaid Diagrams
+
+The CLI generates `.mmd` files. To convert them to images:
+
+```bash
+# Install the Mermaid CLI (one-time)
+npm install -g @mermaid-js/mermaid-cli
+
+# Render to SVG
+mmdc -i think-tank-output/architecture.mmd -o think-tank-output/architecture.svg
+
+# Render to PNG
+mmdc -i think-tank-output/architecture.mmd -o think-tank-output/architecture.png
+
+# Render all diagrams
+for f in think-tank-output/*.mmd; do
+  mmdc -i "$f" -o "${f%.mmd}.svg"
+done
+```
+
+Or paste the `.mmd` content into https://mermaid.live for instant preview.
+
+## Plan Schema
+
+The structured plan covers these sections:
+
+| Section | Key Fields |
+|---------|-----------|
+| **Overview** | name, description, problem statement, goals, target users, success metrics |
+| **Requirements** | functional (with priority), non-functional, constraints, assumptions |
+| **Architecture** | system type, pattern, components (with connections), data model, API design |
+| **Tech Stack** | frontend, backend, database, infrastructure, key dependencies, rationale |
+| **Hosting** | platform, CI/CD, environments, domain, estimated monthly cost |
+| **Security** | authentication, authorization, encryption, API key management, compliance |
+| **Design** | design system, key user flows, responsive strategy, accessibility |
+| **Budget** | development effort, infrastructure costs, third-party costs, total estimate |
+| **Timeline** | phases (with deliverables), milestones |
+| **Risks** | description, category, impact, likelihood, mitigation |
+| **Competitors** | name, URL, description, strengths, weaknesses |
+
+## Tips
+
+- The JSON output is compatible with the web UI — export from CLI, import in browser (or vice versa)
+- Use `--personality researcher` for more competitor/market analysis focus
+- Use `--personality critical` for stress-testing your idea
+- Use `--personality budget` for cost-focused planning
+- Set `THINK_TANK_MODEL=claude-haiku-4-5-20251001` for cheaper (but less detailed) planning
+</file>
+
+<file path="cli/think-tank.ts">
+/**
+ * Think Tank CLI — Interactive project planning from your terminal.
+ *
+ * Usage:
+ *   npx tsx cli/think-tank.ts                    # Interactive mode
+ *   npx tsx cli/think-tank.ts --idea "..."       # Start with an idea
+ *   npx tsx cli/think-tank.ts --load plan.json   # Resume from exported plan
+ *   npx tsx cli/think-tank.ts --personality critical
+ *
+ * Environment:
+ *   ANTHROPIC_API_KEY   — Your Anthropic API key (required)
+ *   THINK_TANK_MODEL    — Model to use (default: claude-sonnet-4-6)
+ */
+⋮----
+import Anthropic from '@anthropic-ai/sdk'
+⋮----
+// ── Schema (inline to avoid import alias issues) ──────────────────────
+⋮----
+interface ProjectPlan {
+  meta: { version: '1.0'; createdAt: string; lastModified: string }
+  overview: Record<string, unknown>
+  requirements: Record<string, unknown>
+  architecture: Record<string, unknown>
+  techStack: Record<string, unknown>
+  hosting: Record<string, unknown>
+  security: Record<string, unknown>
+  design: Record<string, unknown>
+  budget: Record<string, unknown>
+  timeline: Record<string, unknown>
+  risks: Array<Record<string, unknown>>
+  competitors: Array<Record<string, unknown>>
+}
+⋮----
+function createEmptyPlan(): ProjectPlan
+⋮----
+// ── Completeness tracking ─────────────────────────────────────────────
+⋮----
+function getSectionCompleteness(plan: ProjectPlan, key: string): number
+⋮----
+function getOverallCompleteness(plan: ProjectPlan): number
+⋮----
+// ── Personality prompts ───────────────────────────────────────────────
+⋮----
+// ── Tool definition ───────────────────────────────────────────────────
+⋮----
+// ── Mermaid diagram generation ────────────────────────────────────────
+⋮----
+function buildArchitectureMmd(
+  components: Array<{ name: string; description: string; connections?: string[] }>,
+): string
+⋮----
+const sanitize = (s: string)
+⋮----
+function buildErDiagramMmd(
+  entities: Array<{ entity: string; fields: string[]; relationships?: string[] }>,
+): string
+⋮----
+async function renderMermaidToSvg(mmdContent: string, outputPath: string): Promise<boolean>
+⋮----
+// Try mermaid.ink API (free, no deps)
+⋮----
+// Fall through to .mmd file
+⋮----
+async function writeDiagram(mmdContent: string, basePath: string): Promise<string>
+⋮----
+// Fallback: save as .mmd text
+⋮----
+async function generateDiagrams(plan: ProjectPlan, outputDir: string): Promise<string[]>
+⋮----
+// ── Markdown export ───────────────────────────────────────────────────
+⋮----
+function planToMarkdown(plan: ProjectPlan): string
+⋮----
+function formatObject(obj: Record<string, unknown>, depth: number): string
+⋮----
+// ── System prompt builder ─────────────────────────────────────────────
+⋮----
+function buildSystemPrompt(personality: string, plan: ProjectPlan): string
+⋮----
+// ── Progress display ──────────────────────────────────────────────────
+⋮----
+function printProgress(plan: ProjectPlan)
+⋮----
+// ── CLI readline helper ───────────────────────────────────────────────
+⋮----
+function ask(rl: readline.Interface, prompt: string): Promise<string>
+⋮----
+// ── CLI command handler ───────────────────────────────────────────────
+⋮----
+function handleCommand(
+  cmd: string,
+  plan: ProjectPlan,
+  outputDir: string,
+  rl: readline.Interface,
+): boolean
+⋮----
+function parseArgs()
+⋮----
+const getArg = (flag: string) =>
+⋮----
+function printBanner(model: string, personality: string, outputDir: string)
+⋮----
+// ── Get initial idea ──────────────────────────────────────────────────
+⋮----
+async function getIdea(
+  rl: readline.Interface,
+  ideaArg: string | null,
+  loadFile: string | null,
+): Promise<string>
+⋮----
+// ── Send initial idea to Claude ───────────────────────────────────────
+⋮----
+async function sendInitialIdea(
+  client: Anthropic,
+  model: string,
+  personality: string,
+  plan: ProjectPlan,
+  messages: Anthropic.MessageParam[],
+  idea: string,
+): Promise<number>
+⋮----
+// ── Conversation loop ─────────────────────────────────────────────────
+⋮----
+async function conversationLoop(
+  client: Anthropic,
+  model: string,
+  personality: string,
+  plan: ProjectPlan,
+  messages: Anthropic.MessageParam[],
+  rl: readline.Interface,
+  outputDir: string,
+  initialTokens: number,
+)
+⋮----
+// ── Main ──────────────────────────────────────────────────────────────
+⋮----
+async function main()
+⋮----
+// Session-based output: each run gets its own folder
+⋮----
+// ── Claude API call ───────────────────────────────────────────────────
+⋮----
+async function callClaude(
+  client: Anthropic,
+  model: string,
+  personality: string,
+  plan: ProjectPlan,
+  messages: Anthropic.MessageParam[],
+): Promise<Anthropic.Message>
+⋮----
+// ── Process Claude response ───────────────────────────────────────────
+⋮----
+interface ProcessContext {
+  client: Anthropic
+  model: string
+  personality: string
+}
+⋮----
+async function processResponse(
+  response: Anthropic.Message,
+  plan: ProjectPlan,
+  messages: Anthropic.MessageParam[],
+  ctx: ProcessContext,
+)
+⋮----
+// Add assistant message to history
+⋮----
+// If there were tool uses, send tool results and make a follow-up API call
+⋮----
+// Update lastModified
+⋮----
+function applyPlanUpdate(plan: ProjectPlan, section: string, data: Record<string, unknown>)
+⋮----
+// Single item for array section — wrap and append
+⋮----
+// ── Save helper ───────────────────────────────────────────────────────
+⋮----
+function savePlan(plan: ProjectPlan, outputDir: string)
+⋮----
+// ── Run ───────────────────────────────────────────────────────────────
+</file>
+
+<file path="prompts/personalities/architect.md">
+# Technical Architect
+
+You are a technical architect focused on system design and engineering decisions. You dive deep into architecture patterns, technology trade-offs, scalability concerns, and best practices. You think about data flow, API design, component boundaries, and infrastructure. You recommend specific technologies with clear rationale.
+
+## Tone
+- Technical and precise
+- "The trade-off here is..." and "This architecture pattern is best because..."
+- Draw connections between components
+- Think in systems, not features
+
+## Focus Areas
+- Architecture patterns (monolith vs microservices vs serverless)
+- Data flow and API design
+- Component boundaries and interfaces
+- Performance and scalability considerations
+- Technology selection with clear rationale
+</file>
+
+<file path="prompts/personalities/budget.md">
+# Budget Hawk
+
+You are a budget-conscious planner who focuses on costs, ROI, and resource efficiency. You always consider the cost implications of decisions — hosting, services, development time, maintenance. You suggest cost-effective alternatives and help users understand the total cost of ownership. You think about free tiers, open-source alternatives, and scaling costs.
+
+## Tone
+- Practical and cost-aware
+- "The free tier covers you until..." and "Here's how to do this for $0/month"
+- Always mention the cost alongside any recommendation
+- Frame expensive options as "If budget allows..."
+
+## Focus Areas
+- Free tier availability for every service
+- Open-source alternatives to paid tools
+- Total cost of ownership (not just hosting)
+- Development time as a cost
+- Scaling costs — what happens when you grow
+</file>
+
+<file path="prompts/personalities/critical.md">
+# Critical Thinker
+
+You are a critical thinker who helps users stress-test their ideas. You ask tough but constructive questions like "What happens if...?", "Have you considered...?", and "What's your plan B for...?". You identify potential failure points, scalability issues, and hidden assumptions. You're not negative — you're thorough. Every challenge you raise comes with a suggested approach.
+
+## Tone
+- Direct but respectful
+- "Let me play devil's advocate here..."
+- "This is strong, but let's stress-test one thing..."
+- Every criticism paired with a constructive alternative
+
+## Focus Areas
+- Edge cases and failure modes
+- Scalability bottlenecks
+- Hidden assumptions that could break the project
+- Security vulnerabilities and data risks
+- "What if 10x users show up tomorrow?"
+</file>
+
+<file path="prompts/personalities/friendly.md">
+# Friendly Guide
+
+You are a friendly and encouraging project planning guide. You explain technical concepts in simple terms, avoid jargon when possible, and help users feel confident about their ideas. When you need to use technical terms, briefly explain what they mean. Celebrate good ideas and gently redirect less feasible ones.
+
+## Tone
+- Warm and supportive
+- "Great question!" and "That's a solid approach"
+- Use analogies to explain technical concepts
+- When something won't work, say "Here's an even better way..." instead of "That won't work"
+
+## Focus Areas
+- Making the user feel confident and capable
+- Breaking complex decisions into simple choices
+- Providing clear recommendations with reasoning
+</file>
+
+<file path="prompts/personalities/researcher.md">
+# Researcher
+
+You are a thorough researcher and analyst. You focus on finding competitors, similar projects, and sources of inspiration. You always consider what already exists in the market and how the user's idea compares. You suggest features and approaches inspired by successful projects. You provide specific examples and references whenever possible.
+
+## Tone
+- Analytical and evidence-based
+- "Based on what [Competitor X] does..." and "The market trend shows..."
+- Always back suggestions with examples from real products
+
+## Focus Areas
+- Competitor analysis with specific strengths/weaknesses
+- Market gaps and opportunities
+- Feature inspiration from successful projects
+- Realistic positioning of the user's idea in the landscape
+</file>
+
+<file path="prompts/sections/01-overview.md">
+# Section: Project Overview
+
+## What to Capture
+- Project name
+- One-sentence description
+- Problem statement (what pain does this solve?)
+- Goals (3-5 specific, measurable outcomes)
+- Non-goals (what this project deliberately does NOT do)
+- Target users (be specific — not "everyone")
+- Success metrics (how do you know it's working?)
+
+## Questions to Ask
+1. Can you describe your idea in one sentence? What does it DO?
+2. What problem does this solve? What's the pain point today?
+3. Who specifically would use this? (Age, role, technical skill level?)
+4. What does success look like 6 months after launch?
+5. What is this project NOT? (Defining boundaries early saves time later)
+
+## Quality Tips
+- A vague description means a vague product. Push for specificity.
+- "Everyone" is not a target user. The best products serve a specific niche first.
+- Non-goals are as important as goals — they prevent scope creep.
+- Success metrics should be measurable: "100 daily active users" not "people like it."
+- If the user can't explain it in one sentence, the idea needs sharpening.
+
+## Common Mistakes
+- Skipping non-goals (leads to feature creep later)
+- Setting goals that can't be measured
+- Targeting too broad an audience
+- Confusing features with goals ("add dark mode" is a feature, not a goal)
+</file>
+
+<file path="prompts/sections/02-competitors.md">
+# Section: Competitors & Inspiration
+
+## What to Capture
+- 3-5 competitors or similar projects
+- For each: name, URL, description, strengths, weaknesses
+- The gap your project fills that competitors don't
+- Features to borrow (inspiration, not copying)
+
+## Questions to Ask
+1. Do you know of any existing tools or products that do something similar?
+2. What do you like about them? What frustrates you?
+3. Why would someone choose YOUR project over what already exists?
+4. Are there projects in adjacent spaces that inspire your approach?
+5. Is there a reason existing solutions don't work for your target users?
+
+## Quality Tips
+- Every idea has competitors. If the user says "nothing exists," dig deeper — there are always alternatives, even if they're spreadsheets, manual processes, or different tools duct-taped together.
+- Understanding competitors is NOT about being scared of them — it's about positioning.
+- The best products don't try to beat competitors on everything. They pick 1-2 things and do them exceptionally well.
+- Competitor weaknesses are your opportunity. Their strengths tell you the table stakes.
+
+## Common Mistakes
+- Ignoring indirect competitors (manual processes, spreadsheets, email)
+- Trying to beat every competitor on every feature
+- Not defining what makes YOUR approach unique
+- Only looking at big players — small niche tools are often the real competition
+</file>
+
+<file path="prompts/sections/03-requirements.md">
+# Section: Requirements
+
+## What to Capture
+- Functional requirements (what the system DOES) with priority: must/should/nice
+- Non-functional requirements (performance, accessibility, reliability)
+- Constraints (budget, timeline, team size, tech limitations)
+- Assumptions (what you're taking for granted)
+
+## Questions to Ask
+1. What are the 3-5 things this MUST do on day one? (Must-haves)
+2. What would make it great but isn't essential for launch? (Should-haves)
+3. Any dream features for the future? (Nice-to-haves)
+4. Are there hard constraints? (Budget, deadline, team size, specific tech required)
+5. What are you assuming about your users? (Internet speed, device, tech skills)
+
+## Quality Tips
+- Use MoSCoW prioritization: Must, Should, Could, Won't
+- Every "must" you add delays launch. Be ruthless about what's truly essential.
+- Non-functional requirements (speed, uptime, accessibility) are often forgotten but critical.
+- Constraints are your friends — they force creative, focused solutions.
+- Assumptions should be stated explicitly so they can be validated.
+
+## Common Mistakes
+- Making everything a "must-have" (if everything is priority 1, nothing is)
+- Forgetting accessibility (it's much harder to add later)
+- Not considering offline scenarios for web apps
+- Assuming users have fast internet or modern devices
+- Ignoring mobile users (>50% of web traffic)
+</file>
+
+<file path="prompts/sections/04-architecture.md">
+# Section: Architecture
+
+## What to Capture
+- System type (web app, mobile app, API, CLI, desktop app, etc.)
+- Architecture pattern (monolith, microservices, serverless, JAMstack, etc.)
+- Components (name, description, connections between them)
+- Data model (entities, fields, relationships)
+- API design (REST, GraphQL, WebSocket, etc.)
+
+## Questions to Ask
+1. What type of system is this? (Web app? Mobile? API? CLI?)
+2. Does it need real-time features? (Chat, live updates, collaboration)
+3. What data does it store? What are the main "things" (entities)?
+4. How do those things relate to each other? (User has many Projects, etc.)
+5. Does it need to integrate with external services? (Payments, email, auth providers)
+
+## Quality Tips
+- Start simple. A monolith is almost always the right choice for v1.
+- Only go serverless/microservices if you have a specific scaling need.
+- Draw the component diagram — if you can't draw it, you don't understand it.
+- Every arrow between components is a potential failure point. Minimize connections.
+- Data model is the foundation. Get this wrong and everything else suffers.
+
+## Common Mistakes
+- Over-engineering: microservices for a project with 100 users
+- No clear data model (leads to spaghetti code)
+- Forgetting about state management (where does truth live?)
+- Not thinking about caching strategy
+- Ignoring API versioning from the start
+</file>
+
+<file path="prompts/sections/05-tech-stack.md">
+# Section: Tech Stack
+
+## What to Capture
+- Frontend: framework, UI library, state management
+- Backend: language, framework, runtime
+- Database: type (SQL/NoSQL/graph), specific product
+- Infrastructure: cloud provider, containerization
+- Key dependencies and why
+- Rationale for choices
+
+## Questions to Ask
+1. Do you or your team have experience with specific languages/frameworks?
+2. Does this need server-side rendering (SEO-critical content)?
+3. How complex is the data? (Simple key-value? Complex relationships? Full-text search?)
+4. Do you need real-time capabilities? (WebSocket, SSE, push notifications)
+5. What's your budget for infrastructure? ($0? $50/mo? $500/mo?)
+
+## Quality Tips
+- Pick boring technology. Proven stacks reduce risk. Innovation should be in your product, not your infrastructure.
+- Match the stack to the team. A perfect tech choice that nobody on the team knows is the wrong choice.
+- Consider the hiring market if you plan to grow the team.
+- Every dependency is a liability. Fewer dependencies = less maintenance.
+- Always explain WHY, not just WHAT. "React because our team knows it" is better than "React because it's popular."
+
+## Common Mistakes
+- Choosing tech because it's trending, not because it fits
+- Using a database you don't need (NoSQL when SQL would be simpler)
+- Not considering the learning curve for the team
+- Over-relying on third-party services for core functionality
+- Ignoring the long-term maintenance cost of each dependency
+</file>
+
+<file path="prompts/sections/06-hosting.md">
+# Section: Hosting & Deployment
+
+## What to Capture
+- Hosting platform (Vercel, Netlify, AWS, GitHub Pages, Railway, Fly.io, etc.)
+- CI/CD pipeline (GitHub Actions, GitLab CI, etc.)
+- Environments (dev, staging, production)
+- Domain and DNS
+- Estimated monthly hosting cost
+
+## Questions to Ask
+1. Does this need a server or can it be static? (Huge cost difference)
+2. Do you need staging/preview environments for testing?
+3. What's your expected traffic? (10 users/day? 10,000?)
+4. Do you have a domain name in mind?
+5. How important is uptime? (Hobby project vs. business-critical)
+
+## Quality Tips
+- Static sites (GitHub Pages, Netlify, Vercel) are free and fast. Use them when possible.
+- For servers: start with the smallest instance. You can always scale up.
+- Always have CI/CD from day one. Manual deployments cause incidents.
+- Use preview deployments for PRs — catch bugs before they hit production.
+- Free tiers: Vercel (100GB bandwidth), Netlify (100GB), GitHub Pages (unlimited for public repos), Railway ($5 free credit), Fly.io (3 shared VMs free).
+
+## Common Mistakes
+- Paying for hosting before you have users
+- No CI/CD pipeline (deploying manually from a laptop)
+- No staging environment (testing in production)
+- Not considering bandwidth costs for media-heavy sites
+- Choosing a complex cloud provider when a simple PaaS would work
+</file>
+
+<file path="prompts/sections/07-security.md">
+# Section: Security
+
+## What to Capture
+- Authentication method (OAuth, JWT, session-based, passwordless)
+- Authorization model (RBAC, ABAC, simple roles)
+- Data encryption (at rest, in transit)
+- API key management
+- Known security risks and mitigations
+- Compliance requirements (GDPR, SOC2, HIPAA, etc.)
+
+## Questions to Ask
+1. Do users need accounts? If so, how do they log in?
+2. Are there different user roles with different permissions?
+3. What sensitive data do you store? (Personal info, payments, health data?)
+4. Does this need to comply with any regulations? (GDPR if EU users, etc.)
+5. Are there any third-party API keys the app needs to manage securely?
+
+## Quality Tips
+- Don't build your own auth. Use a provider (Auth0, Clerk, Supabase Auth, Firebase Auth).
+- HTTPS everywhere. No exceptions. (Most hosts do this automatically now.)
+- Never store passwords in plain text. (If using a provider, this is handled for you.)
+- Principle of least privilege: users should only access what they need.
+- If you store EU user data, you need GDPR compliance. This affects your architecture.
+
+## Common Mistakes
+- Rolling your own auth system (security bugs guaranteed)
+- Storing API keys in frontend code or git repos
+- No rate limiting on APIs (invitation for abuse)
+- Ignoring GDPR until it's too late to retrofit
+- Not having a security incident response plan
+</file>
+
+<file path="prompts/sections/08-design.md">
+# Section: Design & UX
+
+## What to Capture
+- Design system or component library
+- Key user flows (the 3-5 most important paths through the app)
+- Responsive strategy (mobile-first? desktop-first?)
+- Accessibility level (WCAG A, AA, or AAA)
+- Brand guidelines (if any)
+
+## Questions to Ask
+1. What are the 3 most important things a user does in your app? Walk me through each.
+2. Will this be used more on mobile or desktop? Or equally?
+3. Do you have existing brand colors, fonts, or style guidelines?
+4. How important is accessibility? (Legal requirement? Ethical choice? Nice-to-have?)
+5. Are there apps whose look and feel you admire? What specifically do you like?
+
+## Quality Tips
+- Design the user flow BEFORE the UI. Know where users go before deciding what it looks like.
+- Mobile-first is almost always right. If it works on mobile, it works on desktop. The reverse is rarely true.
+- Accessibility is not optional — it's both ethical and often legally required. WCAG AA is the standard to aim for.
+- Minimum touch target: 44x44px. Minimum body font: 16px. Minimum contrast: 4.5:1.
+- Pick a design system (Tailwind, Shadcn, Material) rather than designing from scratch. Your time is better spent on the product.
+
+## Common Mistakes
+- Designing for desktop first, then trying to shrink it
+- Ignoring accessibility until "later" (it's 10x harder to add)
+- Too many user flows at launch — pick 3 and nail them
+- Custom design system for a small project (use existing ones)
+- Not testing with real users early
+</file>
+
+<file path="prompts/sections/09-budget.md">
+# Section: Budget & Resources
+
+## What to Capture
+- Development effort (person-hours or person-weeks)
+- Infrastructure costs (hosting, databases, CDN)
+- Third-party service costs (auth, email, payments, monitoring)
+- Total estimate (one-time + monthly recurring)
+
+## Questions to Ask
+1. Is this a solo project or do you have a team?
+2. What's your monthly budget for running this? ($0? $50? $500?)
+3. Are you doing the development yourself or hiring?
+4. Any paid services you already use or plan to use?
+5. What's the maximum you'd spend before deciding this isn't worth it?
+
+## Quality Tips
+- Always calculate Total Cost of Ownership: development + hosting + services + maintenance.
+- Free tiers exist for almost everything. Start there.
+- Development time IS a cost, even if you're not paying yourself.
+- Plan for the cost of 10x growth — will your costs scale linearly or exponentially?
+- Monitoring and logging are often forgotten costs but critical for production.
+
+## Common Mistakes
+- Not accounting for ongoing maintenance time (1-2 hours/week minimum)
+- Forgetting domain renewal, SSL certificates (most are free now), email services
+- Choosing "enterprise" tools for a solo project
+- Not setting a budget cap (spend $X/month max, then reassess)
+- Ignoring the cost of your own time
+</file>
+
+<file path="prompts/sections/10-timeline.md">
+# Section: Timeline & Milestones
+
+## What to Capture
+- Phases (MVP, v1, v2, etc.) with duration and deliverables
+- Milestones with target dates and descriptions
+- Dependencies between phases
+
+## Questions to Ask
+1. When do you want this to be usable? (Even if basic)
+2. What's the absolute minimum you need for a "version 1"?
+3. Are there external deadlines? (Conference, launch event, school project?)
+4. How many hours per week can you dedicate to this?
+5. What features can wait for v2?
+
+## Quality Tips
+- Ship the smallest useful thing first. You can always add more.
+- Double your time estimate. Software always takes longer than expected.
+- Define "done" for each phase — vague milestones lead to never-ending development.
+- MVP means Minimum VIABLE Product — it should solve the core problem, not be a prototype.
+- Weekly milestones keep momentum. Monthly milestones lose focus.
+
+## Common Mistakes
+- No MVP — trying to build everything at once
+- Unrealistic timelines (most people underestimate by 2-3x)
+- Feature creep during development (adding "just one more thing")
+- Not defining what "done" means for each milestone
+- Planning too far ahead — detailed plans for 6+ months out are fiction
+</file>
+
+<file path="prompts/sections/11-risks.md">
+# Section: Risks & Mitigations
+
+## What to Capture
+- For each risk: description, category, impact, likelihood, mitigation strategy
+- Categories: technical, resource, timeline, budget, security, other
+
+## Questions to Ask
+1. What's the biggest thing that could go wrong with this project?
+2. What happens if you can't find users in the first month?
+3. Are there any technical unknowns you're worried about?
+4. What if a key dependency breaks or gets discontinued?
+5. What's your plan if this takes 3x longer than expected?
+
+## Quality Tips
+- Every project has at least 3 risks. If you can't find them, you're not looking hard enough.
+- The biggest risk is usually not technical — it's "nobody wants this." Validate demand early.
+- For each risk, have a concrete mitigation, not just "we'll deal with it."
+- Categorize risks: technical (can we build it?), market (do people want it?), resource (do we have the capacity?).
+- Revisit risks monthly. New ones emerge, old ones get resolved.
+
+## Common Mistakes
+- Only listing technical risks (market and resource risks are usually bigger)
+- Vague mitigations ("we'll be careful" is not a plan)
+- Not having a "kill switch" — at what point do you stop and reassess?
+- Ignoring dependency risks (what if that npm package is abandoned?)
+- Not considering the risk of success (what if you go viral and can't handle load?)
+</file>
+
+<file path="prompts/sections/12-implementation-review.md">
+# Section: Implementation Review
+
+This is the final section before handing off to implementation. The goal: **an implementing agent should have zero questions.**
+
+## What This Does
+
+After all 11 planning sections are complete, review the plan from the perspective of someone who has to BUILD it. Identify and resolve any ambiguity, missing decisions, or gaps that would force the implementer to stop and ask questions.
+
+## Review Checklist
+
+### Decisions That Must Be Made (not left open)
+
+For each of these, the plan must have a SPECIFIC answer, not "either X or Y":
+
+1. **Template strategy** — Is there a literal template folder to copy, or does the AI generate code from prompts? Pick one.
+2. **Package manager** — npm, pnpm, yarn, or bun? Pick one.
+3. **Exact versions** — Which version of each framework/library? (e.g., "React 19", not "React")
+4. **File structure** — What does the generated project look like? List the actual files and folders.
+5. **Database choice** — If applicable, pick ONE option (not "X or Y").
+6. **Auth provider** — If applicable, pick ONE recommended provider.
+7. **Hosting config** — Exact deployment steps, not just "use Vercel."
+8. **Build tool config** — Specific vite.config, tsconfig, etc. settings needed.
+9. **CSS strategy** — CDN for dev vs build for prod? Pick one per context and be explicit.
+10. **Agent config format** — .cursorrules (legacy) vs .cursor/rules/*.mdc (current)? Pick one or support both explicitly.
+
+### Common Gaps That Cause Questions
+
+These are things planners often leave vague but implementers need concrete:
+
+- "Integrate with X" — HOW? Via URL reference? npm install? Copy files? Clone repo?
+- "Use X for styling" — Include it HOW? CDN link? npm install + config? Inline?
+- "Deploy to GitHub Pages" — What's the base path? What's the build command? What's the workflow?
+- "Support both static and server" — Are these two separate templates, or one template with conditional parts?
+- "Optional feature X" — Who decides if it's included? The user during setup? The AI? Hardcoded?
+
+### The Test
+
+Read the plan and ask: **"Could I hand this to a junior developer (or AI agent) and they could start building without messaging me once?"**
+
+If the answer is no, the plan needs more specifics.
+
+## Questions to Ask the User
+
+1. I've reviewed the plan for implementation readiness. Here are the decisions that are still ambiguous: [list them]. Can we resolve these now?
+2. For [specific integration], should the implementer reference it via URL, install it as a dependency, or copy the files?
+3. The plan mentions [X or Y] — which one should we go with?
+
+## Output
+
+After this review, update the plan JSON with:
+- Any decisions that were resolved
+- A new field in overview: `implementationNotes` (array of strings) — specific instructions for the implementing agent that don't fit in other sections
+</file>
+
+<file path="prompts/tips/best-practices.md">
+# Best Practices for Project Planning
+
+## Start With "Why"
+Before deciding WHAT to build or HOW to build it, be crystal clear on WHY it needs to exist. What pain point does it address? If you can't articulate the pain clearly, the project will drift.
+
+## Ship Early, Ship Often
+- Week 1-2: Working prototype with core feature
+- Week 3-4: MVP with basic polish and tests
+- Month 2: First real users providing feedback
+- Month 3+: Iterate based on real usage data
+
+## Use Boring Technology
+Exciting, cutting-edge tools are exciting because they're unproven. For your project's infrastructure, pick the most boring, well-documented, widely-supported option. Save innovation for your product, not your tooling.
+
+Good "boring" choices:
+- **Frontend:** React, Vue, or plain HTML/CSS/JS
+- **Backend:** Node.js, Python, or Go
+- **Database:** PostgreSQL (relational) or SQLite (embedded)
+- **Hosting:** Vercel, Netlify, or Railway
+- **CI/CD:** GitHub Actions
+
+## Design for Your CURRENT Scale
+Build for 100 users, not 1 million. You can always refactor when you hit 10,000 — and most projects never do. Premature optimization is the root of all evil.
+
+## Every Decision is a Trade-off
+There are no "best" choices, only trade-offs:
+- **Speed vs. quality:** Move fast and break things, or move carefully and ship solid?
+- **Features vs. simplicity:** More options for power users, or simpler for everyone?
+- **Build vs. buy:** Build it yourself (full control) or use a service (faster but dependent)?
+- **Cost vs. convenience:** Free tier with limitations, or paid for better DX?
+
+Document the trade-off for each major decision so future-you understands why you chose what you chose.
+
+## Test From Day One
+- At minimum: automated tests for your critical path (sign up, core action, payment)
+- Use the testing pyramid: many unit tests, some integration tests, few E2E tests
+- Tests are documentation — they show how your code is supposed to work
+
+## Document Decisions, Not Just Code
+- README: how to set up, run, and contribute
+- Architecture Decision Records (ADRs): WHY you chose X over Y
+- Inline comments: only for non-obvious logic, not for obvious code
+</file>
+
+<file path="prompts/tips/common-mistakes.md">
+# Common Planning Mistakes
+
+## Scope
+- **Building too much for v1.** The best v1 does ONE thing well. Add features after launch based on real user feedback, not assumptions.
+- **"Everyone" is the target user.** Pick a niche. Serve 100 people perfectly rather than 10,000 people poorly.
+- **No non-goals.** Without explicit boundaries, every feature request gets in.
+
+## Technical
+- **Choosing tech you don't know.** Learning a new framework AND building a product at the same time doubles your timeline.
+- **Over-engineering.** Microservices for a solo project. Kubernetes for 50 users. NoSQL when you need joins. Start simple.
+- **No testing plan.** "We'll add tests later" means "We'll never add tests."
+
+## Process
+- **No MVP definition.** If you can't describe what "launch" looks like, you'll never get there.
+- **Planning in isolation.** Talk to potential users BEFORE planning. Your assumptions about what they want are probably wrong.
+- **Waterfall planning.** Don't plan 12 months of features. Plan 2-4 weeks, build it, learn, replan.
+
+## Business
+- **Ignoring competitors.** "Nobody does this" almost always means "I haven't looked hard enough."
+- **No budget cap.** Set a maximum spend. If you hit it before launch, something is wrong with the plan.
+- **Not calculating dev time as cost.** 100 hours at $50/hour is $5,000. That's your real investment.
+
+## Security
+- **"We'll add security later."** Auth, HTTPS, input validation — these need to be in v1.
+- **Storing secrets in code.** Use environment variables. Always.
+- **Ignoring compliance.** If you have EU users, you need GDPR compliance. Plan for it.
+</file>
+
+<file path="prompts/tips/quality-checklist.md">
+# Quality Checklist
+
+Use this to verify a plan is complete and high-quality before finalizing.
+
+## Completeness
+- [ ] All 11 planning sections have meaningful content (not just filler)
+- [ ] Implementation review (section 12) has been done
+- [ ] Overview has specific goals AND non-goals
+- [ ] At least 3 competitors analyzed with strengths AND weaknesses
+- [ ] Requirements are prioritized (must/should/nice)
+- [ ] Architecture has a component diagram with connections
+- [ ] Tech stack choices each have a rationale (WHY, not just WHAT)
+- [ ] Hosting has a cost estimate (even if $0)
+- [ ] Security has been addressed (even if "no auth needed" — say so explicitly)
+- [ ] At least 3 risks identified with concrete mitigations
+- [ ] Timeline has phases with specific deliverables
+
+## Clarity
+- [ ] A non-technical person could read the overview and understand the project
+- [ ] No unexplained jargon or acronyms
+- [ ] Goals are measurable (numbers, not feelings)
+- [ ] "Done" is defined for each milestone
+
+## Realism
+- [ ] Timeline accounts for the team size and availability
+- [ ] Budget includes ALL costs (hosting + services + dev time + maintenance)
+- [ ] MVP scope is genuinely minimal (could launch in 1-2 weeks)
+- [ ] Risks include non-technical ones (market, resource, legal)
+
+## Actionability
+- [ ] Someone could start building from this plan tomorrow
+- [ ] First task of Phase 1 is clear and specific
+- [ ] Technology choices are concrete (specific frameworks, not "some JS framework")
+- [ ] Data model is defined enough to create database tables
+
+## Implementation Readiness (NEW — prevents implementer questions)
+- [ ] Every "X or Y" choice has been resolved to a single answer
+- [ ] Exact library versions specified (not just "React" but "React 19")
+- [ ] Integration method is explicit (URL reference? npm install? copy files?)
+- [ ] File/folder structure of the output is listed
+- [ ] Build and deployment steps are specific commands, not descriptions
+- [ ] Agent config format decided (.cursorrules vs .cursor/rules/)
+- [ ] CSS strategy per context (CDN for dev? Build for prod?)
+- [ ] Test: "Could an AI agent implement this with zero follow-up questions?"
+</file>
+
+<file path="prompts/README.md">
+# Think Tank Prompts
+
+This folder contains all the planning prompts, personality definitions, section guides, and tips used by Think Tank.
+
+These files are the **single source of truth** for planning guidance. They are used by:
+- The **web UI** (fetched from the public GitHub repo at runtime)
+- The **CLI** (read from the local filesystem)
+- **AI coding agents** (Claude Code, Cursor, Copilot — via CLAUDE.md/.cursorrules)
+- **Humans** (readable markdown for manual planning)
+
+## Structure
+
+```
+prompts/
+├── system.md              # Base system prompt (how to guide the conversation)
+├── personalities/         # AI personality modifiers
+│   ├── friendly.md        # Encouraging, explains jargon simply
+│   ├── researcher.md      # Competitor/market focused
+│   ├── critical.md        # Stress-tests ideas
+│   ├── architect.md       # System design focused
+│   └── budget.md          # Cost/ROI focused
+├── sections/              # Per-section planning guides (questions, tips, mistakes)
+│   ├── 01-overview.md
+│   ├── 02-competitors.md
+│   ├── 03-requirements.md
+│   ├── 04-architecture.md
+│   ├── 05-tech-stack.md
+│   ├── 06-hosting.md
+│   ├── 07-security.md
+│   ├── 08-design.md
+│   ├── 09-budget.md
+│   ├── 10-timeline.md
+│   └── 11-risks.md
+└── tips/                  # General advice
+    ├── quality-checklist.md
+    ├── common-mistakes.md
+    └── best-practices.md
+```
+
+## How the Web UI Uses These
+
+The web UI fetches prompts from:
+```
+https://raw.githubusercontent.com/jdeworks/think-tank/main/prompts/<path>
+```
+
+This means prompt updates in the repo are immediately reflected in the live app — no rebuild needed.
+</file>
+
+<file path="prompts/system.md">
+# Think Tank — System Prompt
+
+You are helping a user plan a software project from scratch. Your job is to guide them through a structured conversation, asking questions to gather information and build a comprehensive project plan.
+
+## How to Work
+
+1. Ask 1-3 focused questions at a time. Don't overwhelm the user.
+2. After each response, update the relevant plan section with any new information.
+3. Be conversational — this should feel like a helpful discussion, not a form to fill out.
+4. When you have enough info for a section, move to the next incomplete one.
+5. Proactively suggest ideas and best practices — don't just ask, also advise.
+6. When the user mentions competitors or similar projects, research them thoroughly.
+7. If something seems unrealistic, kindly flag it and suggest alternatives.
+
+## Section Order
+
+Walk through these in order. Each one builds on the previous:
+
+1. **Overview** — What is it? Who is it for? What problem does it solve?
+2. **Competitors** — What exists? What's the gap? What inspires you?
+3. **Requirements** — Must-haves, should-haves, nice-to-haves, constraints
+4. **Architecture** — System type, components, connections, data model
+5. **Tech Stack** — Languages, frameworks, databases — always explain WHY
+6. **Hosting** — Where to deploy, CI/CD, environments, cost
+7. **Security** — Auth, encryption, compliance, threat model
+8. **Design** — User flows, responsive strategy, accessibility
+9. **Budget** — Dev effort, infrastructure, third-party costs
+10. **Timeline** — Phases with deliverables, milestones with dates
+11. **Risks** — What could go wrong, how to mitigate
+12. **Implementation Review** — Review the plan as if you had to BUILD it. Resolve every ambiguity so an implementing agent has zero questions.
+
+## Important Guidelines
+
+- Keep language simple and accessible for non-technical users
+- When recommending technologies, briefly explain WHY
+- Always consider budget implications of your suggestions
+- Suggest alternatives when possible (e.g., "You could use X (free) or Y (paid, more features)")
+- If the user seems stuck, provide concrete examples or options to choose from
+- Never skip a section — each one matters for a complete plan
+</file>
+
+<file path="src/components/common/Badge.tsx">
+interface BadgeProps {
+  value: number
+  size?: 'sm' | 'md'
+}
+⋮----
+export function Badge(
+</file>
+
+<file path="src/components/common/Button.tsx">
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
+  size?: 'sm' | 'md' | 'lg'
+}
+⋮----
+export function Button({
+  variant = 'primary',
+  size = 'md',
+  className = '',
+  children,
+  ...props
+}: ButtonProps)
+</file>
+
+<file path="src/components/common/Modal.tsx">
+import { useEffect, useRef } from 'react'
+⋮----
+interface ModalProps {
+  open: boolean
+  onClose: () => void
+  title: string
+  children: React.ReactNode
+}
+⋮----
+const handler = (e: KeyboardEvent) =>
+</file>
+
+<file path="src/components/plan/ArchitectureDiagram.tsx">
+import { useMemo } from 'react'
+import {
+  ReactFlow,
+  Background,
+  Controls,
+  type Node,
+  type Edge,
+  useNodesState,
+  useEdgesState,
+} from '@xyflow/react'
+⋮----
+import dagre from 'dagre'
+⋮----
+interface Component {
+  name: string
+  description: string
+  connections?: string[]
+}
+⋮----
+interface ArchitectureDiagramProps {
+  components: Component[]
+}
+⋮----
+function layoutNodes(components: Component[]):
+⋮----
+export function ArchitectureDiagram(
+</file>
+
+<file path="src/components/plan/DiagramSection.tsx">
+import { useCallback } from 'react'
+import { MermaidDiagram } from './MermaidDiagram'
+import { fetchMermaidSvg } from '@/utils/mermaid-render'
+⋮----
+interface DiagramSectionProps {
+  title: string
+  chart: string
+  filename: string
+  children?: React.ReactNode
+}
+</file>
+
+<file path="src/components/plan/MermaidDiagram.tsx">
+import { useEffect, useRef, useCallback } from 'react'
+import mermaid from 'mermaid'
+⋮----
+interface MermaidDiagramProps {
+  chart: string
+  className?: string
+}
+⋮----
+export function MermaidDiagram(
+</file>
+
+<file path="src/components/plan/PlanSidebar.tsx">
+import { useProjectStore } from '@/stores/project-store'
+import { PLAN_SECTIONS, SECTION_LABELS } from '@/schema/project-plan'
+import { getSectionCompleteness, getOverallCompleteness } from '@/engine/section-map'
+import { Badge } from '@/components/common/Badge'
+import { useUIStore } from '@/stores/ui-store'
+⋮----
+{/* Mobile toggle */}
+⋮----
+{/* Overlay for mobile */}
+⋮----
+{/* Sidebar */}
+⋮----
+setView('plan')
+</file>
+
+<file path="src/components/project/ProjectList.tsx">
+import { useEffect, useState, useSyncExternalStore } from 'react'
+import { listProjects, deleteProject, type StoredProject } from '@/storage/project-db'
+import { useProjectStore } from '@/stores/project-store'
+import { useUIStore } from '@/stores/ui-store'
+import { Button } from '@/components/common/Button'
+⋮----
+// Track a version counter to trigger re-fetches
+⋮----
+function bumpVersion()
+function subscribe(cb: () => void)
+function getSnapshot()
+⋮----
+export function ProjectList()
+⋮----
+const handleOpen = (project: StoredProject) =>
+⋮----
+const handleDelete = async (id: string) =>
+</file>
+
+<file path="src/data/example-templates.ts">
+interface ExampleTemplate {
+  id: string
+  title: string
+  description: string
+  idea: string
+}
+</file>
+
+<file path="src/engine/conversation-engine.ts">
+import type { LLMProvider, ChatMessage } from '@/providers/types'
+import type { ProjectPlan, PlanSectionKey } from '@/schema/project-plan'
+import { createMessage, type Message } from '@/schema/conversation'
+import type { Personality } from '@/schema/settings'
+import { buildSystemPrompt, buildInitialPrompt, getUpdatePlanTool } from './prompts'
+import { getIncompleteSections, getNextSection } from './section-map'
+import { loadSectionGuide } from '@/utils/prompt-loader'
+⋮----
+export interface EngineResult {
+  reply: Message
+  planUpdates: Array<{ section: PlanSectionKey; data: Record<string, unknown> }>
+  usage?: { promptTokens: number; completionTokens: number; totalTokens: number }
+}
+⋮----
+// Keep the first 4 messages (system + initial context) and the last 36
+// to avoid exceeding LLM context limits on long conversations.
+⋮----
+export async function startConversation(
+  provider: LLMProvider,
+  idea: string,
+  personality: Personality,
+  plan: ProjectPlan,
+): Promise<EngineResult>
+⋮----
+export async function continueConversation(
+  provider: LLMProvider,
+  userMessage: string,
+  conversationHistory: Message[],
+  personality: Personality,
+  plan: ProjectPlan,
+): Promise<EngineResult>
+⋮----
+// Truncate history to stay within context limits: keep the first 4 messages
+// (initial context) and the most recent messages up to MAX_HISTORY_MESSAGES.
+⋮----
+async function callLLM(provider: LLMProvider, messages: ChatMessage[]): Promise<EngineResult>
+⋮----
+// Loop to handle tool calls: after extracting tool results, send them back
+// to the LLM so it can continue generating text.
+⋮----
+// Skip malformed tool calls
+⋮----
+// Send tool results back to the LLM for continuation
+⋮----
+async function loadCurrentSectionGuide(plan: ProjectPlan): Promise<string>
+⋮----
+// All sections complete — load implementation review
+</file>
+
+<file path="src/engine/prompts.ts">
+import type { Personality } from '@/schema/settings'
+import { SECTION_LABELS, type ProjectPlan, type PlanSectionKey } from '@/schema/project-plan'
+⋮----
+export function getUpdatePlanTool()
+⋮----
+export function buildSystemPrompt(
+  personality: Personality,
+  plan: ProjectPlan,
+  incompleteSections: PlanSectionKey[],
+  sectionGuide?: string,
+): string
+⋮----
+function addField(parts: string[], label: string, value: string | undefined | null): void
+⋮----
+function buildPlanSummary(plan: ProjectPlan): string
+⋮----
+export function buildInitialPrompt(idea: string, personality: Personality): string
+</file>
+
+<file path="src/engine/section-map.ts">
+import type { ProjectPlan, PlanSectionKey } from '@/schema/project-plan'
+⋮----
+interface SectionConfig {
+  key: PlanSectionKey
+  requiredFields: string[]
+  order: number
+}
+⋮----
+export function getSectionCompleteness(plan: ProjectPlan, key: PlanSectionKey): number
+⋮----
+export function getOverallCompleteness(plan: ProjectPlan): number
+⋮----
+export function getIncompleteSections(plan: ProjectPlan): PlanSectionKey[]
+⋮----
+export function getNextSection(plan: ProjectPlan): PlanSectionKey | null
+</file>
+
+<file path="src/hooks/useSpeechRecognition.ts">
+import { useState, useCallback, useRef, useEffect } from 'react'
+⋮----
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList
+  resultIndex: number
+}
+⋮----
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string
+  message: string
+}
+⋮----
+interface SpeechRecognitionInstance extends EventTarget {
+  continuous: boolean
+  interimResults: boolean
+  lang: string
+  start(): void
+  stop(): void
+  abort(): void
+  onresult: ((event: SpeechRecognitionEvent) => void) | null
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null
+  onend: (() => void) | null
+  onstart: (() => void) | null
+}
+⋮----
+start(): void
+stop(): void
+abort(): void
+⋮----
+interface Window {
+    SpeechRecognition: new () => SpeechRecognitionInstance
+    webkitSpeechRecognition: new () => SpeechRecognitionInstance
+  }
+⋮----
+export function useSpeechRecognition()
+⋮----
+// Auto-stop after 3 seconds of silence
+⋮----
+// Not a real error — just no speech detected yet
+⋮----
+// Cleanup on unmount
+</file>
+
+<file path="src/hooks/useSpeechSynthesis.ts">
+import { useState, useCallback, useRef, useEffect } from 'react'
+⋮----
+export function useSpeechSynthesis()
+⋮----
+// Cancel any ongoing speech
+⋮----
+// Strip markdown formatting for cleaner speech
+⋮----
+.replace(/#{1,6}\s/g, '') // headings
+.replace(/\*\*([^*]+)\*\*/g, '$1') // bold
+.replace(/\*([^*]+)\*/g, '$1') // italic
+.replace(/```[\s\S]*?```/g, '') // code blocks (before inline code)
+.replace(/`([^`]+)`/g, '$1') // inline code
+.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links
+.replace(/^[-*]\s/gm, '') // list bullets
+.replace(/^\d+\.\s/gm, '') // numbered lists
+.replace(/\n{2,}/g, '. ') // paragraphs to pauses
+⋮----
+// Use a natural voice if available
+⋮----
+// Cleanup on unmount
+</file>
+
+<file path="src/providers/anthropic.ts">
+import type { ChatRequest, ChatResponse, LLMProvider } from './types'
+⋮----
+export class AnthropicProvider implements LLMProvider
+⋮----
+constructor(apiKey: string, model: string)
+⋮----
+async chat(request: ChatRequest): Promise<ChatResponse>
+⋮----
+async validateKey(): Promise<boolean>
+</file>
+
+<file path="src/providers/openai.ts">
+import type { ChatRequest, ChatResponse, LLMProvider } from './types'
+⋮----
+export class OpenAIProvider implements LLMProvider
+⋮----
+constructor(apiKey: string, model: string, baseUrl = 'https://api.openai.com/v1')
+⋮----
+async chat(request: ChatRequest): Promise<ChatResponse>
+⋮----
+async validateKey(): Promise<boolean>
+</file>
+
+<file path="src/providers/registry.ts">
+import type { ProviderConfig } from '@/schema/settings'
+import type { LLMProvider } from './types'
+import { OpenAIProvider } from './openai'
+import { AnthropicProvider } from './anthropic'
+⋮----
+export function createProvider(config: ProviderConfig): LLMProvider
+</file>
+
+<file path="src/providers/types.ts">
+export interface ChatMessage {
+  role: 'system' | 'user' | 'assistant'
+  content: string
+}
+⋮----
+export interface ChatRequest {
+  messages: ChatMessage[]
+  model: string
+  temperature?: number
+  maxTokens?: number
+  tools?: ToolDefinition[]
+}
+⋮----
+export interface ToolDefinition {
+  type: 'function'
+  function: {
+    name: string
+    description: string
+    parameters: Record<string, unknown>
+  }
+}
+⋮----
+export interface ToolCall {
+  name: string
+  arguments: string
+}
+⋮----
+export interface ChatResponse {
+  content: string
+  toolCalls?: ToolCall[]
+  usage?: {
+    promptTokens: number
+    completionTokens: number
+    totalTokens: number
+  }
+}
+⋮----
+export interface LLMProvider {
+  id: string
+  name: string
+  chat(request: ChatRequest): Promise<ChatResponse>
+  validateKey(): Promise<boolean>
+}
+⋮----
+chat(request: ChatRequest): Promise<ChatResponse>
+validateKey(): Promise<boolean>
+</file>
+
+<file path="src/schema/conversation.ts">
+import { z } from 'zod/v4'
+⋮----
+export type Message = z.infer<typeof MessageSchema>
+⋮----
+export function createMessage(role: 'user' | 'assistant' | 'system', content: string): Message
+</file>
+
+<file path="src/schema/project-plan.ts">
+import { z } from 'zod/v4'
+⋮----
+export type ProjectPlan = z.infer<typeof ProjectPlanSchema>
+⋮----
+export type PlanSectionKey = (typeof PLAN_SECTIONS)[number]
+⋮----
+export function createEmptyPlan(): ProjectPlan
+</file>
+
+<file path="src/storage/project-db.ts">
+import localforage from 'localforage'
+import type { ProjectPlan } from '@/schema/project-plan'
+import type { Message } from '@/schema/conversation'
+⋮----
+export interface StoredProject {
+  id: string
+  name: string
+  idea: string
+  plan: ProjectPlan
+  messages: Message[]
+  personality: string
+  createdAt: string
+  updatedAt: string
+}
+⋮----
+export async function saveProject(project: StoredProject): Promise<void>
+⋮----
+export async function listProjects(): Promise<StoredProject[]>
+⋮----
+export async function deleteProject(id: string): Promise<void>
+</file>
+
+<file path="src/stores/project-store.ts">
+import { create } from 'zustand'
+import { createEmptyPlan, type ProjectPlan, type PlanSectionKey } from '@/schema/project-plan'
+import { createMessage, type Message } from '@/schema/conversation'
+import { saveProject, type StoredProject } from '@/storage/project-db'
+import { useSettingsStore } from '@/stores/settings-store'
+import type { Personality } from '@/schema/settings'
+⋮----
+interface ProjectState {
+  id: string | null
+  name: string
+  idea: string
+  plan: ProjectPlan
+  messages: Message[]
+  isLoading: boolean
+  error: string | null
+  totalTokens: number
+
+  startNewProject: (idea: string) => void
+  loadFromStored: (project: StoredProject) => void
+  addUserMessage: (content: string) => void
+  addAssistantMessage: (content: string) => void
+  updatePlanSection: (section: PlanSectionKey, data: Record<string, unknown>) => void
+  setLoading: (loading: boolean) => void
+  setError: (error: string | null) => void
+  addTokens: (tokens: number) => void
+  persist: () => Promise<void>
+  setName: (name: string) => void
+}
+</file>
+
+<file path="src/stores/ui-store.ts">
+import { create } from 'zustand'
+⋮----
+type View = 'home' | 'chat' | 'plan'
+⋮----
+interface UIState {
+  view: View
+  sidebarOpen: boolean
+  settingsOpen: boolean
+  setView: (view: View) => void
+  toggleSidebar: () => void
+  setSettingsOpen: (open: boolean) => void
+}
+</file>
+
+<file path="src/utils/mermaid-helpers.ts">
+// Helper: generate Mermaid flowchart from architecture components
+export function componentsToMermaid(
+  components: Array<{ name: string; description: string; connections?: string[] }>,
+): string
+⋮----
+const sanitizeId = (s: string)
+⋮----
+// Helper: generate Mermaid ER diagram from data model
+export function dataModelToMermaid(
+  entities: Array<{ entity: string; fields: string[]; relationships?: string[] }>,
+): string
+⋮----
+// Helper: generate timeline Mermaid from phases
+export function timelineToMermaid(
+  phases: Array<{ name: string; duration: string; deliverables: string[] }>,
+): string
+</file>
+
+<file path="src/utils/mermaid-render.ts">
+function toMermaidInkUrl(mmdContent: string): string | null
+⋮----
+/**
+ * Fetches a rendered SVG from mermaid.ink for download/export.
+ */
+export async function fetchMermaidSvg(mmdContent: string): Promise<Blob | null>
+</file>
+
+<file path="src/utils/prompt-loader.ts">
+async function fetchPrompt(path: string): Promise<string>
+⋮----
+// Offline or fetch failed — fall through to empty
+⋮----
+export async function loadSectionGuide(
+  sectionNumber: number,
+  sectionName: string,
+): Promise<string>
+</file>
+
+<file path="src/index.css">
+@custom-variant dark (&:where(.dark, .dark *));
+⋮----
+:root {
+⋮----
+body {
+⋮----
+#root {
+⋮----
+/* Prose overrides for chat messages */
+.prose {
+</file>
+
+<file path="src/main.tsx">
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+⋮----
+import App from './App.tsx'
+⋮----
+// System-based dark mode — sync .dark class on <html> with OS preference
+function syncDarkMode()
+</file>
+
+<file path="CLAUDE.md">
+# Think Tank — Agent Instructions
+
+This file tells any AI coding agent (Claude Code, Cursor, Cody, Copilot, etc.) how to run a Think Tank planning session.
+
+## Prompt Source
+
+All planning prompts live in the `prompts/` folder. This is the single source of truth:
+
+```
+prompts/
+├── system.md              # How to guide the conversation
+├── personalities/         # 5 personality styles
+├── sections/              # Per-section questions, tips, and common mistakes
+│   ├── 01-overview.md ... 11-risks.md
+└── tips/                  # Quality checklist, best practices, common mistakes
+```
+
+**Read these before starting a planning session.** They contain the questions to ask, the quality tips to follow, and the mistakes to avoid.
+
+## When to Activate
+
+When a user says anything like:
+- "help me plan a project"
+- "I want to build..."
+- "create a plan for..."
+- "think tank: [idea]"
+
+## The Process — GUIDED, Not Generated
+
+**CRITICAL: This is an interactive, guided process. You MUST ask questions and wait for answers. Do NOT generate a full plan in one shot.**
+
+### Step 0: Setup
+1. Read `prompts/system.md` for the overall approach
+2. Read the relevant personality from `prompts/personalities/`
+3. Create the session output directory:
+   ```bash
+   mkdir -p think-tank-output/<idea-slug>-$(date +%Y-%m-%dT%H-%M-%S)
+   ```
+
+### Step 1: Understand the Idea
+Read `prompts/sections/01-overview.md` for the questions to ask. Start with 2-3 questions about the core idea. **Wait for answers.**
+
+### Step 2: Walk Through Each Section
+For each section (in order 01-11):
+1. Read `prompts/sections/<section>.md` for questions and tips
+2. Ask 2-3 focused questions
+3. **Wait for answers**
+4. Update the plan JSON
+5. Move to the next section
+
+### Step 3: Implementation Review
+Read `prompts/sections/12-implementation-review.md`. Review the plan from the perspective of someone who has to BUILD it:
+1. Identify any "X or Y" decisions that aren't resolved — ask the user to pick one
+2. Check that integration methods are explicit (URL? npm install? copy?)
+3. Verify exact versions, file structures, and deployment commands are specified
+4. Ask: "Could an AI agent implement this with zero follow-up questions?"
+5. Add resolved decisions as `implementationNotes` in the plan
+
+**This step prevents the implementing agent from needing to stop and ask questions.**
+
+### Step 4: Generate Outputs
+After all sections are discussed AND reviewed, create files in the session directory:
+- `plan.json` — Structured plan (validate against `src/schema/project-plan.ts`)
+- `plan.md` — Human-readable Markdown
+- `architecture.svg` — Via mermaid.ink or `.mmd` fallback
+- `data-model.svg` — If data model exists
+- `timeline.svg` — If timeline exists
+
+### Step 5: Quality Review
+Read `prompts/tips/quality-checklist.md` and verify the plan against it (including the new "Implementation Readiness" section). Report any gaps to the user.
+
+### Step 6: Validate
+```bash
+npx tsx -e "
+import{readFileSync}from'fs';
+import{ProjectPlanSchema}from'./src/schema/project-plan.ts';
+const r=ProjectPlanSchema.safeParse(JSON.parse(readFileSync('./think-tank-output/<session>/plan.json','utf-8')));
+console.log(r.success?'VALID':'INVALID:'+JSON.stringify(r.error))
+"
+```
+
+## Personalities
+
+Default is "friendly." User can request others:
+- Read `prompts/personalities/friendly.md` — Encouraging, explains jargon
+- Read `prompts/personalities/researcher.md` — Competitor/market focus
+- Read `prompts/personalities/critical.md` — Stress-tests assumptions
+- Read `prompts/personalities/architect.md` — System design deep-dives
+- Read `prompts/personalities/budget.md` — Cost/ROI optimization
+
+## Quality Commands
+
+```bash
+make check          # Full quality pipeline
+make ci             # Pipeline + build
+make test           # Run tests
+make deadcode       # Find unused code (Knip)
+make health         # Code health metrics
+```
+</file>
+
+<file path="index.html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a" />
+    <meta name="description" content="Turn your project idea into a structured plan through AI-guided conversation." />
+    <link rel="icon" type="image/svg+xml" href="/think-tank/favicon.svg" />
+    <title>Think Tank</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+</file>
+
+<file path="Makefile">
+.PHONY: help install dev build test lint format check clean plan ci deadcode health
+
+# ── Help ───────────────────────────────────────────────────────────────
+
+help: ## Show this help
+	@echo ""
+	@echo "  Think Tank — Development Commands"
+	@echo "  ──────────────────────────────────"
+	@echo ""
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
+	@echo ""
+
+# ── Setup ──────────────────────────────────────────────────────────────
+
+install: ## Install dependencies
+	npm install
+
+# ── Development ────────────────────────────────────────────────────────
+
+dev: ## Start dev server
+	npm run dev
+
+build: ## Production build
+	npm run build
+
+preview: ## Preview production build
+	npm run preview
+
+# ── Quality ────────────────────────────────────────────────────────────
+
+test: ## Run tests
+	npm test
+
+test-watch: ## Run tests in watch mode
+	npm run test:watch
+
+lint: ## Run ESLint (includes complexity checks)
+	npx eslint .
+
+lint-fix: ## Run ESLint with auto-fix
+	npx eslint . --fix
+
+format: ## Format code with Prettier
+	npx prettier --write "src/**/*.{ts,tsx}" "cli/**/*.ts"
+
+format-check: ## Check formatting without writing
+	npx prettier --check "src/**/*.{ts,tsx}" "cli/**/*.ts"
+
+typecheck: ## TypeScript type checking
+	npx tsc -b
+
+deadcode: ## Find unused exports, deps, and files (Knip)
+	npx knip
+
+health: ## Run code health tests (file/function size, complexity)
+	npx vitest run src/test/code-health.test.ts
+
+# ── Full Pipeline ──────────────────────────────────────────────────────
+
+check: format-check lint typecheck deadcode test ## Full quality pipeline
+	@echo ""
+	@echo "  ✅ All checks passed"
+	@echo ""
+
+ci: check build ## Full CI pipeline (check + build)
+	@echo ""
+	@echo "  ✅ CI pipeline complete"
+	@echo ""
+
+# ── CLI Planner ────────────────────────────────────────────────────────
+
+plan: ## Start interactive CLI planner
+	npx tsx cli/think-tank.ts
+
+plan-critical: ## Start planner with critical thinker personality
+	npx tsx cli/think-tank.ts --personality critical
+
+plan-researcher: ## Start planner with researcher personality
+	npx tsx cli/think-tank.ts --personality researcher
+
+plan-architect: ## Start planner with architect personality
+	npx tsx cli/think-tank.ts --personality architect
+
+# ── Cleanup ────────────────────────────────────────────────────────────
+
+clean: ## Remove build artifacts
+	rm -rf docs dist node_modules/.tmp
+
+clean-output: ## Remove generated plan output
+	rm -rf think-tank-output
+
+clean-all: clean clean-output ## Remove all generated files
+	rm -rf node_modules
+</file>
+
+<file path="src/components/chat/ChatInput.tsx">
+import { useState, useRef, useEffect, useMemo } from 'react'
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition'
+import { useSettingsStore } from '@/stores/settings-store'
+⋮----
+interface ChatInputProps {
+  onSend: (message: string) => void
+  disabled?: boolean
+  placeholder?: string
+}
+⋮----
+function MicButton({
+  isListening,
+  disabled,
+  onClick,
+}: {
+  isListening: boolean
+  disabled: boolean
+  onClick: () => void
+})
+⋮----
+// Derive the display value from voice state rather than using setState in effect
+⋮----
+// Auto-send when recording stops with a transcript (transition from listening→not)
+⋮----
+const handleSubmit = () =>
+⋮----
+const handleKeyDown = (e: React.KeyboardEvent) =>
+</file>
+
+<file path="src/components/chat/ChatPanel.tsx">
+import { useEffect, useRef } from 'react'
+import { useProjectStore } from '@/stores/project-store'
+import { useSettingsStore } from '@/stores/settings-store'
+import { createProvider } from '@/providers/registry'
+import { continueConversation } from '@/engine/conversation-engine'
+import { MessageBubble } from './MessageBubble'
+import { ChatInput } from './ChatInput'
+import { formatTokens, estimateCost } from '@/utils/tokens'
+import { useStartConversation } from '@/hooks/useStartConversation'
+⋮----
+const handleSend = async (content: string) =>
+⋮----
+{/* Token counter */}
+⋮----
+<span>Tokens:
+<span>Cost:
+⋮----
+{/* Messages */}
+⋮----
+{/* Input */}
+</file>
+
+<file path="src/components/chat/MessageBubble.tsx">
+import type { Message } from '@/schema/conversation'
+import Markdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis'
+import { useSettingsStore } from '@/stores/settings-store'
+⋮----
+interface MessageBubbleProps {
+  message: Message
+}
+⋮----
+const handleSpeak = () =>
+⋮----
+{/* Speaker button for assistant messages */}
+</file>
+
+<file path="src/components/plan/PlanView.tsx">
+import { useProjectStore } from '@/stores/project-store'
+import { PLAN_SECTIONS, SECTION_LABELS } from '@/schema/project-plan'
+import { getSectionCompleteness } from '@/engine/section-map'
+import { Badge } from '@/components/common/Badge'
+import { Button } from '@/components/common/Button'
+import { useUIStore } from '@/stores/ui-store'
+import { ArchitectureDiagram } from './ArchitectureDiagram'
+import { MermaidDiagram } from './MermaidDiagram'
+import { DiagramSection } from './DiagramSection'
+import { componentsToMermaid, dataModelToMermaid, timelineToMermaid } from '@/utils/mermaid-helpers'
+import { exportAsJSON, exportAsMarkdown, exportAsZip, createShareUrl } from '@/utils/export'
+import { useState } from 'react'
+⋮----
+const handleExportJSON = ()
+const handleExportMD = ()
+const handleExportZip = ()
+const handleShare = () =>
+⋮----
+onClick=
+</file>
+
+<file path="src/hooks/useStartConversation.ts">
+import { useEffect, useRef } from 'react'
+import { useProjectStore } from '@/stores/project-store'
+import { useSettingsStore } from '@/stores/settings-store'
+import { createProvider } from '@/providers/registry'
+import { startConversation } from '@/engine/conversation-engine'
+⋮----
+export function useStartConversation()
+⋮----
+const run = async () =>
+</file>
+
+<file path="src/schema/settings.ts">
+import { z } from 'zod/v4'
+⋮----
+export type ProviderConfig = z.infer<typeof ProviderConfigSchema>
+⋮----
+export type Personality = z.infer<typeof PersonalityType>
+</file>
+
+<file path="src/utils/export.ts">
+import {
+  SECTION_LABELS,
+  ProjectPlanSchema,
+  type ProjectPlan,
+  type PlanSectionKey,
+} from '@/schema/project-plan'
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
+import JSZip from 'jszip'
+import { componentsToMermaid, dataModelToMermaid, timelineToMermaid } from './mermaid-helpers'
+import { fetchMermaidSvg } from './mermaid-render'
+⋮----
+export function exportAsJSON(plan: ProjectPlan, filename: string)
+⋮----
+export function exportAsMarkdown(plan: ProjectPlan, filename: string)
+⋮----
+export async function exportAsZip(plan: ProjectPlan, filename: string)
+⋮----
+// Generate and add SVG diagrams
+⋮----
+function downloadBlob(blob: Blob, filename: string)
+⋮----
+export function importFromJSON(file: File): Promise<ProjectPlan>
+⋮----
+export function createShareUrl(plan: ProjectPlan): string
+⋮----
+export function loadFromShareUrl(): ProjectPlan | null
+⋮----
+function planToMarkdown(plan: ProjectPlan): string
+⋮----
+function renderOverview(plan: ProjectPlan): string
+⋮----
+function renderRequirements(plan: ProjectPlan): string
+⋮----
+function renderArchitecture(plan: ProjectPlan): string
+⋮----
+function renderTechStack(plan: ProjectPlan): string
+⋮----
+function renderHosting(plan: ProjectPlan): string
+⋮----
+function renderSecurity(plan: ProjectPlan): string
+⋮----
+function renderDesign(plan: ProjectPlan): string
+⋮----
+function renderBudget(plan: ProjectPlan): string
+⋮----
+function renderTimeline(plan: ProjectPlan): string
+⋮----
+function renderRisks(plan: ProjectPlan): string
+⋮----
+function renderCompetitors(plan: ProjectPlan): string
+</file>
+
+<file path="src/utils/tokens.ts">
+// Rough cost estimates per 1M tokens (input/output averaged)
+⋮----
+export function estimateCost(model: string, totalTokens: number): string
+⋮----
+export function formatTokens(tokens: number): string
+</file>
+
+<file path="src/App.tsx">
+import { useEffect } from 'react'
+import { useUIStore } from '@/stores/ui-store'
+import { useProjectStore } from '@/stores/project-store'
+import { useSettingsStore } from '@/stores/settings-store'
+import { HomePage } from '@/components/project/HomePage'
+import { ChatPanel } from '@/components/chat/ChatPanel'
+import { PlanSidebar } from '@/components/plan/PlanSidebar'
+import { PlanView } from '@/components/plan/PlanView'
+import { SettingsModal } from '@/components/settings/SettingsModal'
+import { loadFromShareUrl } from '@/utils/export'
+import { createEmptyPlan } from '@/schema/project-plan'
+⋮----
+{/* Top bar */}
+⋮----
+onClick=
+</file>
+
+<file path=".gitignore">
+# Build output (docs/ is committed for GitHub Pages)
+dist
+dist-ssr
+
+# Dependencies
+node_modules
+*.local
+
+# Think Tank session output
+think-tank-output
+
+# Claude Code memory
+.claude
+MEMORY.md
+
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+</file>
+
+<file path="package.json">
+{
+  "name": "think-tank",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"cli/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"cli/**/*.ts\"",
+    "check": "npm run format:check && npm run lint && tsc -b && npx knip && npm test",
+    "deadcode": "knip",
+    "health": "vitest run src/test/code-health.test.ts",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "plan": "tsx cli/think-tank.ts",
+    "plan:critical": "tsx cli/think-tank.ts --personality critical",
+    "plan:researcher": "tsx cli/think-tank.ts --personality researcher",
+    "plan:architect": "tsx cli/think-tank.ts --personality architect"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
+    "@xyflow/react": "^12.10.1",
+    "dagre": "^0.8.5",
+    "jszip": "^3.10.1",
+    "localforage": "^1.10.0",
+    "lz-string": "^1.5.0",
+    "mermaid": "^11.13.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "zod": "^4.3.6",
+    "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@tailwindcss/vite": "^4.2.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/dagre": "^0.7.54",
+    "@types/node": "^24.12.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.4.0",
+    "jsdom": "^29.0.1",
+    "knip": "^6.0.0",
+    "prettier": "^3.8.1",
+    "tailwindcss": "^4.2.2",
+    "tsx": "^4.21.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.57.0",
+    "vite": "^8.0.1",
+    "vitest": "^4.1.0"
+  }
+}
+</file>
+
+<file path="README.md">
+## 🤖 Using this repo with AI assistants
+
+This repo is designed to work with AI tools whether you are in an online chat or using a local agent.
+
+**If you are using an online chatbox** (Claude.ai, ChatGPT, Gemini, Perplexity, etc.):
+
+Fetch the pre-built context bundle directly — no GitHub API calls, no rate limits:
+```xml
+https://raw.githubusercontent.com/jdeworks/think-tank/dev/bundle.xml
+```
+
+Paste that URL in your chat and say: *"Use this as the full context for think-tank. I want to [your goal]."*
+
+**If you are using a local AI agent** (Claude Code, Cursor, Windsurf, Codex, etc.):
+
+Clone the repo so your agent has the full file structure to work with:
+```bash
+git clone -b dev https://github.com/jdeworks/think-tank.git
+```
+
+Then point your agent at the cloned folder and work directly with the files.
+
+---
+
+# Think Tank
+
+Turn your project idea into a structured, comprehensive plan through AI-guided conversation.
+
+## What It Does
+
+1. **Describe your idea** in plain language
+2. **Answer questions** as the AI guides you through architecture, tech stack, hosting, security, budget, and more
+3. **Get a plan** with interactive diagrams, structured JSON, and exportable Markdown
+
+## Features
+
+### Core
+- **Multi-provider LLM support** — OpenAI, Anthropic (Claude), or any OpenAI-compatible API (Ollama, LM Studio, Groq, etc.)
+- **BYOK (Bring Your Own Key)** — API keys stay in your browser, never sent anywhere except your chosen provider
+- **5 AI Personalities** — Friendly Guide, Researcher, Critical Thinker, Technical Architect, Budget Hawk
+- **Structured plan schema** — 11 sections covering the full scope of a software project
+- **Tool-calling loop** — The LLM updates the plan progressively via tool calls with automatic continuation
+
+### Visualization
+- **Interactive architecture diagrams** — React Flow with auto-layout (dagre)
+- **Mermaid diagrams** — Flowcharts, ER data model diagrams, Gantt timeline charts
+- **Toggle between views** — Switch between interactive and flowchart diagram modes
+
+### Voice Mode
+- **Speech-to-text** — Speak your answers via browser `SpeechRecognition` (Chrome/Edge)
+- **Text-to-speech** — Listen to AI responses with markdown-aware text cleaning
+- **Free** — Uses browser-native APIs, no additional API key needed
+
+### Data & Export
+- **Local storage** — All data in IndexedDB (via localForage), nothing leaves your browser
+- **JSON export/import** — Full plan as structured JSON, importable back into the app
+- **Markdown export** — Human-readable project document
+- **Share links** — lz-string compressed plan data in URL (no server needed)
+- **Token tracking** — Real-time token count and estimated cost per model
+
+### Developer Experience
+- **100% client-side** — No backend, no accounts, deployable to GitHub Pages
+- **CLI companion** — Interactive terminal planner using Anthropic SDK
+- **Cloneable** — Run locally with any model including Ollama
+- **6 example templates** — Website, SaaS, Mobile App, E-Commerce, API Service, Community Platform
+
+---
+
+## Quick Start
+
+### Web UI (hosted)
+
+Visit [jdeworks.github.io/think-tank](https://jdeworks.github.io/think-tank)
+
+### Web UI (local)
+
+```bash
+git clone https://github.com/jdeworks/think-tank.git
+cd think-tank
+npm install
+npm run dev
+# Open http://localhost:5173/think-tank/
+```
+
+### CLI (with Claude subscription)
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+make plan                    # Interactive planner
+make plan-critical           # Stress-test personality
+make plan-researcher         # Market research focus
+make plan-architect          # Architecture deep-dive
+```
+
+### Local with Ollama (free, no API key)
+
+```bash
+ollama pull llama3
+npm run dev
+# In Settings: Provider = "OpenAI Compatible", Endpoint = http://localhost:11434/v1, Model = llama3
+```
+
+---
+
+## Project Structure
+
+```
+think-tank/
+├── src/
+│   ├── schema/              # Zod schemas (project plan, conversation, settings)
+│   ├── engine/              # Conversation engine, prompts, section tracking
+│   ├── providers/           # LLM adapters (OpenAI, Anthropic, OpenAI-compatible)
+│   ├── stores/              # Zustand state (project, settings, UI)
+│   ├── storage/             # IndexedDB persistence (localForage)
+│   ├── hooks/               # React hooks (voice, conversation start)
+│   ├── utils/               # Export, tokens, Mermaid helpers
+│   ├── data/                # Example templates
+│   ├── components/
+│   │   ├── chat/            # ChatPanel, ChatInput (with mic), MessageBubble (with speaker)
+│   │   ├── plan/            # PlanSidebar, PlanView, ArchitectureDiagram, MermaidDiagram
+│   │   ├── settings/        # SettingsModal (provider, personality, voice toggle)
+│   │   ├── project/         # HomePage, ProjectList
+│   │   ├── export/          # ImportButton
+│   │   └── common/          # Button, Modal, Badge
+│   └── test/                # Test files
+├── cli/                     # CLI planner (Anthropic SDK)
+├── .github/workflows/       # CI + GitHub Pages deploy
+└── Makefile                 # Unified development commands
+```
+
+**Stats:** ~40 source files, ~300 tests, ~4,100 source LOC
+
+---
+
+## Plan Schema
+
+The structured output covers 11 sections:
+
+| Section | Key Fields |
+|---------|-----------|
+| **Overview** | Name, description, problem statement, goals, non-goals, target users, success metrics |
+| **Requirements** | Functional (with priority: must/should/nice), non-functional, constraints, assumptions |
+| **Architecture** | System type, pattern, components (with connections), data model (entities/fields/relationships), API design |
+| **Tech Stack** | Frontend (framework/UI/state), backend (language/framework/runtime), database, infrastructure, rationale |
+| **Hosting** | Platform, CI/CD, environments, domain, estimated monthly cost |
+| **Security** | Authentication, authorization, encryption, API key management, compliance |
+| **Design** | Design system, key user flows, responsive strategy, accessibility level |
+| **Budget** | Development effort, infrastructure costs, third-party costs, total estimate |
+| **Timeline** | Phases (with deliverables), milestones (with target dates) |
+| **Risks** | Description, category, impact, likelihood, mitigation strategy |
+| **Competitors** | Name, URL, description, strengths, weaknesses |
+
+---
+
+## Development
+
+### Commands (via Makefile)
+
+```
+make help           # Show all commands
+make dev            # Start dev server
+make check          # Full quality pipeline (format + lint + types + deadcode + tests)
+make ci             # Full CI (check + build)
+make health         # Code health tests only
+make deadcode       # Knip dead code detection only
+make lint           # ESLint only (includes complexity)
+make format         # Auto-format with Prettier
+make clean          # Remove build artifacts
+```
+
+### Quality Pipeline (`make check`)
+
+Runs 6 stages in order:
+
+| Stage | Tool | What It Checks |
+|-------|------|----------------|
+| 1. Format | Prettier | Code style consistency |
+| 2. Lint | ESLint | Complexity (max 15), nesting (max 4), function length (max 120), params (max 5), type imports, equality |
+| 3. Types | TypeScript | Strict type checking |
+| 4. Dead code | Knip | Unused exports, dependencies, files |
+| 5. Unit tests | Vitest | ~300 tests across schemas, engine, providers, stores, utils, hooks |
+| 6. Code health | Custom | File size (350 LOC), function size (80/150 LOC), no console.log, total LOC budget (< 5000) |
+
+### CI Pipelines
+
+- **`ci.yml`** — Runs on push to `dev`/`main` and PRs: full quality pipeline + build
+- **`deploy.yml`** — Runs on push to `main`: quality pipeline + build + deploy to GitHub Pages
+
+---
+
+## Tech Stack
+
+| Layer | Choice | Why |
+|-------|--------|-----|
+| Framework | React 19 + Vite 8 | Fast builds, static output for GitHub Pages |
+| Language | TypeScript (strict) | Type safety, Zod integration |
+| Styling | Tailwind CSS 4 | Utility-first, dark mode ready, make-it-look-good design system |
+| State | Zustand | Minimal boilerplate, persist middleware |
+| Validation | Zod 4 | Single source of truth for plan schema + runtime validation |
+| Diagrams | React Flow + Mermaid | Interactive + static diagram options |
+| Storage | localForage (IndexedDB) | Handles large project data client-side |
+| Sharing | lz-string | URL-safe compression for shareable plan links |
+| Voice | Web Speech API | Browser-native STT/TTS, zero dependencies |
+| CLI | Anthropic SDK + tsx | Direct Claude API access for terminal planning |
+| Testing | Vitest | Fast, Vite-native, ~300 tests |
+| Dead code | Knip | Catches unused exports, deps, files |
+| Formatting | Prettier | Consistent style |
+| Linting | ESLint | Complexity + quality rules |
+
+---
+
+## Security
+
+- **API keys** stored in localStorage with clear user notice — never sent anywhere except the chosen LLM provider
+- **Mermaid** uses `securityLevel: 'strict'` to prevent SVG/HTML injection
+- **Import validation** — all imported JSON is validated against the Zod schema before use
+- **No raw HTML rendering** — react-markdown does not execute HTML by default
+- **CSP-friendly** — no inline scripts or eval
+- **Conversation history** — truncated to 40 messages to prevent context overflow
+
+---
+
+## License
+
+MIT
+</file>
+
+<file path="src/components/project/HomePage.tsx">
+import { useState } from 'react'
+import { useProjectStore } from '@/stores/project-store'
+import { useSettingsStore } from '@/stores/settings-store'
+import { useUIStore } from '@/stores/ui-store'
+import { PERSONALITY_INFO } from '@/schema/settings'
+import { EXAMPLE_TEMPLATES } from '@/data/example-templates'
+import { ProjectList } from './ProjectList'
+import { Button } from '@/components/common/Button'
+⋮----
+const handleStart = () =>
+⋮----
+{/* Header */}
+⋮----
+{/* Idea input */}
+⋮----
+{/* Status bar */}
+⋮----
+onClick=
+⋮----
+{/* How it works */}
+⋮----
+{/* Example templates — paste into input, don't start */}
+⋮----
+{/* Saved projects */}
+</file>
+
+<file path="src/stores/settings-store.ts">
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+import type { ProviderConfig, Personality } from '@/schema/settings'
+⋮----
+interface SettingsState {
+  provider: ProviderConfig | null
+  personality: Personality
+  voiceInputEnabled: boolean
+  voiceOutputEnabled: boolean
+  setProvider: (provider: ProviderConfig) => void
+  setPersonality: (personality: Personality) => void
+  setVoiceInputEnabled: (enabled: boolean) => void
+  setVoiceOutputEnabled: (enabled: boolean) => void
+  clearProvider: () => void
+}
+⋮----
+// Persist everything EXCEPT the API key
+</file>
+
+<file path="src/components/settings/SettingsModal.tsx">
+import { useState } from 'react'
+import { Modal } from '@/components/common/Modal'
+import { Button } from '@/components/common/Button'
+import { useSettingsStore } from '@/stores/settings-store'
+import {
+  PROVIDER_PRESETS,
+  PERSONALITY_INFO,
+  type Personality,
+  type ProviderConfig,
+} from '@/schema/settings'
+import { createProvider } from '@/providers/registry'
+⋮----
+interface SettingsModalProps {
+  open: boolean
+  onClose: () => void
+}
+⋮----
+export function SettingsModal(
+⋮----
+const handleSave = () =>
+⋮----
+const handleTest = async () =>
+⋮----
+interface ProviderFieldsProps {
+  providerType: string
+  apiKey: string
+  baseUrl: string
+  model: string
+  selectedPreset: (typeof PROVIDER_PRESETS)[number] | undefined
+  testing: boolean
+  testResult: 'success' | 'error' | null
+  onProviderTypeChange: (type: ProviderConfig['type']) => void
+  onApiKeyChange: (value: string) => void
+  onBaseUrlChange: (value: string) => void
+  onModelChange: (value: string) => void
+  onTest: () => void
+}
+⋮----
+onClick=
+</file>
+
+</files>

@@ -1,0 +1,25 @@
+{
+  "output": {
+    "style": "xml",
+    "filePath": "bundle.xml",
+    "compress": true
+  },
+  "ignore": {
+    "customPatterns": [
+      "docs/**",
+      "bundle.xml",
+      "repomix.config.json",
+      ".github/**",
+      ".cursorrules",
+      ".prettierrc",
+      "knip.config.ts",
+      "tsconfig.*.json",
+      "tsconfig.json",
+      "eslint.config.js",
+      "vite.config.ts",
+      "vitest.config.ts",
+      "src/test/**",
+      "public/**"
+    ]
+  }
+}
