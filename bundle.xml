@@ -601,7 +601,7 @@ Document the trade-off for each major decision so future-you understands why you
 This folder contains all the planning prompts, personality definitions, section guides, and tips used by Think Tank.
 
 These files are the **single source of truth** for planning guidance. They are used by:
-- The **web UI** (fetched from the public GitHub repo at runtime)
+- The **web UI** (bundled at build time via Vite's import.meta.glob)
 - The **CLI** (read from the local filesystem)
 - **AI coding agents** (Claude Code, Cursor, Copilot — via CLAUDE.md/.cursorrules)
 - **Humans** (readable markdown for manual planning)
@@ -618,17 +618,12 @@ prompts/
 │   ├── architect.md       # System design focused
 │   └── budget.md          # Cost/ROI focused
 ├── sections/              # Per-section planning guides (questions, tips, mistakes)
-│   ├── 01-overview.md
-│   ├── 02-competitors.md
-│   ├── 03-requirements.md
-│   ├── 04-architecture.md
-│   ├── 05-tech-stack.md
-│   ├── 06-hosting.md
-│   ├── 07-security.md
-│   ├── 08-design.md
-│   ├── 09-budget.md
-│   ├── 10-timeline.md
-│   └── 11-risks.md
+│   ├── 00-foundation.md   # Mandatory: who is this for?
+│   ├── 01-overview.md ... 11-risks.md
+│   └── 12-implementation-review.md
+├── config/                # Optional workspace-specific context
+│   ├── README.md
+│   └── workspace.example.md
 └── tips/                  # General advice
     ├── quality-checklist.md
     ├── common-mistakes.md
@@ -637,12 +632,8 @@ prompts/
 
 ## How the Web UI Uses These
 
-The web UI fetches prompts from:
-```
-https://raw.githubusercontent.com/jdeworks/think-tank/main/prompts/<path>
-```
-
-This means prompt updates in the repo are immediately reflected in the live app — no rebuild needed.
+Prompts are bundled into the app at build time — no runtime fetches needed.
+Edit the markdown files, rebuild, and the changes are live.
 </file>
 
 <file path="src/components/common/Badge.tsx">
@@ -1563,46 +1554,6 @@ After foundation is complete, the plan contains a design filter sentence. Use it
 - Never skip a section — each one matters for a complete plan
 </file>
 
-<file path="src/components/chat/ChatInput.tsx">
-import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
-import { useSpeechRecognition } from '@/hooks/useSpeechRecognition'
-import { useSettingsStore } from '@/stores/settings-store'
-⋮----
-interface ChatInputProps {
-  onSend: (message: string) => void
-  disabled?: boolean
-  placeholder?: string
-}
-⋮----
-const MAX_FILE_SIZE = 500_000 // 500KB
-⋮----
-function MicButton({
-  isListening,
-  disabled,
-  onClick,
-}: {
-  isListening: boolean
-  disabled: boolean
-  onClick: () => void
-})
-⋮----
-function AttachButton({
-  disabled,
-  onFileContent,
-}: {
-  disabled: boolean
-  onFileContent: (name: string, content: string) => void
-})
-⋮----
-onClick=
-⋮----
-const handleSubmit = () =>
-⋮----
-const handleKeyDown = (e: React.KeyboardEvent) =>
-⋮----
-disabled=
-</file>
-
 <file path="src/components/chat/ChatPanel.tsx">
 import { useEffect, useRef } from 'react'
 import { useProjectStore } from '@/stores/project-store'
@@ -1735,14 +1686,6 @@ export function useStartConversation()
 const run = async () =>
 </file>
 
-<file path="src/schema/settings.ts">
-import { z } from 'zod/v4'
-⋮----
-export type ProviderConfig = z.infer<typeof ProviderConfigSchema>
-⋮----
-export type Personality = z.infer<typeof PersonalityType>
-</file>
-
 <file path="src/utils/mermaid-helpers.ts">
 // Helper: generate Mermaid flowchart from architecture components
 export function componentsToMermaid(
@@ -1777,17 +1720,6 @@ export function budgetToMermaid(costs: Array<
 export function timelineToMermaid(
   phases: Array<{ name: string; duration: string; deliverables: string[] }>,
 ): string
-</file>
-
-<file path="src/utils/prompt-loader.ts">
-// Load prompt files bundled at build time via Vite's import.meta.glob.
-// This eliminates runtime fetches to raw.githubusercontent.com and works
-// offline, on any branch, and on GitHub Pages without 404s.
-⋮----
-export async function loadSectionGuide(
-  sectionNumber: number,
-  sectionName: string,
-): Promise<string>
 </file>
 
 <file path="src/utils/tokens.ts">
@@ -2442,6 +2374,46 @@ until foundation is complete.
 - [ ] Test: "Could someone implement this with zero follow-up questions?"
 </file>
 
+<file path="src/components/chat/ChatInput.tsx">
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
+import { useSpeechRecognition } from '@/hooks/useSpeechRecognition'
+import { useSettingsStore } from '@/stores/settings-store'
+⋮----
+interface ChatInputProps {
+  onSend: (message: string) => void
+  disabled?: boolean
+  placeholder?: string
+}
+⋮----
+const MAX_FILE_SIZE = 500_000 // 500KB
+⋮----
+function MicButton({
+  isListening,
+  disabled,
+  onClick,
+}: {
+  isListening: boolean
+  disabled: boolean
+  onClick: () => void
+})
+⋮----
+function AttachButton({
+  disabled,
+  onFileContent,
+}: {
+  disabled: boolean
+  onFileContent: (name: string, content: string) => void
+})
+⋮----
+onClick=
+⋮----
+const handleSubmit = () =>
+⋮----
+const handleKeyDown = (e: React.KeyboardEvent) =>
+⋮----
+disabled=
+</file>
+
 <file path="src/engine/prompts.ts">
 import type { Personality } from '@/schema/settings'
 import {
@@ -2486,6 +2458,14 @@ export function getIncompleteSections(plan: ProjectPlan): PlanSectionKey[]
 export function getNextSection(plan: ProjectPlan): PlanSectionKey | null
 </file>
 
+<file path="src/schema/settings.ts">
+import { z } from 'zod/v4'
+⋮----
+export type ProviderConfig = z.infer<typeof ProviderConfigSchema>
+⋮----
+export type Personality = z.infer<typeof PersonalityType>
+</file>
+
 <file path="src/stores/settings-store.ts">
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -2504,6 +2484,17 @@ interface SettingsState {
 }
 ⋮----
 // Persist everything EXCEPT the API key
+</file>
+
+<file path="src/utils/prompt-loader.ts">
+// Load prompt files bundled at build time via Vite's import.meta.glob.
+// This eliminates runtime fetches to raw.githubusercontent.com and works
+// offline, on any branch, and on GitHub Pages without 404s.
+⋮----
+export async function loadSectionGuide(
+  sectionNumber: number,
+  sectionName: string,
+): Promise<string>
 </file>
 
 <file path=".gitignore">
@@ -2761,6 +2752,18 @@ onClick=
 {/* Saved projects */}
 </file>
 
+<file path="src/schema/project-plan.ts">
+import { z } from 'zod/v4'
+⋮----
+export type ProjectPlan = z.infer<typeof ProjectPlanSchema>
+⋮----
+export type PlanSectionKey = (typeof PLAN_SECTIONS)[number]
+⋮----
+export function createEmptyPlan(): ProjectPlan
+⋮----
+export function isFoundationComplete(plan: ProjectPlan):
+</file>
+
 <file path="src/components/settings/SettingsModal.tsx">
 import { useState } from 'react'
 import { Modal } from '@/components/common/Modal'
@@ -2803,18 +2806,6 @@ interface ProviderFieldsProps {
 }
 ⋮----
 onClick=
-</file>
-
-<file path="src/schema/project-plan.ts">
-import { z } from 'zod/v4'
-⋮----
-export type ProjectPlan = z.infer<typeof ProjectPlanSchema>
-⋮----
-export type PlanSectionKey = (typeof PLAN_SECTIONS)[number]
-⋮----
-export function createEmptyPlan(): ProjectPlan
-⋮----
-export function isFoundationComplete(plan: ProjectPlan):
 </file>
 
 <file path="src/utils/export.ts">
