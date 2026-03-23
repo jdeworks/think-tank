@@ -23,6 +23,6 @@
 ## Common Mistakes
 - Making everything a "must-have" (if everything is priority 1, nothing is)
 - Forgetting accessibility (it's much harder to add later)
-- Not considering offline scenarios for web apps
-- Assuming users have fast internet or modern devices
-- Ignoring mobile users (>50% of web traffic)
+- Not considering offline or low-connectivity scenarios
+- Assuming users have fast internet, modern devices, or ideal conditions
+- Ignoring the primary user's actual context (device, location, comfort level)

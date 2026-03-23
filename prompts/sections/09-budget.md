@@ -2,8 +2,8 @@
 
 ## What to Capture
 - Development effort (person-hours or person-weeks)
-- Infrastructure costs (hosting, databases, CDN)
-- Third-party service costs (auth, email, payments, monitoring)
+- Infrastructure/operations costs (hosting, rent, equipment, databases, CDN)
+- Third-party/external costs (services, vendors, licenses, subscriptions)
 - Total estimate (one-time + monthly recurring)
 
 ## Questions to Ask
@@ -21,8 +21,8 @@
 - Monitoring and logging are often forgotten costs but critical for production.
 
 ## Common Mistakes
-- Not accounting for ongoing maintenance time (1-2 hours/week minimum)
-- Forgetting domain renewal, SSL certificates (most are free now), email services
+- Not accounting for ongoing maintenance/operations time
+- Forgetting recurring costs (domain renewal, subscriptions, supplies, rent)
 - Choosing "enterprise" tools for a solo project
 - Not setting a budget cap (spend $X/month max, then reassess)
 - Ignoring the cost of your own time

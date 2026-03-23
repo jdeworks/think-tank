@@ -1,29 +1,41 @@
 # Section: Architecture
 
+> **Adapt to the project type.** For software: system architecture, components, data model.
+> For physical businesses/services/events: operational structure, process flow, key systems.
+
 ## What to Capture
-- System type (web app, mobile app, API, CLI, desktop app, etc.)
-- Architecture pattern (monolith, microservices, serverless, JAMstack, etc.)
+- System or business type (web app, mobile app, physical store, service, event, etc.)
+- Structure or pattern (how the parts fit together)
 - Components (name, description, connections between them)
-- Data model (entities, fields, relationships)
-- API design (REST, GraphQL, WebSocket, etc.)
+- Data or information model (what "things" exist and how they relate)
+- Integration points (external services, suppliers, partners, APIs)
 
 ## Questions to Ask
+
+### For digital products:
 1. What type of system is this? (Web app? Mobile? API? CLI?)
 2. Does it need real-time features? (Chat, live updates, collaboration)
-3. What data does it store? What are the main "things" (entities)?
-4. How do those things relate to each other? (User has many Projects, etc.)
-5. Does it need to integrate with external services? (Payments, email, auth providers)
+3. What data does it store? What are the main entities?
+4. How do those things relate to each other?
+5. Does it need to integrate with external services?
+
+### For physical businesses/services/events:
+1. What's the structure? (Single location? Multiple? Mobile? Online+offline?)
+2. Walk me through the customer journey from discovery to completion.
+3. What are the key operational processes? (Inventory, scheduling, delivery, etc.)
+4. What information do you need to track? (Customers, orders, inventory, bookings?)
+5. What external partners or suppliers are involved?
 
 ## Quality Tips
-- Start simple. A monolith is almost always the right choice for v1.
-- Only go serverless/microservices if you have a specific scaling need.
-- Draw the component diagram — if you can't draw it, you don't understand it.
-- Every arrow between components is a potential failure point. Minimize connections.
-- Data model is the foundation. Get this wrong and everything else suffers.
+- Start simple. A straightforward structure is almost always right for v1.
+- Draw the component/process diagram — if you can't draw it, you don't understand it.
+- Every connection between components is a potential failure point. Minimize them.
+- The data/information model is the foundation. Get this wrong and everything suffers.
+- Consider what happens when things go wrong — where are the bottlenecks?
 
 ## Common Mistakes
-- Over-engineering: microservices for a project with 100 users
-- No clear data model (leads to spaghetti code)
-- Forgetting about state management (where does truth live?)
-- Not thinking about caching strategy
-- Ignoring API versioning from the start
+- Over-engineering: complex architecture for a simple problem
+- No clear data/information model
+- Forgetting about how state or information flows between parts
+- Not thinking about capacity and peak load
+- Ignoring how components depend on each other

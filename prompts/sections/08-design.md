@@ -1,29 +1,40 @@
-# Section: Design & UX
+# Section: Design & Experience
+
+> **Adapt to the project type.** For software: UI/UX design, responsive strategy.
+> For physical businesses: customer experience, layout, branding.
 
 ## What to Capture
-- Design system or component library
-- Key user flows (the 3-5 most important paths through the app)
-- Responsive strategy (mobile-first? desktop-first?)
-- Accessibility level (WCAG A, AA, or AAA)
+- Design approach or system
+- Key user/customer journeys (the 3-5 most important paths)
+- How the experience adapts to different contexts (devices, locations, situations)
+- Accessibility considerations
 - Brand guidelines (if any)
 
 ## Questions to Ask
-1. What are the 3 most important things a user does in your app? Walk me through each.
-2. Will this be used more on mobile or desktop? Or equally?
-3. Do you have existing brand colors, fonts, or style guidelines?
-4. How important is accessibility? (Legal requirement? Ethical choice? Nice-to-have?)
-5. Are there apps whose look and feel you admire? What specifically do you like?
+
+### For all projects:
+1. What are the 3 most important things a user/customer does? Walk me through each.
+2. Do you have existing brand colors, style, or guidelines?
+3. How important is accessibility? (Legal requirement? Ethical choice? Nice-to-have?)
+4. Are there businesses or products whose look and feel you admire?
+
+### For digital products (add):
+5. Will this be used more on mobile or desktop?
+
+### For physical businesses (add):
+5. What should the space/environment feel like? Walk me through a customer visit.
 
 ## Quality Tips
-- Design the user flow BEFORE the UI. Know where users go before deciding what it looks like.
-- Mobile-first is almost always right. If it works on mobile, it works on desktop. The reverse is rarely true.
-- Accessibility is not optional — it's both ethical and often legally required. WCAG AA is the standard to aim for.
-- Minimum touch target: 44x44px. Minimum body font: 16px. Minimum contrast: 4.5:1.
-- Pick a design system (Tailwind, Shadcn, Material) rather than designing from scratch. Your time is better spent on the product.
+- Design the journey BEFORE the details. Know where people go before deciding what it looks like.
+- For digital: mobile-first is almost always right.
+- For physical: the first 10 seconds of a customer's visit set expectations — what do they see?
+- Accessibility is not optional — it's both ethical and often legally required.
+- Pick an existing design system or reference rather than designing from scratch.
+- Not testing with real users early is the most common and costly mistake.
 
 ## Common Mistakes
-- Designing for desktop first, then trying to shrink it
+- Too many paths at launch — pick 3 and nail them
 - Ignoring accessibility until "later" (it's 10x harder to add)
-- Too many user flows at launch — pick 3 and nail them
-- Custom design system for a small project (use existing ones)
-- Not testing with real users early
+- Designing for the builder's preferences instead of the primary user's context
+- Not considering the design filter: does this work for [primary user] in [their context]?
+- Skipping user/customer testing before committing to a design

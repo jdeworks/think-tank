@@ -22,5 +22,5 @@
 - Only listing technical risks (market and resource risks are usually bigger)
 - Vague mitigations ("we'll be careful" is not a plan)
 - Not having a "kill switch" — at what point do you stop and reassess?
-- Ignoring dependency risks (what if that npm package is abandoned?)
+- Ignoring dependency/vendor risks (what if a key supplier, tool, or service disappears?)
 - Not considering the risk of success (what if you go viral and can't handle load?)
