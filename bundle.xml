@@ -686,22 +686,6 @@ interface MermaidDiagramProps {
 export function MermaidDiagram(
 </file>
 
-<file path="src/components/plan/PlanSidebar.tsx">
-import { useProjectStore } from '@/stores/project-store'
-import { PLAN_SECTIONS, getAdaptiveLabels } from '@/schema/project-plan'
-import { getSectionCompleteness, getOverallCompleteness } from '@/engine/section-map'
-import { Badge } from '@/components/common/Badge'
-import { useUIStore } from '@/stores/ui-store'
-⋮----
-{/* Mobile toggle */}
-⋮----
-{/* Overlay for mobile */}
-⋮----
-{/* Sidebar */}
-⋮----
-setView('plan')
-</file>
-
 <file path="src/components/project/ProjectList.tsx">
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { listProjects, deleteProject, type StoredProject } from '@/storage/project-db'
@@ -1559,7 +1543,6 @@ import type { Message } from '@/schema/conversation'
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis'
-import { useSettingsStore } from '@/stores/settings-store'
 ⋮----
 interface MessageBubbleProps {
   message: Message
@@ -1570,26 +1553,20 @@ const handleSpeak = () =>
 {/* Speaker button for assistant messages */}
 </file>
 
-<file path="src/components/plan/PlanView.tsx">
+<file path="src/components/plan/PlanSidebar.tsx">
 import { useProjectStore } from '@/stores/project-store'
 import { PLAN_SECTIONS, getAdaptiveLabels } from '@/schema/project-plan'
-import { getSectionCompleteness } from '@/engine/section-map'
+import { getSectionCompleteness, getOverallCompleteness } from '@/engine/section-map'
 import { Badge } from '@/components/common/Badge'
-import { Button } from '@/components/common/Button'
 import { useUIStore } from '@/stores/ui-store'
-import { ArchitectureDiagram } from './ArchitectureDiagram'
-import { MermaidDiagram } from './MermaidDiagram'
-import { DiagramSection } from './DiagramSection'
-import { componentsToMermaid, dataModelToMermaid, timelineToMermaid } from '@/utils/mermaid-helpers'
-import { exportAsJSON, exportAsMarkdown, exportAsZip, createShareUrl } from '@/utils/export'
-import { useState } from 'react'
 ⋮----
-const handleExportJSON = ()
-const handleExportMD = ()
-const handleExportZip = ()
-const handleShare = () =>
+{/* Mobile toggle */}
 ⋮----
-onClick=
+{/* Overlay for mobile */}
+⋮----
+{/* Sidebar */}
+⋮----
+setView('plan')
 </file>
 
 <file path="src/data/example-templates.ts">
@@ -2356,6 +2333,28 @@ const handleSend = async (content: string) =>
 {/* Input */}
 </file>
 
+<file path="src/components/plan/PlanView.tsx">
+import { useProjectStore } from '@/stores/project-store'
+import { PLAN_SECTIONS, getAdaptiveLabels } from '@/schema/project-plan'
+import { getSectionCompleteness } from '@/engine/section-map'
+import { Badge } from '@/components/common/Badge'
+import { Button } from '@/components/common/Button'
+import { useUIStore } from '@/stores/ui-store'
+import { ArchitectureDiagram } from './ArchitectureDiagram'
+import { MermaidDiagram } from './MermaidDiagram'
+import { DiagramSection } from './DiagramSection'
+import { componentsToMermaid, dataModelToMermaid, timelineToMermaid } from '@/utils/mermaid-helpers'
+import { exportAsJSON, exportAsMarkdown, exportAsZip, createShareUrl } from '@/utils/export'
+import { useState } from 'react'
+⋮----
+const handleExportJSON = ()
+const handleExportMD = ()
+const handleExportZip = ()
+const handleShare = () =>
+⋮----
+onClick=
+</file>
+
 <file path="src/engine/prompts.ts">
 import type { Personality } from '@/schema/settings'
 import {
@@ -2694,21 +2693,6 @@ onClick=
 {/* Saved projects */}
 </file>
 
-<file path="src/schema/project-plan.ts">
-import { z } from 'zod/v4'
-⋮----
-export type ProjectPlan = z.infer<typeof ProjectPlanSchema>
-⋮----
-export type PlanSectionKey = (typeof PLAN_SECTIONS)[number]
-⋮----
-export function createEmptyPlan(): ProjectPlan
-⋮----
-/** Returns context-aware section labels based on the project type inferred from foundation. */
-export function getAdaptiveLabels(plan: ProjectPlan): Record<PlanSectionKey, string>
-⋮----
-export function isFoundationComplete(plan: ProjectPlan):
-</file>
-
 <file path="src/App.tsx">
 import { useEffect, useState } from 'react'
 import { useUIStore } from '@/stores/ui-store'
@@ -2818,79 +2802,21 @@ interface ProviderFieldsProps {
   onModelChange: (value: string) => void
   onTest: () => void
 }
-⋮----
-onClick=
 </file>
 
-<file path="src/utils/export.ts">
-import {
-  getAdaptiveLabels,
-  ProjectPlanSchema,
-  type ProjectPlan,
-  type PlanSectionKey,
-} from '@/schema/project-plan'
-import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
-import JSZip from 'jszip'
-import {
-  componentsToMermaid,
-  dataModelToMermaid,
-  timelineToMermaid,
-  userJourneyToMermaid,
-  risksToMermaid,
-  budgetToMermaid,
-} from './mermaid-helpers'
-import { fetchMermaidSvg } from './mermaid-render'
-import { generateOnePageSummary, generateHandoff } from './export-extras'
+<file path="src/schema/project-plan.ts">
+import { z } from 'zod/v4'
 ⋮----
-export function exportAsJSON(plan: ProjectPlan, filename: string)
+export type ProjectPlan = z.infer<typeof ProjectPlanSchema>
 ⋮----
-export function exportAsMarkdown(plan: ProjectPlan, filename: string)
+export type PlanSectionKey = (typeof PLAN_SECTIONS)[number]
 ⋮----
-export async function exportAsZip(plan: ProjectPlan, filename: string)
+export function createEmptyPlan(): ProjectPlan
 ⋮----
-// Core plan files
+/** Returns context-aware section labels based on the project type inferred from foundation. */
+export function getAdaptiveLabels(plan: ProjectPlan): Record<PlanSectionKey, string>
 ⋮----
-// Generate mermaid sources and SVGs
-⋮----
-function addDiagram(diagrams: Array<[string, string]>, name: string, mmd: string)
-⋮----
-function buildDiagramSources(plan: ProjectPlan): Array<[string, string]>
-⋮----
-function extractBudgetItems(plan: ProjectPlan): Array<
-⋮----
-function downloadBlob(blob: Blob, filename: string)
-⋮----
-export function importFromJSON(file: File): Promise<ProjectPlan>
-⋮----
-export function createShareUrl(plan: ProjectPlan): string
-⋮----
-export function loadFromShareUrl(): ProjectPlan | null
-⋮----
-function planToMarkdown(plan: ProjectPlan): string
-⋮----
-function renderFoundation(plan: ProjectPlan): string
-⋮----
-function renderOverview(plan: ProjectPlan): string
-⋮----
-function renderRequirements(plan: ProjectPlan): string
-⋮----
-function renderArchitecture(plan: ProjectPlan): string
-⋮----
-function renderTechStack(plan: ProjectPlan): string
-⋮----
-function renderHosting(plan: ProjectPlan): string
-⋮----
-function renderSecurity(plan: ProjectPlan): string
-⋮----
-function renderDesign(plan: ProjectPlan): string
-⋮----
-function renderBudget(plan: ProjectPlan): string
-⋮----
-function renderTimeline(plan: ProjectPlan): string
-⋮----
-function renderRisks(plan: ProjectPlan): string
-⋮----
-function renderCompetitors(plan: ProjectPlan): string
+export function isFoundationComplete(plan: ProjectPlan):
 </file>
 
 <file path="README.md">
@@ -3120,6 +3046,77 @@ Runs 6 stages in order:
 ## License
 
 MIT
+</file>
+
+<file path="src/utils/export.ts">
+import {
+  getAdaptiveLabels,
+  ProjectPlanSchema,
+  type ProjectPlan,
+  type PlanSectionKey,
+} from '@/schema/project-plan'
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
+import JSZip from 'jszip'
+import {
+  componentsToMermaid,
+  dataModelToMermaid,
+  timelineToMermaid,
+  userJourneyToMermaid,
+  risksToMermaid,
+  budgetToMermaid,
+} from './mermaid-helpers'
+import { fetchMermaidSvg } from './mermaid-render'
+import { generateOnePageSummary, generateHandoff } from './export-extras'
+⋮----
+export function exportAsJSON(plan: ProjectPlan, filename: string)
+⋮----
+export function exportAsMarkdown(plan: ProjectPlan, filename: string)
+⋮----
+export async function exportAsZip(plan: ProjectPlan, filename: string)
+⋮----
+// Core plan files
+⋮----
+// Generate mermaid sources and SVGs
+⋮----
+function addDiagram(diagrams: Array<[string, string]>, name: string, mmd: string)
+⋮----
+function buildDiagramSources(plan: ProjectPlan): Array<[string, string]>
+⋮----
+function extractBudgetItems(plan: ProjectPlan): Array<
+⋮----
+function downloadBlob(blob: Blob, filename: string)
+⋮----
+export function importFromJSON(file: File): Promise<ProjectPlan>
+⋮----
+export function createShareUrl(plan: ProjectPlan): string
+⋮----
+export function loadFromShareUrl(): ProjectPlan | null
+⋮----
+function planToMarkdown(plan: ProjectPlan): string
+⋮----
+function renderFoundation(plan: ProjectPlan): string
+⋮----
+function renderOverview(plan: ProjectPlan): string
+⋮----
+function renderRequirements(plan: ProjectPlan): string
+⋮----
+function renderArchitecture(plan: ProjectPlan): string
+⋮----
+function renderTechStack(plan: ProjectPlan): string
+⋮----
+function renderHosting(plan: ProjectPlan): string
+⋮----
+function renderSecurity(plan: ProjectPlan): string
+⋮----
+function renderDesign(plan: ProjectPlan): string
+⋮----
+function renderBudget(plan: ProjectPlan): string
+⋮----
+function renderTimeline(plan: ProjectPlan): string
+⋮----
+function renderRisks(plan: ProjectPlan): string
+⋮----
+function renderCompetitors(plan: ProjectPlan): string
 </file>
 
 </files>

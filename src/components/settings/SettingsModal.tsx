@@ -16,16 +16,7 @@ interface SettingsModalProps {
 }
 
 export function SettingsModal({ open, onClose }: SettingsModalProps) {
-  const {
-    provider,
-    personality,
-    voiceInputEnabled,
-    voiceOutputEnabled,
-    setProvider,
-    setPersonality,
-    setVoiceInputEnabled,
-    setVoiceOutputEnabled,
-  } = useSettingsStore()
+  const { provider, personality, setProvider, setPersonality } = useSettingsStore()
   const [presetId, setPresetId] = useState(
     provider?.id ||
       (provider?.type === 'openai-compatible' ? 'openrouter' : provider?.type) ||
@@ -100,21 +91,6 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
         <hr className="border-slate-200 dark:border-slate-700" />
 
         <PersonalitySelector personality={personality} onSelect={setPersonality} />
-
-        <hr className="border-slate-200 dark:border-slate-700" />
-
-        <VoiceToggle
-          label="Voice Input (Mic)"
-          description="Speak your answers instead of typing"
-          enabled={voiceInputEnabled}
-          onToggle={setVoiceInputEnabled}
-        />
-        <VoiceToggle
-          label="Voice Output (Listen)"
-          description="Hear AI responses read aloud"
-          enabled={voiceOutputEnabled}
-          onToggle={setVoiceOutputEnabled}
-        />
 
         <div className="flex justify-end gap-2 pt-2">
           <Button variant="secondary" onClick={onClose}>
@@ -263,41 +239,6 @@ function ProviderFields({
 interface PersonalitySelectorProps {
   personality: Personality
   onSelect: (personality: Personality) => void
-}
-
-function VoiceToggle({
-  label,
-  description,
-  enabled,
-  onToggle,
-}: {
-  label: string
-  description: string
-  enabled: boolean
-  onToggle: (v: boolean) => void
-}) {
-  return (
-    <div>
-      <div className="flex items-center justify-between">
-        <div>
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-            {label}
-          </label>
-          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{description}</p>
-        </div>
-        <button
-          onClick={() => onToggle(!enabled)}
-          role="switch"
-          aria-checked={enabled}
-          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${enabled ? 'bg-blue-500' : 'bg-slate-200 dark:bg-slate-600'}`}
-        >
-          <span
-            className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-sm transform transition-transform duration-200 ${enabled ? 'translate-x-5' : 'translate-x-0'}`}
-          />
-        </button>
-      </div>
-    </div>
-  )
 }
 
 function PersonalitySelector({ personality, onSelect }: PersonalitySelectorProps) {

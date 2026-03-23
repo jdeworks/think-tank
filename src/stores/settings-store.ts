@@ -19,8 +19,8 @@ export const useSettingsStore = create<SettingsState>()(
     (set) => ({
       provider: null,
       personality: 'friendly',
-      voiceInputEnabled: false,
-      voiceOutputEnabled: false,
+      voiceInputEnabled: true,
+      voiceOutputEnabled: true,
       setProvider: (provider) => set({ provider }),
       setPersonality: (personality) => set({ personality }),
       setVoiceInputEnabled: (voiceInputEnabled) => set({ voiceInputEnabled }),

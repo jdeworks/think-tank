@@ -2,7 +2,6 @@ import type { Message } from '@/schema/conversation'
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis'
-import { useSettingsStore } from '@/stores/settings-store'
 
 interface MessageBubbleProps {
   message: Message
@@ -11,9 +10,8 @@ interface MessageBubbleProps {
 export function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === 'user'
   const { isSupported: ttsSupported, isSpeaking, speak, stop } = useSpeechSynthesis()
-  const voiceOutputEnabled = useSettingsStore((s) => s.voiceOutputEnabled)
 
-  const showSpeaker = !isUser && voiceOutputEnabled && ttsSupported
+  const showSpeaker = !isUser && ttsSupported
 
   const handleSpeak = () => {
     if (isSpeaking) {

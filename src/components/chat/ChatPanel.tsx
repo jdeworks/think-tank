@@ -101,8 +101,17 @@ export function ChatPanel() {
             </div>
           )}
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg p-3 text-sm">
-              {error}
+            <div className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg p-3 text-sm flex items-center justify-between gap-3">
+              <span>{error}</span>
+              <button
+                onClick={() => {
+                  const lastUserMsg = [...messages].reverse().find((m) => m.role === 'user')
+                  if (lastUserMsg) handleSend(lastUserMsg.content)
+                }}
+                className="shrink-0 px-3 py-1 rounded-md bg-red-100 dark:bg-red-900/40 hover:bg-red-200 dark:hover:bg-red-800/40 text-red-700 dark:text-red-300 font-medium text-xs transition-colors"
+              >
+                Retry
+              </button>
             </div>
           )}
           <div ref={messagesEndRef} />
