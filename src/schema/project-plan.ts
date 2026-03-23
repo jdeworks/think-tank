@@ -172,7 +172,7 @@ export const ProjectPlanSchema = z.object({
     createdAt: z.string(),
     lastModified: z.string(),
   }),
-  foundation: FoundationSection,
+  foundation: z.optional(FoundationSection).default({}),
   overview: OverviewSection,
   requirements: RequirementsSection,
   architecture: ArchitectureSection,

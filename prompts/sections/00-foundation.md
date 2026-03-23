@@ -29,6 +29,7 @@ a community, an event, a product line. If it has a user or customer, this sectio
 | "general users" | "Who is the first specific person who will try this? Paint me a picture." |
 | "anyone who wants to..." | "Who wants to? Where are they? What's their situation?" |
 | "customers" | "What kind of customer? Walk-in, online, referred? What's their day like?" |
+| "fitness enthusiasts" / "foodies" / "gamers" | "That's an interest, not a person. Who specifically? What's their situation?" |
 
 **DO accept descriptions that pass this test: could you put this person in a room and recognise them?**
 
@@ -172,16 +173,20 @@ This is not just a data collection exercise. The foundation actively constrains 
 **Overview (01):** Goals must be achievable by the primary user in their context.
 Non-goals should exclude things requiring more than the primary user has.
 
-**Requirements (02):** Every requirement should map to something the primary user needs.
+**Competitors (02):** Frame competitors through the primary user's eyes — what do they use today?
 
-**Architecture (03):** Every component must be reachable by the primary user.
+**Requirements (03):** Every requirement should map to something the primary user needs.
 
-**Tech Stack (04):** Complexity ceiling = what the primary user's anchor requires of them.
+**Architecture (04):** Every component must be reachable by the primary user.
 
-**Hosting (05):** Performance and access must match the primary user's context.
+**Tech Stack (05):** Complexity ceiling = what the primary user's anchor requires of them.
 
-**Design (07):** UI/UX complexity must not exceed what the primary user can navigate.
+**Hosting (06):** Performance and access must match the primary user's context.
 
-**Budget (08):** Value is defined by whether first success is achievable at the price point.
+**Security (07):** Protect the data and access patterns of the primary user.
+
+**Design (08):** Experience complexity must not exceed what the primary user can navigate.
+
+**Budget (09):** Value is defined by whether first success is achievable at the price point.
 
 The design filter sentence should be quoted verbatim whenever a major decision is being evaluated.

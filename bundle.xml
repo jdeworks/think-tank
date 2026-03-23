@@ -255,189 +255,6 @@ The structured plan covers these sections:
 - Set `THINK_TANK_MODEL=claude-haiku-4-5-20251001` for cheaper (but less detailed) planning
 </file>
 
-<file path="cli/think-tank.ts">
-/**
- * Think Tank CLI — Interactive project planning from your terminal.
- *
- * Usage:
- *   npx tsx cli/think-tank.ts                    # Interactive mode
- *   npx tsx cli/think-tank.ts --idea "..."       # Start with an idea
- *   npx tsx cli/think-tank.ts --load plan.json   # Resume from exported plan
- *   npx tsx cli/think-tank.ts --personality critical
- *
- * Environment:
- *   ANTHROPIC_API_KEY   — Your Anthropic API key (required)
- *   THINK_TANK_MODEL    — Model to use (default: claude-sonnet-4-6)
- */
-⋮----
-import Anthropic from '@anthropic-ai/sdk'
-⋮----
-// ── Schema (inline to avoid import alias issues) ──────────────────────
-⋮----
-interface ProjectPlan {
-  meta: { version: '1.0'; createdAt: string; lastModified: string }
-  overview: Record<string, unknown>
-  requirements: Record<string, unknown>
-  architecture: Record<string, unknown>
-  techStack: Record<string, unknown>
-  hosting: Record<string, unknown>
-  security: Record<string, unknown>
-  design: Record<string, unknown>
-  budget: Record<string, unknown>
-  timeline: Record<string, unknown>
-  risks: Array<Record<string, unknown>>
-  competitors: Array<Record<string, unknown>>
-}
-⋮----
-function createEmptyPlan(): ProjectPlan
-⋮----
-// ── Completeness tracking ─────────────────────────────────────────────
-⋮----
-function getSectionCompleteness(plan: ProjectPlan, key: string): number
-⋮----
-function getOverallCompleteness(plan: ProjectPlan): number
-⋮----
-// ── Personality prompts ───────────────────────────────────────────────
-⋮----
-// ── Tool definition ───────────────────────────────────────────────────
-⋮----
-// ── Mermaid diagram generation ────────────────────────────────────────
-⋮----
-function buildArchitectureMmd(
-  components: Array<{ name: string; description: string; connections?: string[] }>,
-): string
-⋮----
-const sanitize = (s: string)
-⋮----
-function buildErDiagramMmd(
-  entities: Array<{ entity: string; fields: string[]; relationships?: string[] }>,
-): string
-⋮----
-async function renderMermaidToSvg(mmdContent: string, outputPath: string): Promise<boolean>
-⋮----
-// Try mermaid.ink API (free, no deps)
-⋮----
-// Fall through to .mmd file
-⋮----
-async function writeDiagram(mmdContent: string, basePath: string): Promise<string>
-⋮----
-// Fallback: save as .mmd text
-⋮----
-async function generateDiagrams(plan: ProjectPlan, outputDir: string): Promise<string[]>
-⋮----
-// ── Markdown export ───────────────────────────────────────────────────
-⋮----
-function planToMarkdown(plan: ProjectPlan): string
-⋮----
-function formatObject(obj: Record<string, unknown>, depth: number): string
-⋮----
-// ── System prompt builder ─────────────────────────────────────────────
-⋮----
-function buildSystemPrompt(personality: string, plan: ProjectPlan): string
-⋮----
-// ── Progress display ──────────────────────────────────────────────────
-⋮----
-function printProgress(plan: ProjectPlan)
-⋮----
-// ── CLI readline helper ───────────────────────────────────────────────
-⋮----
-function ask(rl: readline.Interface, prompt: string): Promise<string>
-⋮----
-// ── CLI command handler ───────────────────────────────────────────────
-⋮----
-function handleCommand(
-  cmd: string,
-  plan: ProjectPlan,
-  outputDir: string,
-  rl: readline.Interface,
-): boolean
-⋮----
-function parseArgs()
-⋮----
-const getArg = (flag: string) =>
-⋮----
-function printBanner(model: string, personality: string, outputDir: string)
-⋮----
-// ── Get initial idea ──────────────────────────────────────────────────
-⋮----
-async function getIdea(
-  rl: readline.Interface,
-  ideaArg: string | null,
-  loadFile: string | null,
-): Promise<string>
-⋮----
-// ── Send initial idea to Claude ───────────────────────────────────────
-⋮----
-async function sendInitialIdea(
-  client: Anthropic,
-  model: string,
-  personality: string,
-  plan: ProjectPlan,
-  messages: Anthropic.MessageParam[],
-  idea: string,
-): Promise<number>
-⋮----
-// ── Conversation loop ─────────────────────────────────────────────────
-⋮----
-async function conversationLoop(
-  client: Anthropic,
-  model: string,
-  personality: string,
-  plan: ProjectPlan,
-  messages: Anthropic.MessageParam[],
-  rl: readline.Interface,
-  outputDir: string,
-  initialTokens: number,
-)
-⋮----
-// ── Main ──────────────────────────────────────────────────────────────
-⋮----
-async function main()
-⋮----
-// Session-based output: each run gets its own folder
-⋮----
-// ── Claude API call ───────────────────────────────────────────────────
-⋮----
-async function callClaude(
-  client: Anthropic,
-  model: string,
-  personality: string,
-  plan: ProjectPlan,
-  messages: Anthropic.MessageParam[],
-): Promise<Anthropic.Message>
-⋮----
-// ── Process Claude response ───────────────────────────────────────────
-⋮----
-interface ProcessContext {
-  client: Anthropic
-  model: string
-  personality: string
-}
-⋮----
-async function processResponse(
-  response: Anthropic.Message,
-  plan: ProjectPlan,
-  messages: Anthropic.MessageParam[],
-  ctx: ProcessContext,
-)
-⋮----
-// Add assistant message to history
-⋮----
-// If there were tool uses, send tool results and make a follow-up API call
-⋮----
-// Update lastModified
-⋮----
-function applyPlanUpdate(plan: ProjectPlan, section: string, data: Record<string, unknown>)
-⋮----
-// Single item for array section — wrap and append
-⋮----
-// ── Save helper ───────────────────────────────────────────────────────
-⋮----
-function savePlan(plan: ProjectPlan, outputDir: string)
-⋮----
-// ── Run ───────────────────────────────────────────────────────────────
-</file>
-
 <file path="prompts/config/jdeworks.md">
 # jdeworks Workspace Configuration
 
@@ -624,7 +441,7 @@ You are a technical architect focused on system design and engineering decisions
 <file path="prompts/personalities/budget.md">
 # Budget Hawk
 
-You are a budget-conscious planner who focuses on costs, ROI, and resource efficiency. You always consider the cost implications of decisions — hosting, services, development time, maintenance. You suggest cost-effective alternatives and help users understand the total cost of ownership. You think about free tiers, open-source alternatives, and scaling costs.
+You are a budget-conscious planner who focuses on costs, ROI, and resource efficiency. You always consider the cost implications of decisions — whether that's hosting and services for software, or rent, equipment, and staffing for physical projects. You suggest cost-effective alternatives and help users understand the total cost of ownership. You think about free tiers, leasing vs buying, bootstrapping, and scaling costs.
 
 ## Tone
 - Practical and cost-aware
@@ -633,11 +450,13 @@ You are a budget-conscious planner who focuses on costs, ROI, and resource effic
 - Frame expensive options as "If budget allows..."
 
 ## Focus Areas
-- Free tier availability for every service
-- Open-source alternatives to paid tools
-- Total cost of ownership (not just hosting)
-- Development time as a cost
+- Free tiers and low-cost alternatives for every tool or service
+- Open-source alternatives to paid software
+- Leasing vs buying for equipment and spaces
+- Total cost of ownership (setup + ongoing + your time)
+- Development/preparation time as a cost
 - Scaling costs — what happens when you grow
+- Funding strategies — bootstrapping, sponsors, grants, pre-sales
 </file>
 
 <file path="prompts/personalities/critical.md">
@@ -725,6 +544,7 @@ a community, an event, a product line. If it has a user or customer, this sectio
 | "general users" | "Who is the first specific person who will try this? Paint me a picture." |
 | "anyone who wants to..." | "Who wants to? Where are they? What's their situation?" |
 | "customers" | "What kind of customer? Walk-in, online, referred? What's their day like?" |
+| "fitness enthusiasts" / "foodies" / "gamers" | "That's an interest, not a person. Who specifically? What's their situation?" |
 
 **DO accept descriptions that pass this test: could you put this person in a room and recognise them?**
 
@@ -868,17 +688,21 @@ This is not just a data collection exercise. The foundation actively constrains 
 **Overview (01):** Goals must be achievable by the primary user in their context.
 Non-goals should exclude things requiring more than the primary user has.
 
-**Requirements (02):** Every requirement should map to something the primary user needs.
+**Competitors (02):** Frame competitors through the primary user's eyes — what do they use today?
 
-**Architecture (03):** Every component must be reachable by the primary user.
+**Requirements (03):** Every requirement should map to something the primary user needs.
 
-**Tech Stack (04):** Complexity ceiling = what the primary user's anchor requires of them.
+**Architecture (04):** Every component must be reachable by the primary user.
 
-**Hosting (05):** Performance and access must match the primary user's context.
+**Tech Stack (05):** Complexity ceiling = what the primary user's anchor requires of them.
 
-**Design (07):** UI/UX complexity must not exceed what the primary user can navigate.
+**Hosting (06):** Performance and access must match the primary user's context.
 
-**Budget (08):** Value is defined by whether first success is achievable at the price point.
+**Security (07):** Protect the data and access patterns of the primary user.
+
+**Design (08):** Experience complexity must not exceed what the primary user can navigate.
+
+**Budget (09):** Value is defined by whether first success is achievable at the price point.
 
 The design filter sentence should be quoted verbatim whenever a major decision is being evaluated.
 </file>
@@ -915,31 +739,43 @@ The design filter sentence should be quoted verbatim whenever a major decision i
 <file path="prompts/sections/10-timeline.md">
 # Section: Timeline & Milestones
 
+> **Adapt to the project type.** For one-time launches: phases with deliverables.
+> For recurring projects (events, services): cadence, prep cycle, and iteration plan.
+
 ## What to Capture
-- Phases (MVP, v1, v2, etc.) with duration and deliverables
-- Milestones with target dates and descriptions
-- Dependencies between phases
+- Phases (what gets done in what order, with duration and deliverables)
+- Milestones (key dates or checkpoints)
+- For recurring projects: cadence (weekly, monthly, quarterly) and prep timeline per cycle
 
 ## Questions to Ask
-1. When do you want this to be usable? (Even if basic)
-2. What's the absolute minimum you need for a "version 1"?
-3. Are there external deadlines? (Conference, launch event, school project?)
-4. How many hours per week can you dedicate to this?
-5. What features can wait for v2?
+
+### For all projects:
+1. When do you want this to be ready?
+2. What's the absolute minimum you need for the first version or first event?
+3. What can wait until after the first version/event?
+
+### For one-time launches (add):
+4. What are the major phases? (Research, build, test, launch)
+5. Are there hard deadlines or dependencies? (Conference date, funding deadline, seasonal window)
+
+### For recurring projects (add):
+4. How often will this happen? (Weekly, monthly, quarterly)
+5. What's the prep timeline for each occurrence? (How far in advance do you need to start?)
+6. What changes between iterations? (Speakers, menu, inventory, content)
 
 ## Quality Tips
-- Ship the smallest useful thing first. You can always add more.
-- Double your time estimate. Software always takes longer than expected.
-- Define "done" for each phase — vague milestones lead to never-ending development.
-- MVP means Minimum VIABLE Product — it should solve the core problem, not be a prototype.
-- Weekly milestones keep momentum. Monthly milestones lose focus.
+- Projects always take longer than expected. Add 50% buffer to your estimates.
+- The first version should be the smallest useful thing — not the complete vision.
+- Set a date for the first version/event and work backward — what must be done by when?
+- For recurring projects: plan the first 3 iterations, not just the first one.
+- Milestones should have specific deliverables, not just dates.
 
 ## Common Mistakes
-- No MVP — trying to build everything at once
-- Unrealistic timelines (most people underestimate by 2-3x)
-- Feature creep during development (adding "just one more thing")
-- Not defining what "done" means for each milestone
-- Planning too far ahead — detailed plans for 6+ months out are fiction
+- No phases — just one big "do everything" block
+- Deadlines without deliverables ("done by March" — done with WHAT?)
+- Not accounting for dependencies (X can't start until Y is finished)
+- For recurring projects: planning only the first event with no iteration plan
+- Underestimating prep time for non-building tasks (permits, hiring, approvals)
 </file>
 
 <file path="prompts/tips/best-practices.md">
@@ -1457,17 +1293,6 @@ function toMermaidInkUrl(mmdContent: string): string | null
 export async function fetchMermaidSvg(mmdContent: string): Promise<Blob | null>
 </file>
 
-<file path="src/utils/prompt-loader.ts">
-async function fetchPrompt(path: string): Promise<string>
-⋮----
-// Offline or fetch failed — fall through to empty
-⋮----
-export async function loadSectionGuide(
-  sectionNumber: number,
-  sectionName: string,
-): Promise<string>
-</file>
-
 <file path="src/index.css">
 @custom-variant dark (&:where(.dark, .dark *));
 ⋮----
@@ -1606,6 +1431,190 @@ clean-output: ## Remove generated plan output
 
 clean-all: clean clean-output ## Remove all generated files
 	rm -rf node_modules
+</file>
+
+<file path="cli/think-tank.ts">
+/**
+ * Think Tank CLI — Interactive project planning from your terminal.
+ *
+ * Usage:
+ *   npx tsx cli/think-tank.ts                    # Interactive mode
+ *   npx tsx cli/think-tank.ts --idea "..."       # Start with an idea
+ *   npx tsx cli/think-tank.ts --load plan.json   # Resume from exported plan
+ *   npx tsx cli/think-tank.ts --personality critical
+ *
+ * Environment:
+ *   ANTHROPIC_API_KEY   — Your Anthropic API key (required)
+ *   THINK_TANK_MODEL    — Model to use (default: claude-sonnet-4-6)
+ */
+⋮----
+import Anthropic from '@anthropic-ai/sdk'
+⋮----
+// ── Schema (inline to avoid import alias issues) ──────────────────────
+⋮----
+interface ProjectPlan {
+  meta: { version: '1.0'; createdAt: string; lastModified: string }
+  foundation: Record<string, unknown>
+  overview: Record<string, unknown>
+  requirements: Record<string, unknown>
+  architecture: Record<string, unknown>
+  techStack: Record<string, unknown>
+  hosting: Record<string, unknown>
+  security: Record<string, unknown>
+  design: Record<string, unknown>
+  budget: Record<string, unknown>
+  timeline: Record<string, unknown>
+  risks: Array<Record<string, unknown>>
+  competitors: Array<Record<string, unknown>>
+}
+⋮----
+function createEmptyPlan(): ProjectPlan
+⋮----
+// ── Completeness tracking ─────────────────────────────────────────────
+⋮----
+function getSectionCompleteness(plan: ProjectPlan, key: string): number
+⋮----
+function getOverallCompleteness(plan: ProjectPlan): number
+⋮----
+// ── Personality prompts ───────────────────────────────────────────────
+⋮----
+// ── Tool definition ───────────────────────────────────────────────────
+⋮----
+// ── Mermaid diagram generation ────────────────────────────────────────
+⋮----
+function buildArchitectureMmd(
+  components: Array<{ name: string; description: string; connections?: string[] }>,
+): string
+⋮----
+const sanitize = (s: string)
+⋮----
+function buildErDiagramMmd(
+  entities: Array<{ entity: string; fields: string[]; relationships?: string[] }>,
+): string
+⋮----
+async function renderMermaidToSvg(mmdContent: string, outputPath: string): Promise<boolean>
+⋮----
+// Try mermaid.ink API (free, no deps)
+⋮----
+// Fall through to .mmd file
+⋮----
+async function writeDiagram(mmdContent: string, basePath: string): Promise<string>
+⋮----
+// Fallback: save as .mmd text
+⋮----
+async function generateDiagrams(plan: ProjectPlan, outputDir: string): Promise<string[]>
+⋮----
+// ── Markdown export ───────────────────────────────────────────────────
+⋮----
+function planToMarkdown(plan: ProjectPlan): string
+⋮----
+function formatObject(obj: Record<string, unknown>, depth: number): string
+⋮----
+// ── System prompt builder ─────────────────────────────────────────────
+⋮----
+function buildSystemPrompt(personality: string, plan: ProjectPlan): string
+⋮----
+// ── Progress display ──────────────────────────────────────────────────
+⋮----
+function printProgress(plan: ProjectPlan)
+⋮----
+// ── CLI readline helper ───────────────────────────────────────────────
+⋮----
+function ask(rl: readline.Interface, prompt: string): Promise<string>
+⋮----
+// ── CLI command handler ───────────────────────────────────────────────
+⋮----
+function handleCommand(
+  cmd: string,
+  plan: ProjectPlan,
+  outputDir: string,
+  rl: readline.Interface,
+): boolean
+⋮----
+function parseArgs()
+⋮----
+const getArg = (flag: string) =>
+⋮----
+function printBanner(model: string, personality: string, outputDir: string)
+⋮----
+// ── Get initial idea ──────────────────────────────────────────────────
+⋮----
+async function getIdea(
+  rl: readline.Interface,
+  ideaArg: string | null,
+  loadFile: string | null,
+): Promise<string>
+⋮----
+// ── Send initial idea to Claude ───────────────────────────────────────
+⋮----
+async function sendInitialIdea(
+  client: Anthropic,
+  model: string,
+  personality: string,
+  plan: ProjectPlan,
+  messages: Anthropic.MessageParam[],
+  idea: string,
+): Promise<number>
+⋮----
+// ── Conversation loop ─────────────────────────────────────────────────
+⋮----
+async function conversationLoop(
+  client: Anthropic,
+  model: string,
+  personality: string,
+  plan: ProjectPlan,
+  messages: Anthropic.MessageParam[],
+  rl: readline.Interface,
+  outputDir: string,
+  initialTokens: number,
+)
+⋮----
+// ── Main ──────────────────────────────────────────────────────────────
+⋮----
+async function main()
+⋮----
+// Session-based output: each run gets its own folder
+⋮----
+// ── Claude API call ───────────────────────────────────────────────────
+⋮----
+async function callClaude(
+  client: Anthropic,
+  model: string,
+  personality: string,
+  plan: ProjectPlan,
+  messages: Anthropic.MessageParam[],
+): Promise<Anthropic.Message>
+⋮----
+// ── Process Claude response ───────────────────────────────────────────
+⋮----
+interface ProcessContext {
+  client: Anthropic
+  model: string
+  personality: string
+}
+⋮----
+async function processResponse(
+  response: Anthropic.Message,
+  plan: ProjectPlan,
+  messages: Anthropic.MessageParam[],
+  ctx: ProcessContext,
+)
+⋮----
+// Add assistant message to history
+⋮----
+// If there were tool uses, send tool results and make a follow-up API call
+⋮----
+// Update lastModified
+⋮----
+function applyPlanUpdate(plan: ProjectPlan, section: string, data: Record<string, unknown>)
+⋮----
+// Single item for array section — wrap and append
+⋮----
+// ── Save helper ───────────────────────────────────────────────────────
+⋮----
+function savePlan(plan: ProjectPlan, outputDir: string)
+⋮----
+// ── Run ───────────────────────────────────────────────────────────────
 </file>
 
 <file path="prompts/sections/01-overview.md">
@@ -1889,61 +1898,87 @@ clean-all: clean clean-output ## Remove all generated files
 <file path="prompts/sections/09-budget.md">
 # Section: Budget & Resources
 
+> **Adapt to the project type.** For software: dev effort, hosting, services.
+> For physical businesses/events: rent, equipment, staffing, supplies, venue.
+
 ## What to Capture
-- Development effort (person-hours or person-weeks)
-- Infrastructure/operations costs (hosting, rent, equipment, databases, CDN)
-- Third-party/external costs (services, vendors, licenses, subscriptions)
-- Total estimate (one-time + monthly recurring)
+- Effort to build or set up (person-hours, person-weeks, or prep time)
+- Ongoing operational costs (infrastructure, rent, supplies, subscriptions)
+- Third-party/external costs (services, vendors, licenses, tools)
+- Total estimate (one-time setup + monthly recurring)
+- Funding model (self-funded, sponsors, revenue, grants)
 
 ## Questions to Ask
-1. Is this a solo project or do you have a team?
-2. What's your monthly budget for running this? ($0? $50? $500?)
-3. Are you doing the development yourself or hiring?
-4. Any paid services you already use or plan to use?
-5. What's the maximum you'd spend before deciding this isn't worth it?
+
+### For all projects:
+1. Is this a solo effort or do you have a team?
+2. What's your monthly budget for running this?
+3. What's the maximum you'd spend before deciding this isn't worth it?
+
+### For digital products (add):
+4. Are you building this yourself or hiring developers?
+5. Any paid services you already use or plan to use? (Hosting, APIs, auth, email)
+
+### For physical businesses/events (add):
+4. What are the major setup costs? (Equipment, renovation, permits, initial inventory)
+5. What are the recurring costs? (Rent, staff, supplies, insurance)
+6. How will this be funded? (Self-funded, sponsors, ticket sales, grants?)
 
 ## Quality Tips
-- Always calculate Total Cost of Ownership: development + hosting + services + maintenance.
-- Free tiers exist for almost everything. Start there.
-- Development time IS a cost, even if you're not paying yourself.
-- Plan for the cost of 10x growth — will your costs scale linearly or exponentially?
-- Monitoring and logging are often forgotten costs but critical for production.
+- Always calculate Total Cost of Ownership: setup + ongoing operations + your time.
+- Free tiers and low-cost options exist for almost everything. Start there.
+- Your own time IS a cost, even if you're not paying yourself.
+- Plan for what happens at 10x scale — do costs grow linearly or exponentially?
+- For recurring projects (events, services): calculate per-occurrence cost, not just monthly.
 
 ## Common Mistakes
-- Not accounting for ongoing maintenance/operations time
-- Forgetting recurring costs (domain renewal, subscriptions, supplies, rent)
-- Choosing "enterprise" tools for a solo project
+- Not accounting for ongoing maintenance or operations time
+- Forgetting recurring costs (subscriptions, supplies, rent, renewals)
+- Choosing "enterprise" tools or spaces for a small project
 - Not setting a budget cap (spend $X/month max, then reassess)
 - Ignoring the cost of your own time
+- No funding plan — assuming costs will just work out
 </file>
 
 <file path="prompts/sections/11-risks.md">
 # Section: Risks & Mitigations
 
+> **Adapt to the project type.** For software: technical, dependency, scaling risks.
+> For physical businesses/events: logistics, legal, supplier, community risks.
+
 ## What to Capture
 - For each risk: description, category, impact, likelihood, mitigation strategy
-- Categories: technical, resource, timeline, budget, security, other
+- Categories: technical, resource, timeline, budget, security, market, legal, logistics, other
 
 ## Questions to Ask
-1. What's the biggest thing that could go wrong with this project?
-2. What happens if you can't find users in the first month?
-3. Are there any technical unknowns you're worried about?
-4. What if a key dependency breaks or gets discontinued?
-5. What's your plan if this takes 3x longer than expected?
+
+### For all projects:
+1. What's the biggest thing that could go wrong?
+2. What happens if you can't find users/customers/attendees in the first month?
+3. What's your plan if this takes 3x longer than expected?
+
+### For digital products (add):
+4. Are there technical unknowns you're worried about?
+5. What if a key dependency or service gets discontinued?
+
+### For physical businesses/events (add):
+4. What if a key supplier, venue, or partner falls through?
+5. Are there legal or regulatory risks? (Permits, insurance, liability, compliance)
+6. What if demand is much higher or lower than expected?
 
 ## Quality Tips
 - Every project has at least 3 risks. If you can't find them, you're not looking hard enough.
 - The biggest risk is usually not technical — it's "nobody wants this." Validate demand early.
 - For each risk, have a concrete mitigation, not just "we'll deal with it."
-- Categorize risks: technical (can we build it?), market (do people want it?), resource (do we have the capacity?).
-- Revisit risks monthly. New ones emerge, old ones get resolved.
+- Categorize risks: technical (can we build it?), market (do people want it?), resource (do we have the capacity?), legal (are we allowed?).
+- Revisit risks regularly. New ones emerge, old ones get resolved.
 
 ## Common Mistakes
 - Only listing technical risks (market and resource risks are usually bigger)
 - Vague mitigations ("we'll be careful" is not a plan)
 - Not having a "kill switch" — at what point do you stop and reassess?
 - Ignoring dependency/vendor risks (what if a key supplier, tool, or service disappears?)
-- Not considering the risk of success (what if you go viral and can't handle load?)
+- Not considering the risk of success (what if demand exceeds your capacity?)
 </file>
 
 <file path="prompts/sections/12-implementation-review.md">
@@ -2022,7 +2057,7 @@ Use this to verify a plan is complete and high-quality before finalizing.
 - [ ] **Primary user description** is a specific person or role scenario
       (NOT a demographic category like "developers" or "small businesses")
 - [ ] **Device/context** is specified (not "any device" or unspecified)
-- [ ] **Technical comfort** is anchored to a named tool, app, or process
+- [ ] **Comfort level** is anchored to a named tool, app, or process
       (NOT abstract labels like "non-technical" or "tech-savvy")
 - [ ] **First success** is a concrete observable action (NOT a feeling)
 - [ ] **Design filter sentence** is present:
@@ -2033,45 +2068,43 @@ until foundation is complete.
 
 ## Completeness
 - [ ] All planning sections have meaningful content (not just filler)
-- [ ] Implementation review (section 12) has been done
+- [ ] Implementation review has been done
 - [ ] Overview has specific goals AND non-goals
-- [ ] At least 3 competitors analyzed with strengths AND weaknesses
+- [ ] At least 3 competitors or alternatives analyzed with strengths AND weaknesses
 - [ ] Requirements are prioritized (must/should/nice)
-- [ ] Architecture has a component diagram with connections
-- [ ] Tech stack choices each have a rationale (WHY, not just WHAT)
-- [ ] Hosting has a cost estimate (even if $0)
-- [ ] Security has been addressed (even if "no auth needed" — say so explicitly)
+- [ ] Architecture/structure has components or processes with connections
+- [ ] Key tool/technology choices each have a rationale (WHY, not just WHAT)
+- [ ] Hosting/operations has a cost estimate (even if $0)
+- [ ] Security/compliance has been addressed (even if minimal — say so explicitly)
 - [ ] At least 3 risks identified with concrete mitigations
 - [ ] Timeline has phases with specific deliverables
 
 ## Clarity
 - [ ] A non-technical person could read the overview and understand the project
 - [ ] No unexplained jargon or acronyms
-- [ ] Goals are measurable (numbers, not feelings)
+- [ ] Goals are measurable (numbers or observable outcomes, not feelings)
 - [ ] "Done" is defined for each milestone
 
 ## Realism
-- [ ] Timeline accounts for the team size and availability
-- [ ] Budget includes ALL costs (hosting + services + dev time + maintenance)
-- [ ] MVP scope is genuinely minimal (could launch in 1-2 weeks)
-- [ ] Risks include non-technical ones (market, resource, legal)
+- [ ] Timeline accounts for the team size, availability, and external dependencies
+- [ ] Budget includes ALL costs (setup + ongoing operations + your time)
+- [ ] First version scope is genuinely minimal (could be ready in weeks, not months)
+- [ ] Risks include non-technical ones (market, resource, legal, logistics)
 
 ## Actionability
-- [ ] Someone could start building from this plan tomorrow
+- [ ] Someone could start building/executing from this plan tomorrow
 - [ ] First task of Phase 1 is clear and specific
-- [ ] Technology choices are concrete (specific frameworks, not "some JS framework")
-- [ ] Data model is defined enough to create database tables
+- [ ] Key choices are concrete (specific tools/vendors/partners, not vague categories)
+- [ ] Information model is defined enough to start tracking data
 
 ## Implementation Readiness
-- [ ] The design filter sentence is actionable — an implementer can test every decision against it
+- [ ] The design filter sentence is actionable — every decision can be tested against it
 - [ ] The primary user's device/context is unambiguous
 - [ ] The primary user's first success action is testable
 - [ ] Every "X or Y" choice has been resolved to a single answer
-- [ ] Exact library versions specified (not just "React" but "React 19")
-- [ ] Integration method is explicit (URL reference? npm install? copy files?)
-- [ ] File/folder structure of the output is listed
-- [ ] Build and deployment steps are specific commands, not descriptions
-- [ ] Test: "Could an AI agent implement this with zero follow-up questions?"
+- [ ] For digital products: exact versions, file structure, build/deploy commands specified
+- [ ] For physical projects: location specifics, supplier choices, permits, opening checklist
+- [ ] Test: "Could someone implement this with zero follow-up questions?"
 </file>
 
 <file path="prompts/system.md">
@@ -2357,6 +2390,17 @@ import { z } from 'zod/v4'
 export type ProviderConfig = z.infer<typeof ProviderConfigSchema>
 ⋮----
 export type Personality = z.infer<typeof PersonalityType>
+</file>
+
+<file path="src/utils/prompt-loader.ts">
+async function fetchPrompt(path: string): Promise<string>
+⋮----
+// Offline or fetch failed — fall through to empty
+⋮----
+export async function loadSectionGuide(
+  sectionNumber: number,
+  sectionName: string,
+): Promise<string>
 </file>
 
 <file path="src/utils/tokens.ts">
@@ -2702,6 +2746,48 @@ think-tank-plan/
 think-tank-plan.zip
 </file>
 
+<file path="src/components/settings/SettingsModal.tsx">
+import { useState } from 'react'
+import { Modal } from '@/components/common/Modal'
+import { Button } from '@/components/common/Button'
+import { useSettingsStore } from '@/stores/settings-store'
+import {
+  PROVIDER_PRESETS,
+  PERSONALITY_INFO,
+  type Personality,
+  type ProviderConfig,
+} from '@/schema/settings'
+import { createProvider } from '@/providers/registry'
+⋮----
+interface SettingsModalProps {
+  open: boolean
+  onClose: () => void
+}
+⋮----
+export function SettingsModal(
+⋮----
+const handleSave = () =>
+⋮----
+const handleTest = async () =>
+⋮----
+interface ProviderFieldsProps {
+  providerType: string
+  apiKey: string
+  baseUrl: string
+  model: string
+  selectedPreset: (typeof PROVIDER_PRESETS)[number] | undefined
+  testing: boolean
+  testResult: 'success' | 'error' | null
+  onProviderTypeChange: (type: ProviderConfig['type']) => void
+  onApiKeyChange: (value: string) => void
+  onBaseUrlChange: (value: string) => void
+  onModelChange: (value: string) => void
+  onTest: () => void
+}
+⋮----
+onClick=
+</file>
+
 <file path="README.md">
 ## 🤖 Using this repo with AI assistants
 
@@ -2929,48 +3015,6 @@ Runs 6 stages in order:
 ## License
 
 MIT
-</file>
-
-<file path="src/components/settings/SettingsModal.tsx">
-import { useState } from 'react'
-import { Modal } from '@/components/common/Modal'
-import { Button } from '@/components/common/Button'
-import { useSettingsStore } from '@/stores/settings-store'
-import {
-  PROVIDER_PRESETS,
-  PERSONALITY_INFO,
-  type Personality,
-  type ProviderConfig,
-} from '@/schema/settings'
-import { createProvider } from '@/providers/registry'
-⋮----
-interface SettingsModalProps {
-  open: boolean
-  onClose: () => void
-}
-⋮----
-export function SettingsModal(
-⋮----
-const handleSave = () =>
-⋮----
-const handleTest = async () =>
-⋮----
-interface ProviderFieldsProps {
-  providerType: string
-  apiKey: string
-  baseUrl: string
-  model: string
-  selectedPreset: (typeof PROVIDER_PRESETS)[number] | undefined
-  testing: boolean
-  testResult: 'success' | 'error' | null
-  onProviderTypeChange: (type: ProviderConfig['type']) => void
-  onApiKeyChange: (value: string) => void
-  onBaseUrlChange: (value: string) => void
-  onModelChange: (value: string) => void
-  onTest: () => void
-}
-⋮----
-onClick=
 </file>
 
 </files>

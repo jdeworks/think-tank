@@ -245,6 +245,7 @@ function renderSecurity(plan: ProjectPlan): string {
   if (s.authentication) parts.push(`**Auth:** ${s.authentication}`)
   if (s.authorization) parts.push(`**Authorization:** ${s.authorization}`)
   if (s.dataEncryption) parts.push(`**Encryption:** ${s.dataEncryption}`)
+  if (s.apiKeyManagement) parts.push(`**API Key Management:** ${s.apiKeyManagement}`)
   if (s.knownRisks?.length)
     parts.push(`**Risks:**\n${s.knownRisks.map((r) => `- ${r}`).join('\n')}`)
   if (s.compliance?.length) parts.push(`**Compliance:** ${s.compliance.join(', ')}`)

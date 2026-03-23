@@ -22,6 +22,7 @@ import * as readline from 'readline'
 
 interface ProjectPlan {
   meta: { version: '1.0'; createdAt: string; lastModified: string }
+  foundation: Record<string, unknown>
   overview: Record<string, unknown>
   requirements: Record<string, unknown>
   architecture: Record<string, unknown>
@@ -36,6 +37,7 @@ interface ProjectPlan {
 }
 
 const SECTION_LABELS: Record<string, string> = {
+  foundation: 'Foundation',
   overview: 'Project Overview',
   requirements: 'Requirements',
   architecture: 'Architecture',
@@ -55,6 +57,7 @@ function createEmptyPlan(): ProjectPlan {
   const now = new Date().toISOString()
   return {
     meta: { version: '1.0', createdAt: now, lastModified: now },
+    foundation: {},
     overview: {},
     requirements: {},
     architecture: {},
@@ -298,8 +301,12 @@ function buildSystemPrompt(personality: string, plan: ProjectPlan): string {
     (k) => SECTION_LABELS[k],
   )
 
+  const fn = plan.foundation as Record<string, unknown>
+  const pu = (fn?.primaryUser as Record<string, unknown>) || {}
   const ov = plan.overview as Record<string, unknown>
   const summaryParts: string[] = []
+  if (pu.description) summaryParts.push(`**Primary User:** ${pu.description}`)
+  if (fn?.designFilter) summaryParts.push(`**Design Filter:** ${fn.designFilter}`)
   if (ov.name) summaryParts.push(`**Project:** ${ov.name}`)
   if (ov.description) summaryParts.push(`**Description:** ${ov.description}`)
   if (ov.goals) summaryParts.push(`**Goals:** ${(ov.goals as string[]).join(', ')}`)
