@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useUIStore } from '@/stores/ui-store'
 import { useProjectStore } from '@/stores/project-store'
 import { useSettingsStore } from '@/stores/settings-store'
@@ -12,8 +12,9 @@ import { createEmptyPlan } from '@/schema/project-plan'
 
 export default function App() {
   const { view, setView, settingsOpen, setSettingsOpen } = useUIStore()
-  const { id } = useProjectStore()
+  const { id, name, setName } = useProjectStore()
   const provider = useSettingsStore((s) => s.provider)
+  const [editingName, setEditingName] = useState(false)
 
   useEffect(() => {
     const sharedPlan = loadFromShareUrl()
@@ -44,6 +45,30 @@ export default function App() {
           Think Tank
         </button>
         <div className="flex items-center gap-1">
+          {id && view !== 'home' && editingName ? (
+            <input
+              autoFocus
+              defaultValue={name}
+              onBlur={(e) => {
+                const v = e.target.value.trim()
+                if (v) setName(v)
+                setEditingName(false)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') (e.target as HTMLInputElement).blur()
+                if (e.key === 'Escape') setEditingName(false)
+              }}
+              className="text-sm font-medium px-2 py-1 rounded border border-blue-400 bg-white dark:bg-slate-700 text-slate-900 dark:text-white outline-none w-48"
+            />
+          ) : id && view !== 'home' && name ? (
+            <button
+              onClick={() => setEditingName(true)}
+              title="Click to rename"
+              className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-500 dark:hover:text-blue-400 px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors truncate max-w-[200px]"
+            >
+              {name}
+            </button>
+          ) : null}
           {id && view !== 'home' && (
             <>
               <button

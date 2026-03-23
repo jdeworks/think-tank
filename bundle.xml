@@ -595,47 +595,6 @@ Document the trade-off for each major decision so future-you understands why you
 - **Ignoring compliance.** If you have EU users, you need GDPR compliance. Plan for it.
 </file>
 
-<file path="prompts/README.md">
-# Think Tank Prompts
-
-This folder contains all the planning prompts, personality definitions, section guides, and tips used by Think Tank.
-
-These files are the **single source of truth** for planning guidance. They are used by:
-- The **web UI** (bundled at build time via Vite's import.meta.glob)
-- The **CLI** (read from the local filesystem)
-- **AI coding agents** (Claude Code, Cursor, Copilot — via CLAUDE.md/.cursorrules)
-- **Humans** (readable markdown for manual planning)
-
-## Structure
-
-```
-prompts/
-├── system.md              # Base system prompt (how to guide the conversation)
-├── personalities/         # AI personality modifiers
-│   ├── friendly.md        # Encouraging, explains jargon simply
-│   ├── researcher.md      # Competitor/market focused
-│   ├── critical.md        # Stress-tests ideas
-│   ├── architect.md       # System design focused
-│   └── budget.md          # Cost/ROI focused
-├── sections/              # Per-section planning guides (questions, tips, mistakes)
-│   ├── 00-foundation.md   # Mandatory: who is this for?
-│   ├── 01-overview.md ... 11-risks.md
-│   └── 12-implementation-review.md
-├── config/                # Optional workspace-specific context
-│   ├── README.md
-│   └── workspace.example.md
-└── tips/                  # General advice
-    ├── quality-checklist.md
-    ├── common-mistakes.md
-    └── best-practices.md
-```
-
-## How the Web UI Uses These
-
-Prompts are bundled into the app at build time — no runtime fetches needed.
-Edit the markdown files, rebuild, and the changes are live.
-</file>
-
 <file path="src/components/common/Badge.tsx">
 interface BadgeProps {
   value: number
@@ -1480,6 +1439,47 @@ After this review, update the plan JSON with:
 - A new field in overview: `implementationNotes` (array of strings) — specific instructions for the implementer that don't fit in other sections
 </file>
 
+<file path="prompts/README.md">
+# Think Tank Prompts
+
+This folder contains all the planning prompts, personality definitions, section guides, and tips used by Think Tank.
+
+These files are the **single source of truth** for planning guidance. They are used by:
+- The **web UI** (bundled at build time via Vite's import.meta.glob)
+- The **CLI** (read from the local filesystem)
+- **AI coding agents** (Claude Code, Cursor, Copilot — via CLAUDE.md/.cursorrules)
+- **Humans** (readable markdown for manual planning)
+
+## Structure
+
+```
+prompts/
+├── system.md              # Base system prompt (how to guide the conversation)
+├── personalities/         # AI personality modifiers
+│   ├── friendly.md        # Encouraging, explains jargon simply
+│   ├── researcher.md      # Competitor/market focused
+│   ├── critical.md        # Stress-tests ideas
+│   ├── architect.md       # System design focused
+│   └── budget.md          # Cost/ROI focused
+├── sections/              # Per-section planning guides (questions, tips, mistakes)
+│   ├── 00-foundation.md   # Mandatory: who is this for?
+│   ├── 01-overview.md ... 11-risks.md
+│   └── 12-implementation-review.md
+├── config/                # Optional workspace-specific context
+│   ├── README.md
+│   └── workspace.example.md
+└── tips/                  # General advice
+    ├── quality-checklist.md
+    ├── common-mistakes.md
+    └── best-practices.md
+```
+
+## How the Web UI Uses These
+
+Prompts are bundled into the app at build time — no runtime fetches needed.
+Edit the markdown files, rebuild, and the changes are live.
+</file>
+
 <file path="prompts/system.md">
 # Think Tank — System Prompt
 
@@ -1731,7 +1731,7 @@ export function formatTokens(tokens: number): string
 </file>
 
 <file path="src/App.tsx">
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useUIStore } from '@/stores/ui-store'
 import { useProjectStore } from '@/stores/project-store'
 import { useSettingsStore } from '@/stores/settings-store'
@@ -1746,6 +1746,10 @@ import { createEmptyPlan } from '@/schema/project-plan'
 {/* Top bar */}
 ⋮----
 onClick=
+⋮----
+const v = e.target.value.trim()
+if (v) setName(v)
+setEditingName(false)
 </file>
 
 <file path="CLAUDE.md">
