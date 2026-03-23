@@ -2726,6 +2726,8 @@ onClick=
 ⋮----
 // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally excludes setValue
 ⋮----
+// Auto-resize textarea when displayValue changes (voice input, setValue, etc.)
+⋮----
 const handleSubmit = () =>
 ⋮----
 const handleKeyDown = (e: React.KeyboardEvent) =>

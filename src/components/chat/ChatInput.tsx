@@ -168,6 +168,15 @@ export function ChatInput({
     return value
   }, [isListening, transcript, interimTranscript, value])
 
+  // Auto-resize textarea when displayValue changes (voice input, setValue, etc.)
+  useEffect(() => {
+    const t = textareaRef.current
+    if (t) {
+      t.style.height = 'auto'
+      t.style.height = Math.min(t.scrollHeight, 120) + 'px'
+    }
+  }, [displayValue])
+
   useEffect(() => {
     if (!disabled && textareaRef.current) textareaRef.current.focus()
   }, [disabled])
