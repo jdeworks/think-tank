@@ -1,27 +1,32 @@
-import type { ProjectPlan, PlanSectionKey } from '@/schema/project-plan'
+import {
+  type ProjectPlan,
+  type PlanSectionKey,
+  PLAN_SECTIONS,
+  isFoundationComplete,
+} from '@/schema/project-plan'
 
-interface SectionConfig {
-  key: PlanSectionKey
-  requiredFields: string[]
-  order: number
+const SECTION_ORDER: Record<PlanSectionKey, number> = {
+  foundation: 0,
+  overview: 1,
+  competitors: 2,
+  requirements: 3,
+  architecture: 4,
+  techStack: 5,
+  hosting: 6,
+  security: 7,
+  design: 8,
+  budget: 9,
+  timeline: 10,
+  risks: 11,
 }
 
-const SECTION_CONFIGS: SectionConfig[] = [
-  { key: 'foundation', requiredFields: ['primaryUser', 'designFilter'], order: 0 },
-  { key: 'overview', requiredFields: ['name', 'description', 'goals'], order: 1 },
-  { key: 'competitors', requiredFields: [], order: 2 },
-  { key: 'requirements', requiredFields: ['functional'], order: 3 },
-  { key: 'architecture', requiredFields: ['systemType', 'pattern', 'components'], order: 4 },
-  { key: 'techStack', requiredFields: ['frontend', 'backend'], order: 5 },
-  { key: 'hosting', requiredFields: ['platform', 'estimatedMonthlyCost'], order: 6 },
-  { key: 'security', requiredFields: ['authentication'], order: 7 },
-  { key: 'design', requiredFields: ['keyUserFlows'], order: 8 },
-  { key: 'budget', requiredFields: ['totalEstimate'], order: 9 },
-  { key: 'timeline', requiredFields: ['phases'], order: 10 },
-  { key: 'risks', requiredFields: [], order: 11 },
-]
-
 export function getSectionCompleteness(plan: ProjectPlan, key: PlanSectionKey): number {
+  // Foundation uses deep validation — all required sub-fields must be present
+  if (key === 'foundation') {
+    const result = isFoundationComplete(plan)
+    return result.complete ? 100 : Math.round(((5 - result.missing.length) / 5) * 100)
+  }
+
   const section = plan[key]
 
   if (Array.isArray(section)) {
@@ -44,14 +49,14 @@ export function getSectionCompleteness(plan: ProjectPlan, key: PlanSectionKey): 
 }
 
 export function getOverallCompleteness(plan: ProjectPlan): number {
-  const scores = SECTION_CONFIGS.map((c) => getSectionCompleteness(plan, c.key))
+  const scores = PLAN_SECTIONS.map((key) => getSectionCompleteness(plan, key))
   return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
 }
 
 export function getIncompleteSections(plan: ProjectPlan): PlanSectionKey[] {
-  return SECTION_CONFIGS.filter((c) => getSectionCompleteness(plan, c.key) < 80)
-    .sort((a, b) => a.order - b.order)
-    .map((c) => c.key)
+  return PLAN_SECTIONS.filter((key) => getSectionCompleteness(plan, key) < 80).sort(
+    (a, b) => (SECTION_ORDER[a] ?? 99) - (SECTION_ORDER[b] ?? 99),
+  )
 }
 
 export function getNextSection(plan: ProjectPlan): PlanSectionKey | null {

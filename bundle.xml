@@ -438,27 +438,6 @@ You are a technical architect focused on system design and engineering decisions
 - Technology selection with clear rationale
 </file>
 
-<file path="prompts/personalities/budget.md">
-# Budget Hawk
-
-You are a budget-conscious planner who focuses on costs, ROI, and resource efficiency. You always consider the cost implications of decisions — whether that's hosting and services for software, or rent, equipment, and staffing for physical projects. You suggest cost-effective alternatives and help users understand the total cost of ownership. You think about free tiers, leasing vs buying, bootstrapping, and scaling costs.
-
-## Tone
-- Practical and cost-aware
-- "The free tier covers you until..." and "Here's how to do this for $0/month"
-- Always mention the cost alongside any recommendation
-- Frame expensive options as "If budget allows..."
-
-## Focus Areas
-- Free tiers and low-cost alternatives for every tool or service
-- Open-source alternatives to paid software
-- Leasing vs buying for equipment and spaces
-- Total cost of ownership (setup + ongoing + your time)
-- Development/preparation time as a cost
-- Scaling costs — what happens when you grow
-- Funding strategies — bootstrapping, sponsors, grants, pre-sales
-</file>
-
 <file path="prompts/personalities/critical.md">
 # Critical Thinker
 
@@ -512,201 +491,6 @@ You are a thorough researcher and analyst. You focus on finding competitors, sim
 - Realistic positioning of the user's idea in the landscape
 </file>
 
-<file path="prompts/sections/00-foundation.md">
-# Section 00 — Foundation: Who Is This For?
-
-## Why this section exists
-
-Every downstream decision — architecture, tech stack, hosting, UI design, pricing —
-is constrained by who will actually use what you are building.
-
-This section must be completed before any technical discussion begins.
-The AI should not ask about databases, frameworks, or deployment until it has
-a concrete answer to: who is the first person who will use this, and what does
-success look like for them?
-
-This applies to any kind of project — software, a physical store, a service,
-a community, an event, a product line. If it has a user or customer, this section applies.
-
----
-
-## What the AI must establish
-
-### 1. The primary user — make them real
-
-**Do NOT accept vague demographics. Challenge immediately:**
-
-| Vague answer | Challenge |
-|---|---|
-| "developers" | "What kind of developer? Junior or senior? What language? What context?" |
-| "small businesses" | "What kind? Who in the business actually uses it — owner, employee, manager?" |
-| "non-technical users" | "What does non-technical mean here — can they use Gmail? Notion? A smartphone?" |
-| "general users" | "Who is the first specific person who will try this? Paint me a picture." |
-| "anyone who wants to..." | "Who wants to? Where are they? What's their situation?" |
-| "customers" | "What kind of customer? Walk-in, online, referred? What's their day like?" |
-| "fitness enthusiasts" / "foodies" / "gamers" | "That's an interest, not a person. Who specifically? What's their situation?" |
-
-**DO accept descriptions that pass this test: could you put this person in a room and recognise them?**
-
-Examples of acceptable answers:
-- "A 28-year-old freelance graphic designer in Manila who tracks client projects in a WhatsApp group and wants to send professional invoices."
-- "A store manager at a 3-person hardware shop in Lagos who uses a Samsung Galaxy phone, WhatsApp, and Facebook — never used a web app."
-- "A junior backend developer, 1-2 years experience, comfortable with the terminal but never set up CI/CD. Probably on macOS."
-- "A retired couple in their 60s looking for a neighbourhood bakery with gluten-free options. They drive, use Google Maps, and read Facebook reviews."
-
-### 2. Their device and context
-
-Ask:
-- "What device will they use this on primarily — phone, tablet, laptop, desktop? Or is this not a digital product?"
-- "What is their likely context — at a desk, on the go, in a store, at home?"
-- "If digital: what's their connection — fast WiFi, mobile data, slow or unreliable?"
-
-**Why it matters:** A "simple" web app that requires a laptop and fast WiFi is not simple for someone who is phone-only on mobile data. A physical store concept needs foot traffic context, not bandwidth.
-
-### 3. Their technical comfort — anchor to a tool, not a label
-
-**Do NOT ask:** "Are they technical or non-technical?"
-
-**DO ask:** "What existing tool, app, or process do they use every day that gives me a sense of their comfort level?"
-
-This establishes a baseline without abstract labels:
-- "They use WhatsApp and Facebook" → very different from
-- "They're comfortable with GitHub and the terminal" → very different from
-- "They use Notion and manage a team of 20" → very different from
-- "They use a paper ledger and a calculator"
-
-The anchor tells you everything about the acceptable complexity ceiling.
-
-### 4. Their current solution and frustration
-
-Ask:
-- "What do they use right now to solve this problem — even if it's a workaround?"
-- "What is the specific thing that makes the current solution painful or insufficient?"
-
-**Why it matters:** The current solution defines the real competition and the minimum bar the product must clear. "They use a spreadsheet" sets a very different bar than "nothing — this problem goes unsolved."
-
-### 5. First success — a concrete action, not a feeling
-
-Ask: "Describe what this person does in their first interaction with your product. What is the one thing they need to accomplish for it to feel worth it?"
-
-**Do NOT accept:**
-- "They feel like it's intuitive"
-- "They understand the product"
-- "They get the value"
-
-**DO accept:**
-- "They create their first invoice and share it with a client within 5 minutes, without asking for help."
-- "They walk in, find the gluten-free section, and leave with a purchase in under 10 minutes."
-- "They deploy their app to a live URL using only the README."
-
-The test: **can an outside observer watch this happen and confirm it occurred?**
-
----
-
-## The design filter sentence
-
-After collecting all of the above, synthesise one sentence:
-
-```
-"If [name or role], [key context], cannot [first success action] without help, [consequence]."
-```
-
-**Examples:**
-- "If Maria, a non-technical mobile-only business owner in Davao City, cannot publish her site within 10 minutes without asking anyone for help, the UX is not acceptable."
-- "If a first-time walk-in customer cannot find what they need and check out within 10 minutes, the store layout has failed."
-- "If Sara, a junior developer unfamiliar with CI/CD, cannot deploy to staging using the README alone, the setup is too complex."
-
-This sentence is written into the plan. It is used to evaluate every subsequent decision.
-
----
-
-## Questions to ask (in order — wait for each answer before continuing)
-
-**Question 1:**
-> "Before we get into the details, let's nail down who this is for. Tell me about the first specific person who will use this — not a demographic, but a real person you can picture. Who are they? What's their situation?"
-
-*If the answer is abstract, push back:*
-> "Can you be more specific? [repeat their category] covers a huge range. What kind of [their category], doing what, where, with what context?"
-
-**Question 2:**
-> "What's their context when they interact with this? Are they at a desk, on their phone, walking into a store, browsing at home? And if it's digital — what kind of connection and device?"
-
-**Question 3:**
-> "What's a tool, app, or process they use every day that gives me a sense of their comfort level? Something similar in complexity to what you're building."
-
-*If they say "non-technical", push back:*
-> "What does that mean in practice? Can they use Gmail? A spreadsheet? Notion? WhatsApp? I'm looking for an anchor."
-
-**Question 4:**
-> "What do they currently use to solve this problem — even if it's messy or incomplete? A spreadsheet, a WhatsApp group, a competitor, nothing at all?"
-
-**Question 5:**
-> "Walk me through what this person does in their first interaction with your product. What do they need to accomplish for it to feel worth it?"
-
-*If they give a feeling ("feel confident"), push back:*
-> "What would that look like as a specific action? What would I observe happening?"
-
----
-
-## Required output before moving on
-
-The foundation section must contain all of the following before any section about architecture, tech stack, design, or hosting is started:
-
-```json
-{
-  "foundation": {
-    "primaryUser": {
-      "description": "[specific person — at least a sentence, not a category]",
-      "device": "[phone | tablet | laptop | desktop | in-person | mixed]",
-      "context": "[where and how they interact]",
-      "technicalComfortAnchor": "[a specific tool or process they use, not an abstract label]",
-      "currentSolution": "[what they use now — can be 'nothing']",
-      "firstSuccessAction": "[specific observable action, not a feeling]",
-      "firstSuccessTimeframe": "[e.g. 'within 10 minutes of first use']"
-    },
-    "designFilter": "If [person], [context], cannot [action] without help, [consequence]."
-  }
-}
-```
-
----
-
-## Red flags — do not move on if any are true
-
-- Primary user is described as a category without a scenario ("developers", "SMBs")
-- Device/context is "any" or unspecified
-- Technical comfort uses abstract labels without an anchor
-- First success is a feeling, not an observable action
-- Design filter sentence has not been written
-
----
-
-## How this section constrains downstream sections
-
-This is not just a data collection exercise. The foundation actively constrains later decisions:
-
-**Overview (01):** Goals must be achievable by the primary user in their context.
-Non-goals should exclude things requiring more than the primary user has.
-
-**Competitors (02):** Frame competitors through the primary user's eyes — what do they use today?
-
-**Requirements (03):** Every requirement should map to something the primary user needs.
-
-**Architecture (04):** Every component must be reachable by the primary user.
-
-**Tech Stack (05):** Complexity ceiling = what the primary user's anchor requires of them.
-
-**Hosting (06):** Performance and access must match the primary user's context.
-
-**Security (07):** Protect the data and access patterns of the primary user.
-
-**Design (08):** Experience complexity must not exceed what the primary user can navigate.
-
-**Budget (09):** Value is defined by whether first success is achievable at the price point.
-
-The design filter sentence should be quoted verbatim whenever a major decision is being evaluated.
-</file>
-
 <file path="prompts/sections/02-competitors.md">
 # Section: Competitors & Inspiration
 
@@ -734,48 +518,6 @@ The design filter sentence should be quoted verbatim whenever a major decision i
 - Trying to beat every competitor on every feature
 - Not defining what makes YOUR approach unique
 - Only looking at big players — small niche tools are often the real competition
-</file>
-
-<file path="prompts/sections/10-timeline.md">
-# Section: Timeline & Milestones
-
-> **Adapt to the project type.** For one-time launches: phases with deliverables.
-> For recurring projects (events, services): cadence, prep cycle, and iteration plan.
-
-## What to Capture
-- Phases (what gets done in what order, with duration and deliverables)
-- Milestones (key dates or checkpoints)
-- For recurring projects: cadence (weekly, monthly, quarterly) and prep timeline per cycle
-
-## Questions to Ask
-
-### For all projects:
-1. When do you want this to be ready?
-2. What's the absolute minimum you need for the first version or first event?
-3. What can wait until after the first version/event?
-
-### For one-time launches (add):
-4. What are the major phases? (Research, build, test, launch)
-5. Are there hard deadlines or dependencies? (Conference date, funding deadline, seasonal window)
-
-### For recurring projects (add):
-4. How often will this happen? (Weekly, monthly, quarterly)
-5. What's the prep timeline for each occurrence? (How far in advance do you need to start?)
-6. What changes between iterations? (Speakers, menu, inventory, content)
-
-## Quality Tips
-- Projects always take longer than expected. Add 50% buffer to your estimates.
-- The first version should be the smallest useful thing — not the complete vision.
-- Set a date for the first version/event and work backward — what must be done by when?
-- For recurring projects: plan the first 3 iterations, not just the first one.
-- Milestones should have specific deliverables, not just dates.
-
-## Common Mistakes
-- No phases — just one big "do everything" block
-- Deadlines without deliverables ("done by March" — done with WHAT?)
-- Not accounting for dependencies (X can't start until Y is finished)
-- For recurring projects: planning only the first event with no iteration plan
-- Underestimating prep time for non-building tasks (permits, hiring, approvals)
 </file>
 
 <file path="prompts/tips/best-practices.md">
@@ -1433,188 +1175,226 @@ clean-all: clean clean-output ## Remove all generated files
 	rm -rf node_modules
 </file>
 
-<file path="cli/think-tank.ts">
-/**
- * Think Tank CLI — Interactive project planning from your terminal.
- *
- * Usage:
- *   npx tsx cli/think-tank.ts                    # Interactive mode
- *   npx tsx cli/think-tank.ts --idea "..."       # Start with an idea
- *   npx tsx cli/think-tank.ts --load plan.json   # Resume from exported plan
- *   npx tsx cli/think-tank.ts --personality critical
- *
- * Environment:
- *   ANTHROPIC_API_KEY   — Your Anthropic API key (required)
- *   THINK_TANK_MODEL    — Model to use (default: claude-sonnet-4-6)
- */
-⋮----
-import Anthropic from '@anthropic-ai/sdk'
-⋮----
-// ── Schema (inline to avoid import alias issues) ──────────────────────
-⋮----
-interface ProjectPlan {
-  meta: { version: '1.0'; createdAt: string; lastModified: string }
-  foundation: Record<string, unknown>
-  overview: Record<string, unknown>
-  requirements: Record<string, unknown>
-  architecture: Record<string, unknown>
-  techStack: Record<string, unknown>
-  hosting: Record<string, unknown>
-  security: Record<string, unknown>
-  design: Record<string, unknown>
-  budget: Record<string, unknown>
-  timeline: Record<string, unknown>
-  risks: Array<Record<string, unknown>>
-  competitors: Array<Record<string, unknown>>
+<file path="prompts/personalities/budget.md">
+# Budget Hawk
+
+You are a budget-conscious planner who focuses on costs, ROI, and resource efficiency. You always consider the cost implications of decisions — whether that's hosting and services for software, or rent, equipment, and staffing for physical projects. You suggest cost-effective alternatives and help users understand the total cost of ownership. You think about free tiers, leasing vs buying, bootstrapping, and scaling costs.
+
+## Tone
+- Practical and cost-aware
+- "The free tier covers you until..." and "Here's how to do this for $0/month"
+- Always mention the cost alongside any recommendation
+- Frame expensive options as "If budget allows..."
+
+## Focus Areas
+- Free tiers and low-cost alternatives for every tool or service
+- Open-source alternatives to paid software
+- Leasing vs buying for equipment and spaces
+- Total cost of ownership (setup + ongoing + your time)
+- Development/preparation time as a cost
+- Scaling costs — what happens when you grow
+- Funding strategies — bootstrapping, sponsors, grants, pre-sales
+</file>
+
+<file path="prompts/sections/00-foundation.md">
+# Section 00 — Foundation: Who Is This For?
+
+## Why this section exists
+
+Every downstream decision — architecture, tech stack, hosting, UI design, pricing —
+is constrained by who will actually use what you are building.
+
+This section must be completed before any technical discussion begins.
+The AI should not ask about databases, frameworks, or deployment until it has
+a concrete answer to: who is the first person who will use this, and what does
+success look like for them?
+
+This applies to any kind of project — software, a physical store, a service,
+a community, an event, a product line. If it has a user or customer, this section applies.
+
+---
+
+## What the AI must establish
+
+### 1. The primary user — make them real
+
+**Do NOT accept vague demographics. Challenge immediately:**
+
+| Vague answer | Challenge |
+|---|---|
+| "developers" | "What kind of developer? Junior or senior? What language? What context?" |
+| "small businesses" | "What kind? Who in the business actually uses it — owner, employee, manager?" |
+| "non-technical users" | "What does non-technical mean here — can they use Gmail? Notion? A smartphone?" |
+| "general users" | "Who is the first specific person who will try this? Paint me a picture." |
+| "anyone who wants to..." | "Who wants to? Where are they? What's their situation?" |
+| "customers" | "What kind of customer? Walk-in, online, referred? What's their day like?" |
+| "fitness enthusiasts" / "foodies" / "gamers" | "That's an interest, not a person. Who specifically? What's their situation?" |
+
+**DO accept descriptions that pass this test: could you put this person in a room and recognise them?**
+
+Examples of acceptable answers:
+- "A 28-year-old freelance graphic designer in Manila who tracks client projects in a WhatsApp group and wants to send professional invoices."
+- "A store manager at a 3-person hardware shop in Lagos who uses a Samsung Galaxy phone, WhatsApp, and Facebook — never used a web app."
+- "A junior backend developer, 1-2 years experience, comfortable with the terminal but never set up CI/CD. Probably on macOS."
+- "A retired couple in their 60s looking for a neighbourhood bakery with gluten-free options. They drive, use Google Maps, and read Facebook reviews."
+
+### 2. Their device and context
+
+Ask:
+- "How does this person interact with your product? Phone, laptop, walking into a store, attending an event — or a mix?"
+- "What's their context — at a desk, on the go, in a store, at home, at an event?"
+- "If digital: what's their connection — fast WiFi, mobile data, slow or unreliable?"
+- "If in-person: how do they discover you and get there?"
+
+The `device` field captures their primary interaction channel:
+- `phone`, `tablet`, `laptop`, `desktop` — for digital products
+- `in-person` — for physical businesses, stores, events
+- `mixed` — when they discover online but interact in person (or vice versa)
+
+**Why it matters:** A "simple" web app that requires a laptop and fast WiFi is not simple for someone who is phone-only on mobile data. A physical store needs foot traffic and discovery context, not bandwidth.
+
+### 3. Their technical comfort — anchor to a tool, not a label
+
+**Do NOT ask:** "Are they technical or non-technical?"
+
+**DO ask:** "What existing tool, app, or process do they use every day that gives me a sense of their comfort level?"
+
+This establishes a baseline without abstract labels:
+- "They use WhatsApp and Facebook" → very different from
+- "They're comfortable with GitHub and the terminal" → very different from
+- "They use Notion and manage a team of 20" → very different from
+- "They use a paper ledger and a calculator"
+
+The anchor tells you everything about the acceptable complexity ceiling.
+
+### 4. Their current solution and frustration
+
+Ask:
+- "What do they use right now to solve this problem — even if it's a workaround?"
+- "What is the specific thing that makes the current solution painful or insufficient?"
+
+**Why it matters:** The current solution defines the real competition and the minimum bar the product must clear. "They use a spreadsheet" sets a very different bar than "nothing — this problem goes unsolved."
+
+### 5. First success — a concrete action, not a feeling
+
+Ask: "Describe what this person does in their first interaction with your product. What is the one thing they need to accomplish for it to feel worth it?"
+
+**Do NOT accept:**
+- "They feel like it's intuitive"
+- "They understand the product"
+- "They get the value"
+
+**DO accept:**
+- "They create their first invoice and share it with a client within 5 minutes, without asking for help."
+- "They walk in, find the gluten-free section, and leave with a purchase in under 10 minutes."
+- "They deploy their app to a live URL using only the README."
+
+The test: **can an outside observer watch this happen and confirm it occurred?**
+
+---
+
+## The design filter sentence
+
+After collecting all of the above, synthesise one sentence:
+
+```
+"If [name or role], [key context], cannot [first success action] without help, [consequence]."
+```
+
+**Examples:**
+- "If Maria, a non-technical mobile-only business owner in Davao City, cannot publish her site within 10 minutes without asking anyone for help, the UX is not acceptable."
+- "If a first-time walk-in customer cannot find what they need and check out within 10 minutes, the store layout has failed."
+- "If Sara, a junior developer unfamiliar with CI/CD, cannot deploy to staging using the README alone, the setup is too complex."
+
+This sentence is written into the plan. It is used to evaluate every subsequent decision.
+
+---
+
+## Questions to ask (in order — wait for each answer before continuing)
+
+**Question 1:**
+> "Before we get into the details, let's nail down who this is for. Tell me about the first specific person who will use this — not a demographic, but a real person you can picture. Who are they? What's their situation?"
+
+*If the answer is abstract, push back:*
+> "Can you be more specific? [repeat their category] covers a huge range. What kind of [their category], doing what, where, with what context?"
+
+**Question 2:**
+> "What's their context when they interact with this? Are they at a desk, on their phone, walking into a store, browsing at home? And if it's digital — what kind of connection and device?"
+
+**Question 3:**
+> "What's a tool, app, or process they use every day that gives me a sense of their comfort level? Something similar in complexity to what you're building."
+
+*If they say "non-technical", push back:*
+> "What does that mean in practice? Can they use Gmail? A spreadsheet? Notion? WhatsApp? I'm looking for an anchor."
+
+**Question 4:**
+> "What do they currently use to solve this problem — even if it's messy or incomplete? A spreadsheet, a WhatsApp group, a competitor, nothing at all?"
+
+**Question 5:**
+> "Walk me through what this person does in their first interaction with your product. What do they need to accomplish for it to feel worth it?"
+
+*If they give a feeling ("feel confident"), push back:*
+> "What would that look like as a specific action? What would I observe happening?"
+
+---
+
+## Required output before moving on
+
+The foundation section must contain all of the following before any section about architecture, tech stack, design, or hosting is started:
+
+```json
+{
+  "foundation": {
+    "primaryUser": {
+      "description": "[specific person — at least a sentence, not a category]",
+      "device": "[phone | tablet | laptop | desktop | in-person | mixed]",
+      "context": "[where and how they interact]",
+      "technicalComfortAnchor": "[a specific tool or process they use, not an abstract label]",
+      "currentSolution": "[what they use now — can be 'nothing']",
+      "firstSuccessAction": "[specific observable action, not a feeling]",
+      "firstSuccessTimeframe": "[e.g. 'within 10 minutes of first use']"
+    },
+    "designFilter": "If [person], [context], cannot [action] without help, [consequence]."
+  }
 }
-⋮----
-function createEmptyPlan(): ProjectPlan
-⋮----
-// ── Completeness tracking ─────────────────────────────────────────────
-⋮----
-function getSectionCompleteness(plan: ProjectPlan, key: string): number
-⋮----
-function getOverallCompleteness(plan: ProjectPlan): number
-⋮----
-// ── Personality prompts ───────────────────────────────────────────────
-⋮----
-// ── Tool definition ───────────────────────────────────────────────────
-⋮----
-// ── Mermaid diagram generation ────────────────────────────────────────
-⋮----
-function buildArchitectureMmd(
-  components: Array<{ name: string; description: string; connections?: string[] }>,
-): string
-⋮----
-const sanitize = (s: string)
-⋮----
-function buildErDiagramMmd(
-  entities: Array<{ entity: string; fields: string[]; relationships?: string[] }>,
-): string
-⋮----
-async function renderMermaidToSvg(mmdContent: string, outputPath: string): Promise<boolean>
-⋮----
-// Try mermaid.ink API (free, no deps)
-⋮----
-// Fall through to .mmd file
-⋮----
-async function writeDiagram(mmdContent: string, basePath: string): Promise<string>
-⋮----
-// Fallback: save as .mmd text
-⋮----
-async function generateDiagrams(plan: ProjectPlan, outputDir: string): Promise<string[]>
-⋮----
-// ── Markdown export ───────────────────────────────────────────────────
-⋮----
-function planToMarkdown(plan: ProjectPlan): string
-⋮----
-function formatObject(obj: Record<string, unknown>, depth: number): string
-⋮----
-// ── System prompt builder ─────────────────────────────────────────────
-⋮----
-function buildSystemPrompt(personality: string, plan: ProjectPlan): string
-⋮----
-// ── Progress display ──────────────────────────────────────────────────
-⋮----
-function printProgress(plan: ProjectPlan)
-⋮----
-// ── CLI readline helper ───────────────────────────────────────────────
-⋮----
-function ask(rl: readline.Interface, prompt: string): Promise<string>
-⋮----
-// ── CLI command handler ───────────────────────────────────────────────
-⋮----
-function handleCommand(
-  cmd: string,
-  plan: ProjectPlan,
-  outputDir: string,
-  rl: readline.Interface,
-): boolean
-⋮----
-function parseArgs()
-⋮----
-const getArg = (flag: string) =>
-⋮----
-function printBanner(model: string, personality: string, outputDir: string)
-⋮----
-// ── Get initial idea ──────────────────────────────────────────────────
-⋮----
-async function getIdea(
-  rl: readline.Interface,
-  ideaArg: string | null,
-  loadFile: string | null,
-): Promise<string>
-⋮----
-// ── Send initial idea to Claude ───────────────────────────────────────
-⋮----
-async function sendInitialIdea(
-  client: Anthropic,
-  model: string,
-  personality: string,
-  plan: ProjectPlan,
-  messages: Anthropic.MessageParam[],
-  idea: string,
-): Promise<number>
-⋮----
-// ── Conversation loop ─────────────────────────────────────────────────
-⋮----
-async function conversationLoop(
-  client: Anthropic,
-  model: string,
-  personality: string,
-  plan: ProjectPlan,
-  messages: Anthropic.MessageParam[],
-  rl: readline.Interface,
-  outputDir: string,
-  initialTokens: number,
-)
-⋮----
-// ── Main ──────────────────────────────────────────────────────────────
-⋮----
-async function main()
-⋮----
-// Session-based output: each run gets its own folder
-⋮----
-// ── Claude API call ───────────────────────────────────────────────────
-⋮----
-async function callClaude(
-  client: Anthropic,
-  model: string,
-  personality: string,
-  plan: ProjectPlan,
-  messages: Anthropic.MessageParam[],
-): Promise<Anthropic.Message>
-⋮----
-// ── Process Claude response ───────────────────────────────────────────
-⋮----
-interface ProcessContext {
-  client: Anthropic
-  model: string
-  personality: string
-}
-⋮----
-async function processResponse(
-  response: Anthropic.Message,
-  plan: ProjectPlan,
-  messages: Anthropic.MessageParam[],
-  ctx: ProcessContext,
-)
-⋮----
-// Add assistant message to history
-⋮----
-// If there were tool uses, send tool results and make a follow-up API call
-⋮----
-// Update lastModified
-⋮----
-function applyPlanUpdate(plan: ProjectPlan, section: string, data: Record<string, unknown>)
-⋮----
-// Single item for array section — wrap and append
-⋮----
-// ── Save helper ───────────────────────────────────────────────────────
-⋮----
-function savePlan(plan: ProjectPlan, outputDir: string)
-⋮----
-// ── Run ───────────────────────────────────────────────────────────────
+```
+
+---
+
+## Red flags — do not move on if any are true
+
+- Primary user is described as a category without a scenario ("developers", "SMBs")
+- Device/context is "any" or unspecified
+- Technical comfort uses abstract labels without an anchor
+- First success is a feeling, not an observable action
+- Design filter sentence has not been written
+
+---
+
+## How this section constrains downstream sections
+
+This is not just a data collection exercise. The foundation actively constrains later decisions:
+
+**Overview (01):** Goals must be achievable by the primary user in their context.
+Non-goals should exclude things requiring more than the primary user has.
+
+**Competitors (02):** Frame competitors through the primary user's eyes — what do they use today?
+
+**Requirements (03):** Every requirement should map to something the primary user needs.
+
+**Architecture (04):** Every component must be reachable by the primary user.
+
+**Tech Stack (05):** Complexity ceiling = what the primary user's anchor requires of them.
+
+**Hosting (06):** Performance and access must match the primary user's context.
+
+**Security (07):** Protect the data and access patterns of the primary user.
+
+**Design (08):** Experience complexity must not exceed what the primary user can navigate.
+
+**Budget (09):** Value is defined by whether first success is achievable at the price point.
+
+The design filter sentence should be quoted verbatim whenever a major decision is being evaluated.
 </file>
 
 <file path="prompts/sections/01-overview.md">
@@ -1855,7 +1635,8 @@ function savePlan(plan: ProjectPlan, outputDir: string)
 <file path="prompts/sections/08-design.md">
 # Section: Design & Experience
 
-> **Adapt to the project type.** For software: UI/UX design, responsive strategy.
+> **Adapt to the project type.** For software UIs: UI/UX design, responsive strategy.
+> For developer tools/APIs: developer experience (DX), docs, error messages.
 > For physical businesses: customer experience, layout, branding.
 
 ## What to Capture
@@ -1873,112 +1654,77 @@ function savePlan(plan: ProjectPlan, outputDir: string)
 3. How important is accessibility? (Legal requirement? Ethical choice? Nice-to-have?)
 4. Are there businesses or products whose look and feel you admire?
 
-### For digital products (add):
+### For software with a UI (add):
 5. Will this be used more on mobile or desktop?
+6. What design system or component library will you use?
+
+### For developer tools, CLIs, and APIs (add):
+5. What does the `--help` output or API reference look like? Walk me through the first command or request.
+6. How are errors communicated? (Exit codes? HTTP status codes? Structured error objects?)
+7. What does the onboarding path look like? (README? Interactive setup wizard? API quickstart?)
 
 ### For physical businesses (add):
 5. What should the space/environment feel like? Walk me through a customer visit.
 
 ## Quality Tips
 - Design the journey BEFORE the details. Know where people go before deciding what it looks like.
-- For digital: mobile-first is almost always right.
+- For UIs: mobile-first is almost always right for consumer products.
+- For developer tools: the README and error messages ARE the design. Invest in them.
+- For APIs: time-to-first-successful-call is the key metric — optimize for it.
 - For physical: the first 10 seconds of a customer's visit set expectations — what do they see?
 - Accessibility is not optional — it's both ethical and often legally required.
-- Pick an existing design system or reference rather than designing from scratch.
 - Not testing with real users early is the most common and costly mistake.
 
 ## Common Mistakes
 - Too many paths at launch — pick 3 and nail them
 - Ignoring accessibility until "later" (it's 10x harder to add)
 - Designing for the builder's preferences instead of the primary user's context
+- For developer tools: no interactive examples, unclear error messages, no `--help`
+- For APIs: requiring account creation before the first API call
 - Not considering the design filter: does this work for [primary user] in [their context]?
 - Skipping user/customer testing before committing to a design
 </file>
 
-<file path="prompts/sections/09-budget.md">
-# Section: Budget & Resources
+<file path="prompts/sections/10-timeline.md">
+# Section: Timeline & Milestones
 
-> **Adapt to the project type.** For software: dev effort, hosting, services.
-> For physical businesses/events: rent, equipment, staffing, supplies, venue.
+> **Adapt to the project type.** For one-time launches: phases with deliverables.
+> For recurring projects (events, services): cadence, prep cycle, and iteration plan.
 
 ## What to Capture
-- Effort to build or set up (person-hours, person-weeks, or prep time)
-- Ongoing operational costs (infrastructure, rent, supplies, subscriptions)
-- Third-party/external costs (services, vendors, licenses, tools)
-- Total estimate (one-time setup + monthly recurring)
-- Funding model (self-funded, sponsors, revenue, grants)
+- Phases (what gets done in what order, with duration and deliverables)
+- Milestones (key dates or checkpoints)
+- For recurring projects: cadence (weekly, monthly, quarterly) and prep timeline per cycle
 
 ## Questions to Ask
 
 ### For all projects:
-1. Is this a solo effort or do you have a team?
-2. What's your monthly budget for running this?
-3. What's the maximum you'd spend before deciding this isn't worth it?
+1. When do you want this to be ready?
+2. What's the absolute minimum you need for the first version or first event?
+3. What can wait until after the first version/event?
 
-### For digital products (add):
-4. Are you building this yourself or hiring developers?
-5. Any paid services you already use or plan to use? (Hosting, APIs, auth, email)
+### For one-time launches (add):
+4. What are the major phases? (Research, build, test, launch)
+5. Are there hard deadlines or dependencies? (Conference date, funding deadline, seasonal window)
 
-### For physical businesses/events (add):
-4. What are the major setup costs? (Equipment, renovation, permits, initial inventory)
-5. What are the recurring costs? (Rent, staff, supplies, insurance)
-6. How will this be funded? (Self-funded, sponsors, ticket sales, grants?)
-
-## Quality Tips
-- Always calculate Total Cost of Ownership: setup + ongoing operations + your time.
-- Free tiers and low-cost options exist for almost everything. Start there.
-- Your own time IS a cost, even if you're not paying yourself.
-- Plan for what happens at 10x scale — do costs grow linearly or exponentially?
-- For recurring projects (events, services): calculate per-occurrence cost, not just monthly.
-
-## Common Mistakes
-- Not accounting for ongoing maintenance or operations time
-- Forgetting recurring costs (subscriptions, supplies, rent, renewals)
-- Choosing "enterprise" tools or spaces for a small project
-- Not setting a budget cap (spend $X/month max, then reassess)
-- Ignoring the cost of your own time
-- No funding plan — assuming costs will just work out
-</file>
-
-<file path="prompts/sections/11-risks.md">
-# Section: Risks & Mitigations
-
-> **Adapt to the project type.** For software: technical, dependency, scaling risks.
-> For physical businesses/events: logistics, legal, supplier, community risks.
-
-## What to Capture
-- For each risk: description, category, impact, likelihood, mitigation strategy
-- Categories: technical, resource, timeline, budget, security, market, legal, logistics, other
-
-## Questions to Ask
-
-### For all projects:
-1. What's the biggest thing that could go wrong?
-2. What happens if you can't find users/customers/attendees in the first month?
-3. What's your plan if this takes 3x longer than expected?
-
-### For digital products (add):
-4. Are there technical unknowns you're worried about?
-5. What if a key dependency or service gets discontinued?
-
-### For physical businesses/events (add):
-4. What if a key supplier, venue, or partner falls through?
-5. Are there legal or regulatory risks? (Permits, insurance, liability, compliance)
-6. What if demand is much higher or lower than expected?
+### For recurring projects (add):
+4. How often will this happen? (Weekly, monthly, quarterly)
+5. What's the prep timeline for each occurrence? (How far in advance do you need to start?)
+6. What changes between iterations? (Speakers, menu, inventory, content)
 
 ## Quality Tips
-- Every project has at least 3 risks. If you can't find them, you're not looking hard enough.
-- The biggest risk is usually not technical — it's "nobody wants this." Validate demand early.
-- For each risk, have a concrete mitigation, not just "we'll deal with it."
-- Categorize risks: technical (can we build it?), market (do people want it?), resource (do we have the capacity?), legal (are we allowed?).
-- Revisit risks regularly. New ones emerge, old ones get resolved.
+- Projects always take longer than expected. Add 50% buffer to your estimates.
+- The first version should be the smallest useful thing — not the complete vision.
+- Set a date for the first version/event and work backward — what must be done by when?
+- For recurring projects: plan the first 3 iterations, not just the first one.
+- Milestones should have specific deliverables, not just dates.
 
 ## Common Mistakes
-- Only listing technical risks (market and resource risks are usually bigger)
-- Vague mitigations ("we'll be careful" is not a plan)
-- Not having a "kill switch" — at what point do you stop and reassess?
-- Ignoring dependency/vendor risks (what if a key supplier, tool, or service disappears?)
-- Not considering the risk of success (what if demand exceeds your capacity?)
+- No phases — just one big "do everything" block
+- Deadlines without deliverables ("done by March" — done with WHAT?)
+- Not accounting for dependencies (X can't start until Y is finished)
+- For recurring projects: planning only the first event with no iteration plan
+- Underestimating prep time for non-building tasks (permits, hiring, approvals)
 </file>
 
 <file path="prompts/sections/12-implementation-review.md">
@@ -2044,67 +1790,6 @@ If the answer is no, the plan needs more specifics.
 After this review, update the plan JSON with:
 - Any decisions that were resolved
 - A new field in overview: `implementationNotes` (array of strings) — specific instructions for the implementer that don't fit in other sections
-</file>
-
-<file path="prompts/tips/quality-checklist.md">
-# Quality Checklist
-
-Use this to verify a plan is complete and high-quality before finalizing.
-
-## Gate 0 — Foundation Completeness
-### This gate runs FIRST. All other checks are blocked until this passes.
-
-- [ ] **Primary user description** is a specific person or role scenario
-      (NOT a demographic category like "developers" or "small businesses")
-- [ ] **Device/context** is specified (not "any device" or unspecified)
-- [ ] **Comfort level** is anchored to a named tool, app, or process
-      (NOT abstract labels like "non-technical" or "tech-savvy")
-- [ ] **First success** is a concrete observable action (NOT a feeling)
-- [ ] **Design filter sentence** is present:
-      "If [person], [context], cannot [action] without help, [consequence]."
-
-If ANY of the above fail, report ONLY the foundation gap. Do not review other sections
-until foundation is complete.
-
-## Completeness
-- [ ] All planning sections have meaningful content (not just filler)
-- [ ] Implementation review has been done
-- [ ] Overview has specific goals AND non-goals
-- [ ] At least 3 competitors or alternatives analyzed with strengths AND weaknesses
-- [ ] Requirements are prioritized (must/should/nice)
-- [ ] Architecture/structure has components or processes with connections
-- [ ] Key tool/technology choices each have a rationale (WHY, not just WHAT)
-- [ ] Hosting/operations has a cost estimate (even if $0)
-- [ ] Security/compliance has been addressed (even if minimal — say so explicitly)
-- [ ] At least 3 risks identified with concrete mitigations
-- [ ] Timeline has phases with specific deliverables
-
-## Clarity
-- [ ] A non-technical person could read the overview and understand the project
-- [ ] No unexplained jargon or acronyms
-- [ ] Goals are measurable (numbers or observable outcomes, not feelings)
-- [ ] "Done" is defined for each milestone
-
-## Realism
-- [ ] Timeline accounts for the team size, availability, and external dependencies
-- [ ] Budget includes ALL costs (setup + ongoing operations + your time)
-- [ ] First version scope is genuinely minimal (could be ready in weeks, not months)
-- [ ] Risks include non-technical ones (market, resource, legal, logistics)
-
-## Actionability
-- [ ] Someone could start building/executing from this plan tomorrow
-- [ ] First task of Phase 1 is clear and specific
-- [ ] Key choices are concrete (specific tools/vendors/partners, not vague categories)
-- [ ] Information model is defined enough to start tracking data
-
-## Implementation Readiness
-- [ ] The design filter sentence is actionable — every decision can be tested against it
-- [ ] The primary user's device/context is unambiguous
-- [ ] The primary user's first success action is testable
-- [ ] Every "X or Y" choice has been resolved to a single answer
-- [ ] For digital products: exact versions, file structure, build/deploy commands specified
-- [ ] For physical projects: location specifics, supplier choices, permits, opening checklist
-- [ ] Test: "Could someone implement this with zero follow-up questions?"
 </file>
 
 <file path="prompts/system.md">
@@ -2324,7 +2009,12 @@ async function loadCurrentSectionGuide(plan: ProjectPlan): Promise<string>
 
 <file path="src/engine/prompts.ts">
 import type { Personality } from '@/schema/settings'
-import { SECTION_LABELS, type ProjectPlan, type PlanSectionKey } from '@/schema/project-plan'
+import {
+  SECTION_LABELS,
+  PLAN_SECTIONS,
+  type ProjectPlan,
+  type PlanSectionKey,
+} from '@/schema/project-plan'
 ⋮----
 export function getUpdatePlanTool()
 ⋮----
@@ -2343,15 +2033,16 @@ export function buildInitialPrompt(idea: string, personality: Personality): stri
 </file>
 
 <file path="src/engine/section-map.ts">
-import type { ProjectPlan, PlanSectionKey } from '@/schema/project-plan'
-⋮----
-interface SectionConfig {
-  key: PlanSectionKey
-  requiredFields: string[]
-  order: number
-}
+import {
+  type ProjectPlan,
+  type PlanSectionKey,
+  PLAN_SECTIONS,
+  isFoundationComplete,
+} from '@/schema/project-plan'
 ⋮----
 export function getSectionCompleteness(plan: ProjectPlan, key: PlanSectionKey): number
+⋮----
+// Foundation uses deep validation — all required sub-fields must be present
 ⋮----
 export function getOverallCompleteness(plan: ProjectPlan): number
 ⋮----
@@ -2370,18 +2061,6 @@ import { startConversation } from '@/engine/conversation-engine'
 export function useStartConversation()
 ⋮----
 const run = async () =>
-</file>
-
-<file path="src/schema/project-plan.ts">
-import { z } from 'zod/v4'
-⋮----
-export type ProjectPlan = z.infer<typeof ProjectPlanSchema>
-⋮----
-export type PlanSectionKey = (typeof PLAN_SECTIONS)[number]
-⋮----
-export function createEmptyPlan(): ProjectPlan
-⋮----
-export function isFoundationComplete(plan: ProjectPlan):
 </file>
 
 <file path="src/schema/settings.ts">
@@ -2602,6 +2281,337 @@ make health         # Code health metrics
 }
 </file>
 
+<file path="cli/think-tank.ts">
+/**
+ * Think Tank CLI — Interactive project planning from your terminal.
+ *
+ * Usage:
+ *   npx tsx cli/think-tank.ts                    # Interactive mode
+ *   npx tsx cli/think-tank.ts --idea "..."       # Start with an idea
+ *   npx tsx cli/think-tank.ts --load plan.json   # Resume from exported plan
+ *   npx tsx cli/think-tank.ts --personality critical
+ *
+ * Environment:
+ *   ANTHROPIC_API_KEY   — Your Anthropic API key (required)
+ *   THINK_TANK_MODEL    — Model to use (default: claude-sonnet-4-6)
+ */
+⋮----
+import Anthropic from '@anthropic-ai/sdk'
+⋮----
+// ── Schema (inline to avoid import alias issues) ──────────────────────
+⋮----
+interface ProjectPlan {
+  meta: { version: '1.0'; createdAt: string; lastModified: string }
+  foundation: Record<string, unknown>
+  overview: Record<string, unknown>
+  requirements: Record<string, unknown>
+  architecture: Record<string, unknown>
+  techStack: Record<string, unknown>
+  hosting: Record<string, unknown>
+  security: Record<string, unknown>
+  design: Record<string, unknown>
+  budget: Record<string, unknown>
+  timeline: Record<string, unknown>
+  risks: Array<Record<string, unknown>>
+  competitors: Array<Record<string, unknown>>
+}
+⋮----
+function createEmptyPlan(): ProjectPlan
+⋮----
+// ── Completeness tracking ─────────────────────────────────────────────
+⋮----
+function getSectionCompleteness(plan: ProjectPlan, key: string): number
+⋮----
+function getOverallCompleteness(plan: ProjectPlan): number
+⋮----
+// ── Personality prompts ───────────────────────────────────────────────
+⋮----
+// ── Tool definition ───────────────────────────────────────────────────
+⋮----
+// ── Mermaid diagram generation ────────────────────────────────────────
+⋮----
+function buildArchitectureMmd(
+  components: Array<{ name: string; description: string; connections?: string[] }>,
+): string
+⋮----
+const sanitize = (s: string)
+⋮----
+function buildErDiagramMmd(
+  entities: Array<{ entity: string; fields: string[]; relationships?: string[] }>,
+): string
+⋮----
+async function renderMermaidToSvg(mmdContent: string, outputPath: string): Promise<boolean>
+⋮----
+// Try mermaid.ink API (free, no deps)
+⋮----
+// Fall through to .mmd file
+⋮----
+async function writeDiagram(mmdContent: string, basePath: string): Promise<string>
+⋮----
+// Fallback: save as .mmd text
+⋮----
+async function generateDiagrams(plan: ProjectPlan, outputDir: string): Promise<string[]>
+⋮----
+// ── Markdown export ───────────────────────────────────────────────────
+⋮----
+function planToMarkdown(plan: ProjectPlan): string
+⋮----
+function formatObject(obj: Record<string, unknown>, depth: number): string
+⋮----
+// ── System prompt builder ─────────────────────────────────────────────
+⋮----
+function buildSystemPrompt(personality: string, plan: ProjectPlan): string
+⋮----
+// ── Progress display ──────────────────────────────────────────────────
+⋮----
+function printProgress(plan: ProjectPlan)
+⋮----
+// ── CLI readline helper ───────────────────────────────────────────────
+⋮----
+function ask(rl: readline.Interface, prompt: string): Promise<string>
+⋮----
+// ── CLI command handler ───────────────────────────────────────────────
+⋮----
+function handleCommand(
+  cmd: string,
+  plan: ProjectPlan,
+  outputDir: string,
+  rl: readline.Interface,
+): boolean
+⋮----
+function parseArgs()
+⋮----
+const getArg = (flag: string) =>
+⋮----
+function printBanner(model: string, personality: string, outputDir: string)
+⋮----
+// ── Get initial idea ──────────────────────────────────────────────────
+⋮----
+async function getIdea(
+  rl: readline.Interface,
+  ideaArg: string | null,
+  loadFile: string | null,
+): Promise<string>
+⋮----
+// ── Send initial idea to Claude ───────────────────────────────────────
+⋮----
+async function sendInitialIdea(
+  client: Anthropic,
+  model: string,
+  personality: string,
+  plan: ProjectPlan,
+  messages: Anthropic.MessageParam[],
+  idea: string,
+): Promise<number>
+⋮----
+// ── Conversation loop ─────────────────────────────────────────────────
+⋮----
+async function conversationLoop(
+  client: Anthropic,
+  model: string,
+  personality: string,
+  plan: ProjectPlan,
+  messages: Anthropic.MessageParam[],
+  rl: readline.Interface,
+  outputDir: string,
+  initialTokens: number,
+)
+⋮----
+// ── Main ──────────────────────────────────────────────────────────────
+⋮----
+async function main()
+⋮----
+// Session-based output: each run gets its own folder
+⋮----
+// ── Claude API call ───────────────────────────────────────────────────
+⋮----
+async function callClaude(
+  client: Anthropic,
+  model: string,
+  personality: string,
+  plan: ProjectPlan,
+  messages: Anthropic.MessageParam[],
+): Promise<Anthropic.Message>
+⋮----
+// ── Process Claude response ───────────────────────────────────────────
+⋮----
+interface ProcessContext {
+  client: Anthropic
+  model: string
+  personality: string
+}
+⋮----
+async function processResponse(
+  response: Anthropic.Message,
+  plan: ProjectPlan,
+  messages: Anthropic.MessageParam[],
+  ctx: ProcessContext,
+)
+⋮----
+// Add assistant message to history
+⋮----
+// If there were tool uses, send tool results and make a follow-up API call
+⋮----
+// Update lastModified
+⋮----
+function applyPlanUpdate(plan: ProjectPlan, section: string, data: Record<string, unknown>)
+⋮----
+// Single item for array section — wrap and append
+⋮----
+// ── Save helper ───────────────────────────────────────────────────────
+⋮----
+function savePlan(plan: ProjectPlan, outputDir: string)
+⋮----
+// ── Run ───────────────────────────────────────────────────────────────
+</file>
+
+<file path="prompts/sections/09-budget.md">
+# Section: Budget & Resources
+
+> **Adapt to the project type.** For software: dev effort, hosting, services.
+> For physical businesses/events: rent, equipment, staffing, supplies, venue.
+
+## What to Capture
+- Effort to build or set up (person-hours, person-weeks, or prep time)
+- Ongoing operational costs (infrastructure, rent, supplies, subscriptions)
+- Third-party/external costs (services, vendors, licenses, tools)
+- Total estimate (one-time setup + monthly recurring)
+- Funding model (self-funded, sponsors, revenue, grants)
+
+## Questions to Ask
+
+### For all projects:
+1. Is this a solo effort or do you have a team?
+2. What's your monthly budget for running this?
+3. What's the maximum you'd spend before deciding this isn't worth it?
+
+### For digital products (add):
+4. Are you building this yourself or hiring developers?
+5. Any paid services you already use or plan to use? (Hosting, APIs, auth, email)
+
+### For physical businesses/events (add):
+4. What are the major setup costs? (Equipment, renovation, permits, initial inventory)
+5. What are the recurring costs? (Rent, staff, supplies, insurance)
+6. How will this be funded? (Self-funded, sponsors, ticket sales, grants?)
+
+## Quality Tips
+- Always calculate Total Cost of Ownership: setup + ongoing operations + your time.
+- Free tiers and low-cost options exist for almost everything. Start there.
+- Your own time IS a cost, even if you're not paying yourself.
+- Plan for what happens at 10x scale — do costs grow linearly or exponentially?
+- For recurring projects (events, services): calculate per-occurrence cost, not just monthly.
+
+## Common Mistakes
+- Not accounting for ongoing maintenance or operations time
+- Forgetting recurring costs (subscriptions, supplies, rent, renewals)
+- Choosing "enterprise" tools or spaces for a small project
+- Not setting a budget cap (spend $X/month max, then reassess)
+- Ignoring the cost of your own time
+- No funding plan — assuming costs will just work out
+</file>
+
+<file path="prompts/sections/11-risks.md">
+# Section: Risks & Mitigations
+
+> **Adapt to the project type.** For software: technical, dependency, scaling risks.
+> For physical businesses/events: logistics, legal, supplier, community risks.
+
+## What to Capture
+- For each risk: description, category, impact, likelihood, mitigation strategy
+- Categories: technical, resource, timeline, budget, security, market, legal, logistics, other
+
+## Questions to Ask
+
+### For all projects:
+1. What's the biggest thing that could go wrong?
+2. What happens if you can't find users/customers/attendees in the first month?
+3. What's your plan if this takes 3x longer than expected?
+
+### For digital products (add):
+4. Are there technical unknowns you're worried about?
+5. What if a key dependency or service gets discontinued?
+
+### For physical businesses/events (add):
+4. What if a key supplier, venue, or partner falls through?
+5. Are there legal or regulatory risks? (Permits, insurance, liability, compliance)
+6. What if demand is much higher or lower than expected?
+
+## Quality Tips
+- Every project has at least 3 risks. If you can't find them, you're not looking hard enough.
+- The biggest risk is usually not technical — it's "nobody wants this." Validate demand early.
+- For each risk, have a concrete mitigation, not just "we'll deal with it."
+- Categorize risks: technical (can we build it?), market (do people want it?), resource (do we have the capacity?), legal (are we allowed?).
+- Revisit risks regularly. New ones emerge, old ones get resolved.
+
+## Common Mistakes
+- Only listing technical risks (market and resource risks are usually bigger)
+- Vague mitigations ("we'll be careful" is not a plan)
+- Not having a "kill switch" — at what point do you stop and reassess?
+- Ignoring dependency/vendor risks (what if a key supplier, tool, or service disappears?)
+- Not considering the risk of success (what if demand exceeds your capacity?)
+</file>
+
+<file path="prompts/tips/quality-checklist.md">
+# Quality Checklist
+
+Use this to verify a plan is complete and high-quality before finalizing.
+
+## Gate 0 — Foundation Completeness
+### This gate runs FIRST. All other checks are blocked until this passes.
+
+- [ ] **Primary user description** is a specific person or role scenario
+      (NOT a demographic category like "developers" or "small businesses")
+- [ ] **Device/context** is specified (not "any device" or unspecified)
+- [ ] **Comfort level** is anchored to a named tool, app, or process
+      (NOT abstract labels like "non-technical" or "tech-savvy")
+- [ ] **First success** is a concrete observable action (NOT a feeling)
+- [ ] **Design filter sentence** is present:
+      "If [person], [context], cannot [action] without help, [consequence]."
+
+If ANY of the above fail, report ONLY the foundation gap. Do not review other sections
+until foundation is complete.
+
+## Completeness
+- [ ] All planning sections have meaningful content (not just filler)
+- [ ] Implementation review has been done
+- [ ] Overview has specific goals AND non-goals
+- [ ] At least 3 competitors or alternatives analyzed with strengths AND weaknesses
+- [ ] Requirements are prioritized (must/should/nice)
+- [ ] Architecture/structure has components or processes with connections
+- [ ] Key tool/technology choices each have a rationale (WHY, not just WHAT)
+- [ ] Hosting/operations has a cost estimate (even if $0)
+- [ ] Security/compliance has been addressed (even if minimal — say so explicitly)
+- [ ] At least 3 risks identified with concrete mitigations
+- [ ] Timeline has phases with specific deliverables
+
+## Clarity
+- [ ] A non-technical person could read the overview and understand the project
+- [ ] No unexplained jargon or acronyms
+- [ ] Goals are measurable (numbers or observable outcomes, not feelings)
+- [ ] "Done" is defined for each milestone
+
+## Realism
+- [ ] Timeline accounts for the team size, availability, and external dependencies
+- [ ] Budget includes ALL costs (setup + ongoing operations + your time)
+- [ ] First version scope is genuinely minimal (could be ready in weeks, not months)
+- [ ] Risks include non-technical ones (market, resource, legal, logistics)
+
+## Actionability
+- [ ] Someone could start building/executing from this plan tomorrow
+- [ ] First task of Phase 1 is clear and specific
+- [ ] Key choices are concrete (specific tools/vendors/partners, not vague categories)
+- [ ] Information model is defined enough to start tracking data
+
+## Implementation Readiness
+- [ ] The design filter sentence is actionable — every decision can be tested against it
+- [ ] The primary user's device/context is unambiguous
+- [ ] The primary user's first success action is testable
+- [ ] Every "X or Y" choice has been resolved to a single answer
+- [ ] For digital products: exact versions, file structure, build/deploy commands specified
+- [ ] For physical projects: location specifics, supplier choices, permits, opening checklist
+- [ ] Test: "Could someone implement this with zero follow-up questions?"
+</file>
+
 <file path="src/components/project/HomePage.tsx">
 import { useState } from 'react'
 import { useProjectStore } from '@/stores/project-store'
@@ -2629,6 +2639,18 @@ onClick=
 {/* Saved projects */}
 </file>
 
+<file path="src/schema/project-plan.ts">
+import { z } from 'zod/v4'
+⋮----
+export type ProjectPlan = z.infer<typeof ProjectPlanSchema>
+⋮----
+export type PlanSectionKey = (typeof PLAN_SECTIONS)[number]
+⋮----
+export function createEmptyPlan(): ProjectPlan
+⋮----
+export function isFoundationComplete(plan: ProjectPlan):
+</file>
+
 <file path="src/stores/settings-store.ts">
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
@@ -2647,61 +2669,6 @@ interface SettingsState {
 }
 ⋮----
 // Persist everything EXCEPT the API key
-</file>
-
-<file path="src/utils/export.ts">
-import {
-  SECTION_LABELS,
-  ProjectPlanSchema,
-  type ProjectPlan,
-  type PlanSectionKey,
-} from '@/schema/project-plan'
-import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
-import JSZip from 'jszip'
-import { componentsToMermaid, dataModelToMermaid, timelineToMermaid } from './mermaid-helpers'
-import { fetchMermaidSvg } from './mermaid-render'
-⋮----
-export function exportAsJSON(plan: ProjectPlan, filename: string)
-⋮----
-export function exportAsMarkdown(plan: ProjectPlan, filename: string)
-⋮----
-export async function exportAsZip(plan: ProjectPlan, filename: string)
-⋮----
-// Generate and add SVG diagrams
-⋮----
-function downloadBlob(blob: Blob, filename: string)
-⋮----
-export function importFromJSON(file: File): Promise<ProjectPlan>
-⋮----
-export function createShareUrl(plan: ProjectPlan): string
-⋮----
-export function loadFromShareUrl(): ProjectPlan | null
-⋮----
-function planToMarkdown(plan: ProjectPlan): string
-⋮----
-function renderFoundation(plan: ProjectPlan): string
-⋮----
-function renderOverview(plan: ProjectPlan): string
-⋮----
-function renderRequirements(plan: ProjectPlan): string
-⋮----
-function renderArchitecture(plan: ProjectPlan): string
-⋮----
-function renderTechStack(plan: ProjectPlan): string
-⋮----
-function renderHosting(plan: ProjectPlan): string
-⋮----
-function renderSecurity(plan: ProjectPlan): string
-⋮----
-function renderDesign(plan: ProjectPlan): string
-⋮----
-function renderBudget(plan: ProjectPlan): string
-⋮----
-function renderTimeline(plan: ProjectPlan): string
-⋮----
-function renderRisks(plan: ProjectPlan): string
-⋮----
-function renderCompetitors(plan: ProjectPlan): string
 </file>
 
 <file path=".gitignore">
@@ -2786,6 +2753,61 @@ interface ProviderFieldsProps {
 }
 ⋮----
 onClick=
+</file>
+
+<file path="src/utils/export.ts">
+import {
+  SECTION_LABELS,
+  ProjectPlanSchema,
+  type ProjectPlan,
+  type PlanSectionKey,
+} from '@/schema/project-plan'
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
+import JSZip from 'jszip'
+import { componentsToMermaid, dataModelToMermaid, timelineToMermaid } from './mermaid-helpers'
+import { fetchMermaidSvg } from './mermaid-render'
+⋮----
+export function exportAsJSON(plan: ProjectPlan, filename: string)
+⋮----
+export function exportAsMarkdown(plan: ProjectPlan, filename: string)
+⋮----
+export async function exportAsZip(plan: ProjectPlan, filename: string)
+⋮----
+// Generate and add SVG diagrams
+⋮----
+function downloadBlob(blob: Blob, filename: string)
+⋮----
+export function importFromJSON(file: File): Promise<ProjectPlan>
+⋮----
+export function createShareUrl(plan: ProjectPlan): string
+⋮----
+export function loadFromShareUrl(): ProjectPlan | null
+⋮----
+function planToMarkdown(plan: ProjectPlan): string
+⋮----
+function renderFoundation(plan: ProjectPlan): string
+⋮----
+function renderOverview(plan: ProjectPlan): string
+⋮----
+function renderRequirements(plan: ProjectPlan): string
+⋮----
+function renderArchitecture(plan: ProjectPlan): string
+⋮----
+function renderTechStack(plan: ProjectPlan): string
+⋮----
+function renderHosting(plan: ProjectPlan): string
+⋮----
+function renderSecurity(plan: ProjectPlan): string
+⋮----
+function renderDesign(plan: ProjectPlan): string
+⋮----
+function renderBudget(plan: ProjectPlan): string
+⋮----
+function renderTimeline(plan: ProjectPlan): string
+⋮----
+function renderRisks(plan: ProjectPlan): string
+⋮----
+function renderCompetitors(plan: ProjectPlan): string
 </file>
 
 <file path="README.md">

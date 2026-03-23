@@ -1,5 +1,10 @@
 import type { Personality } from '@/schema/settings'
-import { SECTION_LABELS, type ProjectPlan, type PlanSectionKey } from '@/schema/project-plan'
+import {
+  SECTION_LABELS,
+  PLAN_SECTIONS,
+  type ProjectPlan,
+  type PlanSectionKey,
+} from '@/schema/project-plan'
 
 const PERSONALITY_PROMPTS: Record<Personality, string> = {
   friendly: `You are a friendly and encouraging project planning guide. You explain technical concepts in simple terms,
@@ -38,20 +43,7 @@ const UPDATE_PLAN_TOOL = {
       properties: {
         section: {
           type: 'string',
-          enum: [
-            'foundation',
-            'overview',
-            'requirements',
-            'architecture',
-            'techStack',
-            'hosting',
-            'security',
-            'design',
-            'budget',
-            'timeline',
-            'risks',
-            'competitors',
-          ],
+          enum: [...PLAN_SECTIONS],
           description: 'The plan section to update',
         },
         data: {

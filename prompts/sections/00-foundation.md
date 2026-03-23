@@ -42,11 +42,17 @@ Examples of acceptable answers:
 ### 2. Their device and context
 
 Ask:
-- "What device will they use this on primarily — phone, tablet, laptop, desktop? Or is this not a digital product?"
-- "What is their likely context — at a desk, on the go, in a store, at home?"
+- "How does this person interact with your product? Phone, laptop, walking into a store, attending an event — or a mix?"
+- "What's their context — at a desk, on the go, in a store, at home, at an event?"
 - "If digital: what's their connection — fast WiFi, mobile data, slow or unreliable?"
+- "If in-person: how do they discover you and get there?"
 
-**Why it matters:** A "simple" web app that requires a laptop and fast WiFi is not simple for someone who is phone-only on mobile data. A physical store concept needs foot traffic context, not bandwidth.
+The `device` field captures their primary interaction channel:
+- `phone`, `tablet`, `laptop`, `desktop` — for digital products
+- `in-person` — for physical businesses, stores, events
+- `mixed` — when they discover online but interact in person (or vice versa)
+
+**Why it matters:** A "simple" web app that requires a laptop and fast WiFi is not simple for someone who is phone-only on mobile data. A physical store needs foot traffic and discovery context, not bandwidth.
 
 ### 3. Their technical comfort — anchor to a tool, not a label
 
