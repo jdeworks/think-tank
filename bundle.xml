@@ -2457,8 +2457,9 @@ import { createEmptyPlan } from '@/schema/project-plan'
 onClick=
 ⋮----
 const v = e.target.value.trim()
-if (v) setName(v)
-setEditingName(false)
+if (v)
+setName(v)
+persist()
 </file>
 
 <file path=".gitignore">
@@ -2689,6 +2690,45 @@ function savePlan(plan: ProjectPlan, outputDir: string)
 // ── Run ───────────────────────────────────────────────────────────────
 </file>
 
+<file path="src/components/project/HomePage.tsx">
+import { useState } from 'react'
+import { useProjectStore } from '@/stores/project-store'
+import { useSettingsStore } from '@/stores/settings-store'
+import { useUIStore } from '@/stores/ui-store'
+import { PERSONALITY_INFO } from '@/schema/settings'
+import { EXAMPLE_TEMPLATES } from '@/data/example-templates'
+import { ProjectList } from './ProjectList'
+import { Button } from '@/components/common/Button'
+⋮----
+const handleStart = () =>
+⋮----
+{/* Header */}
+⋮----
+{/* Idea input */}
+⋮----
+{/* Status bar */}
+⋮----
+onClick=
+⋮----
+{/* How it works */}
+⋮----
+{/* Example templates — paste into input, don't start */}
+⋮----
+{/* Saved projects */}
+</file>
+
+<file path="src/schema/project-plan.ts">
+import { z } from 'zod/v4'
+⋮----
+export type ProjectPlan = z.infer<typeof ProjectPlanSchema>
+⋮----
+export type PlanSectionKey = (typeof PLAN_SECTIONS)[number]
+⋮----
+export function createEmptyPlan(): ProjectPlan
+⋮----
+export function isFoundationComplete(plan: ProjectPlan):
+</file>
+
 <file path="src/components/chat/ChatInput.tsx">
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition'
@@ -2733,45 +2773,6 @@ const handleSubmit = () =>
 const handleKeyDown = (e: React.KeyboardEvent) =>
 ⋮----
 disabled=
-</file>
-
-<file path="src/components/project/HomePage.tsx">
-import { useState } from 'react'
-import { useProjectStore } from '@/stores/project-store'
-import { useSettingsStore } from '@/stores/settings-store'
-import { useUIStore } from '@/stores/ui-store'
-import { PERSONALITY_INFO } from '@/schema/settings'
-import { EXAMPLE_TEMPLATES } from '@/data/example-templates'
-import { ProjectList } from './ProjectList'
-import { Button } from '@/components/common/Button'
-⋮----
-const handleStart = () =>
-⋮----
-{/* Header */}
-⋮----
-{/* Idea input */}
-⋮----
-{/* Status bar */}
-⋮----
-onClick=
-⋮----
-{/* How it works */}
-⋮----
-{/* Example templates — paste into input, don't start */}
-⋮----
-{/* Saved projects */}
-</file>
-
-<file path="src/schema/project-plan.ts">
-import { z } from 'zod/v4'
-⋮----
-export type ProjectPlan = z.infer<typeof ProjectPlanSchema>
-⋮----
-export type PlanSectionKey = (typeof PLAN_SECTIONS)[number]
-⋮----
-export function createEmptyPlan(): ProjectPlan
-⋮----
-export function isFoundationComplete(plan: ProjectPlan):
 </file>
 
 <file path="src/components/settings/SettingsModal.tsx">

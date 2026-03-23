@@ -12,7 +12,7 @@ import { createEmptyPlan } from '@/schema/project-plan'
 
 export default function App() {
   const { view, setView, settingsOpen, setSettingsOpen } = useUIStore()
-  const { id, name, setName } = useProjectStore()
+  const { id, name, setName, persist } = useProjectStore()
   const provider = useSettingsStore((s) => s.provider)
   const [editingName, setEditingName] = useState(false)
 
@@ -51,7 +51,10 @@ export default function App() {
               defaultValue={name}
               onBlur={(e) => {
                 const v = e.target.value.trim()
-                if (v) setName(v)
+                if (v) {
+                  setName(v)
+                  persist()
+                }
                 setEditingName(false)
               }}
               onKeyDown={(e) => {

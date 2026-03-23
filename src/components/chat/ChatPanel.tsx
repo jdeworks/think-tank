@@ -32,7 +32,10 @@ export function ChatPanel() {
   useStartConversation()
 
   const handleSend = async (content: string) => {
-    if (!providerConfig?.apiKey) return
+    if (!providerConfig?.apiKey) {
+      setError('No API key configured. Open Settings to add one.')
+      return
+    }
     addUserMessage(content)
     setLoading(true)
     setError(null)
