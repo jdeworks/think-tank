@@ -772,15 +772,6 @@ const handleOpen = (project: StoredProject) =>
 const handleDelete = async (id: string) =>
 </file>
 
-<file path="src/data/example-templates.ts">
-interface ExampleTemplate {
-  id: string
-  title: string
-  description: string
-  idea: string
-}
-</file>
-
 <file path="src/hooks/useSpeechRecognition.ts">
 import { useState, useCallback, useRef, useEffect } from 'react'
 ⋮----
@@ -1573,7 +1564,7 @@ After foundation is complete, the plan contains a design filter sentence. Use it
 </file>
 
 <file path="src/components/chat/ChatInput.tsx">
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition'
 import { useSettingsStore } from '@/stores/settings-store'
 ⋮----
@@ -1582,6 +1573,8 @@ interface ChatInputProps {
   disabled?: boolean
   placeholder?: string
 }
+⋮----
+const MAX_FILE_SIZE = 500_000 // 500KB
 ⋮----
 function MicButton({
   isListening,
@@ -1593,13 +1586,21 @@ function MicButton({
   onClick: () => void
 })
 ⋮----
-// Derive the display value from voice state rather than using setState in effect
+function AttachButton({
+  disabled,
+  onFileContent,
+}: {
+  disabled: boolean
+  onFileContent: (name: string, content: string) => void
+})
 ⋮----
-// Auto-send when recording stops with a transcript (transition from listening→not)
+onClick=
 ⋮----
 const handleSubmit = () =>
 ⋮----
 const handleKeyDown = (e: React.KeyboardEvent) =>
+⋮----
+disabled=
 </file>
 
 <file path="src/components/chat/ChatPanel.tsx">
@@ -1661,6 +1662,15 @@ const handleExportZip = ()
 const handleShare = () =>
 ⋮----
 onClick=
+</file>
+
+<file path="src/data/example-templates.ts">
+interface ExampleTemplate {
+  id: string
+  title: string
+  description: string
+  idea: string
+}
 </file>
 
 <file path="src/engine/conversation-engine.ts">
@@ -1770,9 +1780,9 @@ export function timelineToMermaid(
 </file>
 
 <file path="src/utils/prompt-loader.ts">
-async function fetchPrompt(path: string): Promise<string>
-⋮----
-// Offline or fetch failed — fall through to empty
+// Load prompt files bundled at build time via Vite's import.meta.glob.
+// This eliminates runtime fetches to raw.githubusercontent.com and works
+// offline, on any branch, and on GitHub Pages without 404s.
 ⋮----
 export async function loadSectionGuide(
   sectionNumber: number,
@@ -2432,33 +2442,6 @@ until foundation is complete.
 - [ ] Test: "Could someone implement this with zero follow-up questions?"
 </file>
 
-<file path="src/components/project/HomePage.tsx">
-import { useState } from 'react'
-import { useProjectStore } from '@/stores/project-store'
-import { useSettingsStore } from '@/stores/settings-store'
-import { useUIStore } from '@/stores/ui-store'
-import { PERSONALITY_INFO } from '@/schema/settings'
-import { EXAMPLE_TEMPLATES } from '@/data/example-templates'
-import { ProjectList } from './ProjectList'
-import { Button } from '@/components/common/Button'
-⋮----
-const handleStart = () =>
-⋮----
-{/* Header */}
-⋮----
-{/* Idea input */}
-⋮----
-{/* Status bar */}
-⋮----
-onClick=
-⋮----
-{/* How it works */}
-⋮----
-{/* Example templates — paste into input, don't start */}
-⋮----
-{/* Saved projects */}
-</file>
-
 <file path="src/engine/prompts.ts">
 import type { Personality } from '@/schema/settings'
 import {
@@ -2751,6 +2734,33 @@ function savePlan(plan: ProjectPlan, outputDir: string)
 // ── Run ───────────────────────────────────────────────────────────────
 </file>
 
+<file path="src/components/project/HomePage.tsx">
+import { useState } from 'react'
+import { useProjectStore } from '@/stores/project-store'
+import { useSettingsStore } from '@/stores/settings-store'
+import { useUIStore } from '@/stores/ui-store'
+import { PERSONALITY_INFO } from '@/schema/settings'
+import { EXAMPLE_TEMPLATES } from '@/data/example-templates'
+import { ProjectList } from './ProjectList'
+import { Button } from '@/components/common/Button'
+⋮----
+const handleStart = () =>
+⋮----
+{/* Header */}
+⋮----
+{/* Idea input */}
+⋮----
+{/* Status bar */}
+⋮----
+onClick=
+⋮----
+{/* How it works */}
+⋮----
+{/* Example templates — paste into input, don't start */}
+⋮----
+{/* Saved projects */}
+</file>
+
 <file path="src/components/settings/SettingsModal.tsx">
 import { useState } from 'react'
 import { Modal } from '@/components/common/Modal'
@@ -2771,19 +2781,21 @@ interface SettingsModalProps {
 ⋮----
 export function SettingsModal(
 ⋮----
+const buildConfig = (): ProviderConfig => (
+⋮----
 const handleSave = () =>
 ⋮----
 const handleTest = async () =>
 ⋮----
 interface ProviderFieldsProps {
-  providerType: string
+  presetId: string
   apiKey: string
   baseUrl: string
   model: string
   selectedPreset: (typeof PROVIDER_PRESETS)[number] | undefined
   testing: boolean
   testResult: 'success' | 'error' | null
-  onProviderTypeChange: (type: ProviderConfig['type']) => void
+  onPresetChange: (id: string) => void
   onApiKeyChange: (value: string) => void
   onBaseUrlChange: (value: string) => void
   onModelChange: (value: string) => void
@@ -2803,6 +2815,77 @@ export type PlanSectionKey = (typeof PLAN_SECTIONS)[number]
 export function createEmptyPlan(): ProjectPlan
 ⋮----
 export function isFoundationComplete(plan: ProjectPlan):
+</file>
+
+<file path="src/utils/export.ts">
+import {
+  SECTION_LABELS,
+  ProjectPlanSchema,
+  type ProjectPlan,
+  type PlanSectionKey,
+} from '@/schema/project-plan'
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
+import JSZip from 'jszip'
+import {
+  componentsToMermaid,
+  dataModelToMermaid,
+  timelineToMermaid,
+  userJourneyToMermaid,
+  risksToMermaid,
+  budgetToMermaid,
+} from './mermaid-helpers'
+import { fetchMermaidSvg } from './mermaid-render'
+import { generateOnePageSummary, generateHandoff } from './export-extras'
+⋮----
+export function exportAsJSON(plan: ProjectPlan, filename: string)
+⋮----
+export function exportAsMarkdown(plan: ProjectPlan, filename: string)
+⋮----
+export async function exportAsZip(plan: ProjectPlan, filename: string)
+⋮----
+// Core plan files
+⋮----
+// Generate mermaid sources and SVGs
+⋮----
+function addDiagram(diagrams: Array<[string, string]>, name: string, mmd: string)
+⋮----
+function buildDiagramSources(plan: ProjectPlan): Array<[string, string]>
+⋮----
+function extractBudgetItems(plan: ProjectPlan): Array<
+⋮----
+function downloadBlob(blob: Blob, filename: string)
+⋮----
+export function importFromJSON(file: File): Promise<ProjectPlan>
+⋮----
+export function createShareUrl(plan: ProjectPlan): string
+⋮----
+export function loadFromShareUrl(): ProjectPlan | null
+⋮----
+function planToMarkdown(plan: ProjectPlan): string
+⋮----
+function renderFoundation(plan: ProjectPlan): string
+⋮----
+function renderOverview(plan: ProjectPlan): string
+⋮----
+function renderRequirements(plan: ProjectPlan): string
+⋮----
+function renderArchitecture(plan: ProjectPlan): string
+⋮----
+function renderTechStack(plan: ProjectPlan): string
+⋮----
+function renderHosting(plan: ProjectPlan): string
+⋮----
+function renderSecurity(plan: ProjectPlan): string
+⋮----
+function renderDesign(plan: ProjectPlan): string
+⋮----
+function renderBudget(plan: ProjectPlan): string
+⋮----
+function renderTimeline(plan: ProjectPlan): string
+⋮----
+function renderRisks(plan: ProjectPlan): string
+⋮----
+function renderCompetitors(plan: ProjectPlan): string
 </file>
 
 <file path="README.md">
@@ -3032,77 +3115,6 @@ Runs 6 stages in order:
 ## License
 
 MIT
-</file>
-
-<file path="src/utils/export.ts">
-import {
-  SECTION_LABELS,
-  ProjectPlanSchema,
-  type ProjectPlan,
-  type PlanSectionKey,
-} from '@/schema/project-plan'
-import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string'
-import JSZip from 'jszip'
-import {
-  componentsToMermaid,
-  dataModelToMermaid,
-  timelineToMermaid,
-  userJourneyToMermaid,
-  risksToMermaid,
-  budgetToMermaid,
-} from './mermaid-helpers'
-import { fetchMermaidSvg } from './mermaid-render'
-import { generateOnePageSummary, generateHandoff } from './export-extras'
-⋮----
-export function exportAsJSON(plan: ProjectPlan, filename: string)
-⋮----
-export function exportAsMarkdown(plan: ProjectPlan, filename: string)
-⋮----
-export async function exportAsZip(plan: ProjectPlan, filename: string)
-⋮----
-// Core plan files
-⋮----
-// Generate mermaid sources and SVGs
-⋮----
-function addDiagram(diagrams: Array<[string, string]>, name: string, mmd: string)
-⋮----
-function buildDiagramSources(plan: ProjectPlan): Array<[string, string]>
-⋮----
-function extractBudgetItems(plan: ProjectPlan): Array<
-⋮----
-function downloadBlob(blob: Blob, filename: string)
-⋮----
-export function importFromJSON(file: File): Promise<ProjectPlan>
-⋮----
-export function createShareUrl(plan: ProjectPlan): string
-⋮----
-export function loadFromShareUrl(): ProjectPlan | null
-⋮----
-function planToMarkdown(plan: ProjectPlan): string
-⋮----
-function renderFoundation(plan: ProjectPlan): string
-⋮----
-function renderOverview(plan: ProjectPlan): string
-⋮----
-function renderRequirements(plan: ProjectPlan): string
-⋮----
-function renderArchitecture(plan: ProjectPlan): string
-⋮----
-function renderTechStack(plan: ProjectPlan): string
-⋮----
-function renderHosting(plan: ProjectPlan): string
-⋮----
-function renderSecurity(plan: ProjectPlan): string
-⋮----
-function renderDesign(plan: ProjectPlan): string
-⋮----
-function renderBudget(plan: ProjectPlan): string
-⋮----
-function renderTimeline(plan: ProjectPlan): string
-⋮----
-function renderRisks(plan: ProjectPlan): string
-⋮----
-function renderCompetitors(plan: ProjectPlan): string
 </file>
 
 </files>

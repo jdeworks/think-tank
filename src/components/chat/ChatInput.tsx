@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition'
 import { useSettingsStore } from '@/stores/settings-store'
 
@@ -7,6 +7,27 @@ interface ChatInputProps {
   disabled?: boolean
   placeholder?: string
 }
+
+const TEXT_EXTENSIONS = [
+  '.txt',
+  '.md',
+  '.json',
+  '.csv',
+  '.xml',
+  '.yaml',
+  '.yml',
+  '.toml',
+  '.env',
+  '.log',
+  '.ts',
+  '.tsx',
+  '.js',
+  '.jsx',
+  '.py',
+  '.html',
+  '.css',
+]
+const MAX_FILE_SIZE = 500_000 // 500KB
 
 function MicButton({
   isListening,
@@ -47,12 +68,73 @@ function MicButton({
   )
 }
 
+function AttachButton({
+  disabled,
+  onFileContent,
+}: {
+  disabled: boolean
+  onFileContent: (name: string, content: string) => void
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const handleFile = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      if (!file) return
+      if (file.size > MAX_FILE_SIZE) {
+        alert(`File too large (${Math.round(file.size / 1000)}KB). Max ${MAX_FILE_SIZE / 1000}KB.`)
+        return
+      }
+      const reader = new FileReader()
+      reader.onload = () => {
+        if (typeof reader.result === 'string') onFileContent(file.name, reader.result)
+      }
+      reader.readAsText(file)
+      if (inputRef.current) inputRef.current.value = ''
+    },
+    [onFileContent],
+  )
+
+  return (
+    <>
+      <input
+        ref={inputRef}
+        type="file"
+        accept={TEXT_EXTENSIONS.join(',')}
+        className="hidden"
+        onChange={handleFile}
+      />
+      <button
+        onClick={() => inputRef.current?.click()}
+        disabled={disabled}
+        aria-label="Attach file"
+        className="rounded-lg min-h-[44px] min-w-[44px] flex items-center justify-center bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150 shrink-0"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+        </svg>
+      </button>
+    </>
+  )
+}
+
 export function ChatInput({
   onSend,
   disabled,
   placeholder = 'Type your answer...',
 }: ChatInputProps) {
   const [value, setValue] = useState('')
+  const [attachedFile, setAttachedFile] = useState<{ name: string; content: string } | null>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const voiceInputEnabled = useSettingsStore((s) => s.voiceInputEnabled)
   const prevListeningRef = useRef(false)
@@ -67,22 +149,31 @@ export function ChatInput({
     stop: stopListening,
   } = useSpeechRecognition()
 
-  // Derive the display value from voice state rather than using setState in effect
   const displayValue = useMemo(() => {
     if (isListening) return `${transcript} ${interimTranscript}`.trim()
     return value
   }, [isListening, transcript, interimTranscript, value])
 
-  // Auto-send when recording stops with a transcript (transition from listening→not)
+  const sendWithAttachment = useCallback(
+    (text: string) => {
+      if (!text && !attachedFile) return
+      let message = text
+      if (attachedFile) {
+        message = `[Attached file: ${attachedFile.name}]\n\`\`\`\n${attachedFile.content}\n\`\`\`\n\n${text}`
+        setAttachedFile(null)
+      }
+      onSend(message)
+    },
+    [attachedFile, onSend],
+  )
+
   useEffect(() => {
     if (prevListeningRef.current && !isListening && transcript.trim()) {
-      const timer = setTimeout(() => {
-        onSend(transcript.trim())
-      }, 500)
+      const timer = setTimeout(() => sendWithAttachment(transcript.trim()), 500)
       return () => clearTimeout(timer)
     }
     prevListeningRef.current = isListening
-  }, [isListening, transcript, onSend])
+  }, [isListening, transcript, sendWithAttachment])
 
   useEffect(() => {
     if (!disabled && textareaRef.current) textareaRef.current.focus()
@@ -90,8 +181,8 @@ export function ChatInput({
 
   const handleSubmit = () => {
     const trimmed = value.trim()
-    if (!trimmed || disabled) return
-    onSend(trimmed)
+    if ((!trimmed && !attachedFile) || disabled) return
+    sendWithAttachment(trimmed)
     setValue('')
   }
 
@@ -114,7 +205,21 @@ export function ChatInput({
           {interimTranscript}...
         </div>
       )}
+      {attachedFile && (
+        <div className="max-w-3xl mx-auto mb-2 flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
+          <span>
+            Attached: {attachedFile.name} ({Math.round(attachedFile.content.length / 1000)}KB)
+          </span>
+          <button onClick={() => setAttachedFile(null)} className="text-red-400 hover:text-red-600">
+            remove
+          </button>
+        </div>
+      )}
       <div className="flex gap-3 items-end max-w-3xl mx-auto">
+        <AttachButton
+          disabled={Boolean(disabled)}
+          onFileContent={(name, content) => setAttachedFile({ name, content })}
+        />
         {showMic && (
           <MicButton
             isListening={isListening}
@@ -140,7 +245,7 @@ export function ChatInput({
         />
         <button
           onClick={handleSubmit}
-          disabled={disabled || !value.trim() || isListening}
+          disabled={disabled || (!value.trim() && !attachedFile) || isListening}
           className="rounded-lg bg-blue-500 text-white px-5 py-2.5 text-sm font-semibold hover:bg-blue-600 active:bg-blue-700 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150 shrink-0 min-h-[44px] shadow-sm"
         >
           Send

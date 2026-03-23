@@ -50,32 +50,41 @@ export const PERSONALITY_INFO: Record<
 
 export const PROVIDER_PRESETS = [
   {
+    id: 'openai',
     type: 'openai' as const,
     name: 'OpenAI',
     baseUrl: 'https://api.openai.com/v1',
     models: ['gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano', 'gpt-4o', 'gpt-4o-mini'],
+    free: false,
   },
   {
+    id: 'anthropic',
     type: 'anthropic' as const,
     name: 'Anthropic (Claude)',
     baseUrl: 'https://api.anthropic.com',
     models: ['claude-sonnet-4-20250514', 'claude-haiku-4-5-20250514', 'claude-opus-4-20250514'],
+    free: false,
   },
   {
+    id: 'openrouter',
     type: 'openai-compatible' as const,
     name: 'OpenRouter (free models available)',
     baseUrl: 'https://openrouter.ai/api/v1',
     models: [
-      'google/gemini-2.5-flash-preview:free',
-      'meta-llama/llama-4-maverick:free',
-      'deepseek/deepseek-chat-v3-0324:free',
-      'qwen/qwen3-235b-a22b:free',
+      'qwen/qwen3-coder:free',
+      'nvidia/nemotron-3-super-120b-a12b:free',
+      'stepfun/step-3.5-flash:free',
+      'google/gemma-3-27b-it:free',
+      'nousresearch/hermes-3-llama-3.1-405b:free',
     ],
+    free: true,
   },
   {
+    id: 'ollama',
     type: 'openai-compatible' as const,
-    name: 'OpenAI Compatible (Ollama, LM Studio, etc.)',
+    name: 'Ollama / LM Studio (local, free)',
     baseUrl: 'http://localhost:11434/v1',
-    models: [],
+    models: ['llama3.3', 'gemma3', 'qwen3', 'deepseek-r1', 'phi4', 'mistral'],
+    free: true,
   },
 ]

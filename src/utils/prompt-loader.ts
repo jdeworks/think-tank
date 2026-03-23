@@ -1,30 +1,18 @@
-const REPO_BASE = 'https://raw.githubusercontent.com/jdeworks/think-tank/dev/prompts'
+// Load prompt files bundled at build time via Vite's import.meta.glob.
+// This eliminates runtime fetches to raw.githubusercontent.com and works
+// offline, on any branch, and on GitHub Pages without 404s.
 
-const cache = new Map<string, string>()
-
-async function fetchPrompt(path: string): Promise<string> {
-  const cached = cache.get(path)
-  if (cached) return cached
-
-  try {
-    const res = await fetch(`${REPO_BASE}/${path}`, {
-      signal: AbortSignal.timeout(5000),
-    })
-    if (res.ok) {
-      const text = await res.text()
-      cache.set(path, text)
-      return text
-    }
-  } catch {
-    // Offline or fetch failed — fall through to empty
-  }
-  return ''
-}
+const promptModules = import.meta.glob('/prompts/**/*.md', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>
 
 export async function loadSectionGuide(
   sectionNumber: number,
   sectionName: string,
 ): Promise<string> {
   const num = String(sectionNumber).padStart(2, '0')
-  return fetchPrompt(`sections/${num}-${sectionName}.md`)
+  const key = `/prompts/sections/${num}-${sectionName}.md`
+  return promptModules[key] || ''
 }

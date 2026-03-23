@@ -26,28 +26,33 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
     setVoiceInputEnabled,
     setVoiceOutputEnabled,
   } = useSettingsStore()
-  const [providerType, setProviderType] = useState(provider?.type || 'openai')
+  const [presetId, setPresetId] = useState(
+    provider?.id ||
+      (provider?.type === 'openai-compatible' ? 'openrouter' : provider?.type) ||
+      'openai',
+  )
   const [apiKey, setApiKey] = useState(provider?.apiKey || '')
   const [model, setModel] = useState(provider?.model || '')
   const [baseUrl, setBaseUrl] = useState(provider?.baseUrl || '')
   const [testing, setTesting] = useState(false)
   const [testResult, setTestResult] = useState<'success' | 'error' | null>(null)
 
-  const selectedPreset = PROVIDER_PRESETS.find((p) => p.type === providerType)
+  const selectedPreset = PROVIDER_PRESETS.find((p) => p.id === presetId)
+
+  const buildConfig = (): ProviderConfig => ({
+    id: presetId,
+    type: selectedPreset?.type || 'openai',
+    name: selectedPreset?.name || presetId,
+    apiKey,
+    model: model || selectedPreset?.models[0] || '',
+    baseUrl:
+      selectedPreset?.type === 'openai-compatible'
+        ? baseUrl || selectedPreset.baseUrl
+        : selectedPreset?.baseUrl,
+  })
 
   const handleSave = () => {
-    const config: ProviderConfig = {
-      id: providerType,
-      type: providerType,
-      name: selectedPreset?.name || providerType,
-      apiKey,
-      model: model || selectedPreset?.models[0] || '',
-      baseUrl:
-        providerType === 'openai-compatible'
-          ? baseUrl || 'http://localhost:11434/v1'
-          : selectedPreset?.baseUrl,
-    }
-    setProvider(config)
+    setProvider(buildConfig())
     onClose()
   }
 
@@ -55,18 +60,7 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
     setTesting(true)
     setTestResult(null)
     try {
-      const config: ProviderConfig = {
-        id: providerType,
-        type: providerType,
-        name: '',
-        apiKey,
-        model: model || selectedPreset?.models[0] || '',
-        baseUrl:
-          providerType === 'openai-compatible'
-            ? baseUrl || 'http://localhost:11434/v1'
-            : selectedPreset?.baseUrl,
-      }
-      const p = createProvider(config)
+      const p = createProvider(buildConfig())
       const ok = await p.validateKey()
       setTestResult(ok ? 'success' : 'error')
     } catch {
@@ -80,16 +74,16 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
     <Modal open={open} onClose={onClose} title="Settings">
       <div className="space-y-5">
         <ProviderFields
-          providerType={providerType}
+          presetId={presetId}
           apiKey={apiKey}
           baseUrl={baseUrl}
           model={model}
           selectedPreset={selectedPreset}
           testing={testing}
           testResult={testResult}
-          onProviderTypeChange={(type) => {
-            setProviderType(type)
-            const preset = PROVIDER_PRESETS.find((p) => p.type === type)
+          onPresetChange={(id) => {
+            setPresetId(id)
+            const preset = PROVIDER_PRESETS.find((p) => p.id === id)
             setBaseUrl(preset?.baseUrl || '')
             setModel(preset?.models[0] || '')
             setTestResult(null)
@@ -136,14 +130,14 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
 }
 
 interface ProviderFieldsProps {
-  providerType: string
+  presetId: string
   apiKey: string
   baseUrl: string
   model: string
   selectedPreset: (typeof PROVIDER_PRESETS)[number] | undefined
   testing: boolean
   testResult: 'success' | 'error' | null
-  onProviderTypeChange: (type: ProviderConfig['type']) => void
+  onPresetChange: (id: string) => void
   onApiKeyChange: (value: string) => void
   onBaseUrlChange: (value: string) => void
   onModelChange: (value: string) => void
@@ -151,14 +145,14 @@ interface ProviderFieldsProps {
 }
 
 function ProviderFields({
-  providerType,
+  presetId,
   apiKey,
   baseUrl,
   model,
   selectedPreset,
   testing,
   testResult,
-  onProviderTypeChange,
+  onPresetChange,
   onApiKeyChange,
   onBaseUrlChange,
   onModelChange,
@@ -171,13 +165,14 @@ function ProviderFields({
           Provider
         </label>
         <select
-          value={providerType}
-          onChange={(e) => onProviderTypeChange(e.target.value as ProviderConfig['type'])}
+          value={presetId}
+          onChange={(e) => onPresetChange(e.target.value)}
           className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
           {PROVIDER_PRESETS.map((p) => (
-            <option key={p.type} value={p.type}>
+            <option key={p.id} value={p.id}>
               {p.name}
+              {p.free ? ' (free)' : ''}
             </option>
           ))}
         </select>
@@ -196,10 +191,20 @@ function ProviderFields({
         />
         <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
           Not stored — you'll need to enter it each session. Only sent to your chosen provider.
+          {selectedPreset?.id === 'openrouter' && (
+            <span className="block mt-1 text-blue-500">
+              Free API key at openrouter.ai — no credit card needed.
+            </span>
+          )}
+          {selectedPreset?.id === 'ollama' && (
+            <span className="block mt-1 text-blue-500">
+              No API key needed for Ollama — enter any value (e.g. &quot;ollama&quot;).
+            </span>
+          )}
         </p>
       </div>
 
-      {providerType === 'openai-compatible' && (
+      {selectedPreset?.type === 'openai-compatible' && (
         <div>
           <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
             Endpoint URL
