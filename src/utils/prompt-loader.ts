@@ -1,4 +1,4 @@
-const REPO_BASE = 'https://raw.githubusercontent.com/jdeworks/think-tank/main/prompts'
+const REPO_BASE = 'https://raw.githubusercontent.com/jdeworks/think-tank/dev/prompts'
 
 const cache = new Map<string, string>()
 

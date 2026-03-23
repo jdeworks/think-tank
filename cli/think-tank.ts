@@ -308,8 +308,9 @@ function buildSystemPrompt(personality: string, plan: ProjectPlan): string {
   return `${PERSONALITIES[personality] || PERSONALITIES.friendly}
 
 ## Your Role
-You are helping a user plan a software project through a terminal conversation.
+You are helping a user plan a project through a terminal conversation.
 Guide them through structured questions to build a comprehensive project plan.
+Start with the foundation: who is the first specific person who will use this?
 
 ## How to Work
 1. Ask 1-3 focused questions at a time. Don't overwhelm the user.
@@ -475,7 +476,7 @@ async function sendInitialIdea(
 ): Promise<number> {
   messages.push({
     role: 'user',
-    content: `The user has this project idea: "${idea}"\n\nStart by asking 2-3 key questions to understand the core of what they want to build.\nFocus on: What problem does it solve? Who is it for? What's the most important feature?\nAlso use the update_plan tool to set the initial overview with what you can already infer.`,
+    content: `The user has this project idea: "${idea}"\n\nStart with the foundation: who is the first specific person who will use this? Ask 2-3 questions about the primary user — a real person, not a demographic category.\nAlso use the update_plan tool to set the initial overview with what you can already infer.`,
   })
   const response = await callClaude(client, model, personality, plan, messages)
   await processResponse(response, plan, messages, { client, model, personality })

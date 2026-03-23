@@ -143,98 +143,6 @@ README.md
 <files>
 This section contains the contents of the repository's files.
 
-<file path="prompts/config/jdeworks.md">
-# jdeworks Workspace Configuration
-
-## About this workspace
-
-jdeworks builds tools and products for builders — developers, designers, and
-small business owners who want to make things. Products range from general-purpose
-developer tools (think-tank, agent-sandbox) to emerging-market consumer products.
-
-## Existing repos and their roles
-
-Read before suggesting a new implementation — these may already solve part of the problem.
-
-| Repo | Role | When to use |
-|------|------|-------------|
-| `make-a-website` | Static site generator — takes content JSON + template to HTML | Any project that outputs HTML sites |
-| `make-it-look-good` | CSS design system — tokens, typography, palettes, components | All new UIs — don't duplicate styling work |
-| `get-me-started` | Zero-knowledge onboarding guide | Read before writing copy for non-technical users |
-| `agent-sandbox` | AI agent orchestration — conversation loop, tool use, state | Any project with a multi-step AI conversation |
-| `think-tank` | Project planning tool (this repo) | Used at the start of every new project |
-| `elemental-surprise` | Python tooling — image processing, scripts | Image manipulation, background removal |
-
-### Integration pattern
-
-All repos live side-by-side in the same workspace directory.
-Cross-repo paths are configured in `.env` so layout changes don't require code changes:
-
-```env
-REPO_MAKE_A_WEBSITE=../make-a-website
-REPO_MAKE_IT_LOOK_GOOD=../make-it-look-good
-REPO_GET_ME_STARTED=../get-me-started
-REPO_AGENT_SANDBOX=../agent-sandbox
-REPO_ELEMENTAL_SURPRISE=../elemental-surprise
-```
-
-## Preferred tech stack
-
-**Runtime:** Node.js 20 LTS. TypeScript preferred, JavaScript acceptable.
-
-**Frontend:** Vanilla JS for simple tools; React 19 for complex UIs.
-
-**Styling:** `make-it-look-good` design system always. Never introduce a new
-CSS approach when the design system already handles it.
-
-**Testing:** Vitest. All projects should have a `make test` target.
-
-**Quality pipeline:** Every project should have `make check` running:
-Prettier, ESLint, TypeScript, Knip (dead code), Vitest, code health.
-
-**State (frontend):** Zustand for complex UI state. LocalStorage/IndexedDB for persistence.
-
-**Validation:** Zod 4 for schema validation. Derive types from Zod, don't duplicate.
-
-**Database:** SQLite via `better-sqlite3` for local/POC. Postgres/Supabase for production.
-
-## Emerging market context
-
-Some jdeworks products target the Philippines and Southeast Asia.
-If the project being planned targets this market, apply the following:
-
-### Mobile-first is non-negotiable
-Most users are phone-only. Every architecture decision must pass:
-"does this work on a low-end Android phone on mobile data?"
-
-### Local payments
-GCash and Maya are the payment methods, not PayPal or Stripe.
-Use HitPay — it handles GCash, Maya, and QR Ph with no monthly fee.
-
-### Language
-- **Filipino/Taglish:** Workable with current LLMs. Needs a native reviewer
-  to check template strings before launch. Design AI flows to accept Taglish.
-- **Cebuano:** NOT launch-ready. Cebuano Wikipedia is heavily bot-generated,
-  corrupting LLM training data. Requires native reviewer and golden set first.
-- **English:** Always available alongside Filipino.
-
-### Pricing
-Show prices in PHP prominently. USD secondary.
-
-### AI cost model for Philippine-market products
-Revenue at PHP 299/month Pro tier is roughly $5.20 USD.
-40% AI budget is roughly PHP 119 / $2.08 per user per month.
-Use claude-haiku-4-5 for ongoing updates, claude-sonnet-4-6 for initial generation.
-Prompt caching is mandatory.
-
-## Common mistakes to avoid
-
-1. **Assuming desktop** — test on a real Android phone on mobile data before declaring UX acceptable
-2. **Skipping the repo audit** — always read actual source of existing repos before integrating
-3. **Building new when existing suffices** — check make-it-look-good, get-me-started, agent-sandbox first
-4. **Underestimating language complexity** — Taglish is not translated English, get a native reviewer
-</file>
-
 <file path="cli/README.md">
 # Think Tank — Local CLI Instructions
 
@@ -528,6 +436,98 @@ function applyPlanUpdate(plan: ProjectPlan, section: string, data: Record<string
 function savePlan(plan: ProjectPlan, outputDir: string)
 ⋮----
 // ── Run ───────────────────────────────────────────────────────────────
+</file>
+
+<file path="prompts/config/jdeworks.md">
+# jdeworks Workspace Configuration
+
+## About this workspace
+
+jdeworks builds tools and products for builders — developers, designers, and
+small business owners who want to make things. Products range from general-purpose
+developer tools (think-tank, agent-sandbox) to emerging-market consumer products.
+
+## Existing repos and their roles
+
+Read before suggesting a new implementation — these may already solve part of the problem.
+
+| Repo | Role | When to use |
+|------|------|-------------|
+| `make-a-website` | Static site generator — takes content JSON + template to HTML | Any project that outputs HTML sites |
+| `make-it-look-good` | CSS design system — tokens, typography, palettes, components | All new UIs — don't duplicate styling work |
+| `get-me-started` | Zero-knowledge onboarding guide | Read before writing copy for non-technical users |
+| `agent-sandbox` | AI agent orchestration — conversation loop, tool use, state | Any project with a multi-step AI conversation |
+| `think-tank` | Project planning tool (this repo) | Used at the start of every new project |
+| `elemental-surprise` | Python tooling — image processing, scripts | Image manipulation, background removal |
+
+### Integration pattern
+
+All repos live side-by-side in the same workspace directory.
+Cross-repo paths are configured in `.env` so layout changes don't require code changes:
+
+```env
+REPO_MAKE_A_WEBSITE=../make-a-website
+REPO_MAKE_IT_LOOK_GOOD=../make-it-look-good
+REPO_GET_ME_STARTED=../get-me-started
+REPO_AGENT_SANDBOX=../agent-sandbox
+REPO_ELEMENTAL_SURPRISE=../elemental-surprise
+```
+
+## Preferred tech stack
+
+**Runtime:** Node.js 20 LTS. TypeScript preferred, JavaScript acceptable.
+
+**Frontend:** Vanilla JS for simple tools; React 19 for complex UIs.
+
+**Styling:** `make-it-look-good` design system always. Never introduce a new
+CSS approach when the design system already handles it.
+
+**Testing:** Vitest. All projects should have a `make test` target.
+
+**Quality pipeline:** Every project should have `make check` running:
+Prettier, ESLint, TypeScript, Knip (dead code), Vitest, code health.
+
+**State (frontend):** Zustand for complex UI state. LocalStorage/IndexedDB for persistence.
+
+**Validation:** Zod 4 for schema validation. Derive types from Zod, don't duplicate.
+
+**Database:** SQLite via `better-sqlite3` for local/POC. Postgres/Supabase for production.
+
+## Emerging market context
+
+Some jdeworks products target the Philippines and Southeast Asia.
+If the project being planned targets this market, apply the following:
+
+### Mobile-first is non-negotiable
+Most users are phone-only. Every architecture decision must pass:
+"does this work on a low-end Android phone on mobile data?"
+
+### Local payments
+GCash and Maya are the payment methods, not PayPal or Stripe.
+Use HitPay — it handles GCash, Maya, and QR Ph with no monthly fee.
+
+### Language
+- **Filipino/Taglish:** Workable with current LLMs. Needs a native reviewer
+  to check template strings before launch. Design AI flows to accept Taglish.
+- **Cebuano:** NOT launch-ready. Cebuano Wikipedia is heavily bot-generated,
+  corrupting LLM training data. Requires native reviewer and golden set first.
+- **English:** Always available alongside Filipino.
+
+### Pricing
+Show prices in PHP prominently. USD secondary.
+
+### AI cost model for Philippine-market products
+Revenue at PHP 299/month Pro tier is roughly $5.20 USD.
+40% AI budget is roughly PHP 119 / $2.08 per user per month.
+Use claude-haiku-4-5 for ongoing updates, claude-sonnet-4-6 for initial generation.
+Prompt caching is mandatory.
+
+## Common mistakes to avoid
+
+1. **Assuming desktop** — test on a real Android phone on mobile data before declaring UX acceptable
+2. **Skipping the repo audit** — always read actual source of existing repos before integrating
+3. **Building new when existing suffices** — check make-it-look-good, get-me-started, agent-sandbox first
+4. **Underestimating language complexity** — Taglish is not translated English, get a native reviewer
 </file>
 
 <file path="prompts/config/README.md">
@@ -912,284 +912,6 @@ The design filter sentence should be quoted verbatim whenever a major decision i
 - Only looking at big players — small niche tools are often the real competition
 </file>
 
-<file path="prompts/sections/03-requirements.md">
-# Section: Requirements
-
-## What to Capture
-- Functional requirements (what the system DOES) with priority: must/should/nice
-- Non-functional requirements (performance, accessibility, reliability)
-- Constraints (budget, timeline, team size, tech limitations)
-- Assumptions (what you're taking for granted)
-
-## Questions to Ask
-1. What are the 3-5 things this MUST do on day one? (Must-haves)
-2. What would make it great but isn't essential for launch? (Should-haves)
-3. Any dream features for the future? (Nice-to-haves)
-4. Are there hard constraints? (Budget, deadline, team size, specific tech required)
-5. What are you assuming about your users? (Internet speed, device, tech skills)
-
-## Quality Tips
-- Use MoSCoW prioritization: Must, Should, Could, Won't
-- Every "must" you add delays launch. Be ruthless about what's truly essential.
-- Non-functional requirements (speed, uptime, accessibility) are often forgotten but critical.
-- Constraints are your friends — they force creative, focused solutions.
-- Assumptions should be stated explicitly so they can be validated.
-
-## Common Mistakes
-- Making everything a "must-have" (if everything is priority 1, nothing is)
-- Forgetting accessibility (it's much harder to add later)
-- Not considering offline or low-connectivity scenarios
-- Assuming users have fast internet, modern devices, or ideal conditions
-- Ignoring the primary user's actual context (device, location, comfort level)
-</file>
-
-<file path="prompts/sections/04-architecture.md">
-# Section: Architecture
-
-> **Adapt to the project type.** For software: system architecture, components, data model.
-> For physical businesses/services/events: operational structure, process flow, key systems.
-
-## What to Capture
-- System or business type (web app, mobile app, physical store, service, event, etc.)
-- Structure or pattern (how the parts fit together)
-- Components (name, description, connections between them)
-- Data or information model (what "things" exist and how they relate)
-- Integration points (external services, suppliers, partners, APIs)
-
-## Questions to Ask
-
-### For digital products:
-1. What type of system is this? (Web app? Mobile? API? CLI?)
-2. Does it need real-time features? (Chat, live updates, collaboration)
-3. What data does it store? What are the main entities?
-4. How do those things relate to each other?
-5. Does it need to integrate with external services?
-
-### For physical businesses/services/events:
-1. What's the structure? (Single location? Multiple? Mobile? Online+offline?)
-2. Walk me through the customer journey from discovery to completion.
-3. What are the key operational processes? (Inventory, scheduling, delivery, etc.)
-4. What information do you need to track? (Customers, orders, inventory, bookings?)
-5. What external partners or suppliers are involved?
-
-## Quality Tips
-- Start simple. A straightforward structure is almost always right for v1.
-- Draw the component/process diagram — if you can't draw it, you don't understand it.
-- Every connection between components is a potential failure point. Minimize them.
-- The data/information model is the foundation. Get this wrong and everything suffers.
-- Consider what happens when things go wrong — where are the bottlenecks?
-
-## Common Mistakes
-- Over-engineering: complex architecture for a simple problem
-- No clear data/information model
-- Forgetting about how state or information flows between parts
-- Not thinking about capacity and peak load
-- Ignoring how components depend on each other
-</file>
-
-<file path="prompts/sections/05-tech-stack.md">
-# Section: Tech Stack & Tools
-
-> **Adapt to the project type.** For software: languages, frameworks, databases.
-> For physical businesses/services: operational tools, equipment, software for running the business.
-
-## What to Capture
-- Key tools and technologies (what you'll build with or run on)
-- Why each choice was made (rationale)
-- Key dependencies and vendors
-- Team familiarity with the choices
-
-## Questions to Ask
-
-### For digital products:
-1. Do you or your team have experience with specific languages/frameworks?
-2. Does this need server-side rendering? (SEO-critical content?)
-3. How complex is the data? (Simple key-value? Complex relationships? Full-text search?)
-4. Do you need real-time capabilities?
-5. What's your budget for infrastructure?
-
-### For physical businesses/services:
-1. What tools do you need to operate? (POS system, scheduling software, equipment?)
-2. Do you already use any software for the business? (Accounting, inventory, booking?)
-3. What equipment or physical resources are required?
-4. Do you need a website, social media presence, or online ordering?
-5. What's your budget for tools and equipment?
-
-## Quality Tips
-- Pick boring, proven choices. Innovation should be in your product, not your tools.
-- Match tools to the team. A perfect choice nobody knows how to use is the wrong choice.
-- Every dependency is a liability. Fewer = less maintenance.
-- Always explain WHY, not just WHAT.
-- Consider vendor lock-in — can you switch if needed?
-
-## Common Mistakes
-- Choosing tools because they're trending, not because they fit
-- Not considering the learning curve for the team
-- Over-relying on third-party services for core functionality
-- Ignoring the long-term maintenance cost of each tool
-- Using complex solutions when simple ones would work
-</file>
-
-<file path="prompts/sections/06-hosting.md">
-# Section: Hosting & Operations
-
-> **Adapt to the project type.** For software: hosting, deployment, CI/CD.
-> For physical businesses: location, distribution, logistics.
-
-## What to Capture
-- Where this operates (hosting platform, physical location, distribution channels)
-- How changes are deployed or rolled out
-- Environments or locations (dev/staging/prod, or pilot/launch locations)
-- Domain, address, or access point
-- Estimated monthly operational cost
-
-## Questions to Ask
-
-### For digital products:
-1. Does this need a server or can it be static? (Huge cost difference)
-2. Do you need staging/preview environments for testing?
-3. What's your expected traffic? (10 users/day? 10,000?)
-4. Do you have a domain name in mind?
-5. How important is uptime?
-
-### For physical businesses/services:
-1. Where will this operate? (Fixed location, mobile, online, hybrid?)
-2. How will customers find and access you?
-3. What's the capacity? (Seats, customers/day, orders/hour?)
-4. Do you need specific permits, licenses, or zoning?
-5. What are the operating hours and staffing needs?
-
-## Quality Tips
-- Start small and scale. Don't over-commit on space, hosting, or capacity.
-- For software: static sites are free and fast — use them when possible.
-- For physical: location determines traffic — research foot traffic, competitors nearby.
-- Always have a way to test changes before they affect real customers.
-- Free tiers exist for many hosting platforms. Start there for digital products.
-
-## Common Mistakes
-- Paying for capacity before you have demand
-- No way to test changes safely (deploying/launching untested)
-- Not considering ongoing operational costs
-- Choosing a complex setup when simple would work
-- Ignoring how customers actually get to you
-</file>
-
-<file path="prompts/sections/07-security.md">
-# Section: Security & Compliance
-
-> **Adapt to the project type.** For software: auth, encryption, API security.
-> For physical businesses: access control, data privacy, payment security, permits.
-
-## What to Capture
-- Authentication/access control (who can access what?)
-- Data protection (what sensitive data exists and how is it protected?)
-- Known security risks and mitigations
-- Compliance requirements (GDPR, PCI-DSS, local regulations, etc.)
-
-## Questions to Ask
-
-### For all projects:
-1. Do users/customers need accounts? If so, how do they identify themselves?
-2. Are there different roles with different permissions?
-3. What sensitive data do you handle? (Personal info, payments, health data?)
-4. Does this need to comply with any regulations?
-
-### For digital products (add):
-5. Are there third-party API keys the app needs to manage securely?
-
-### For physical businesses (add):
-5. How is payment handled? (Cash, card, mobile payments?)
-6. Who has access to the premises, inventory, or cash?
-
-## Quality Tips
-- For digital: don't build your own auth — use a provider.
-- For physical: don't skip payment security — use established payment processors.
-- Principle of least privilege: people should only access what they need.
-- If you handle EU user data, you need GDPR compliance.
-- Every project that handles money or personal data has security requirements — even if simple.
-
-## Common Mistakes
-- Assuming "we're too small for security to matter"
-- Not having a plan for when things go wrong (security incident response)
-- Ignoring data privacy regulations until it's too late
-- For digital: storing secrets in frontend code or git repos
-- For physical: no inventory controls or cash handling procedures
-</file>
-
-<file path="prompts/sections/08-design.md">
-# Section: Design & Experience
-
-> **Adapt to the project type.** For software: UI/UX design, responsive strategy.
-> For physical businesses: customer experience, layout, branding.
-
-## What to Capture
-- Design approach or system
-- Key user/customer journeys (the 3-5 most important paths)
-- How the experience adapts to different contexts (devices, locations, situations)
-- Accessibility considerations
-- Brand guidelines (if any)
-
-## Questions to Ask
-
-### For all projects:
-1. What are the 3 most important things a user/customer does? Walk me through each.
-2. Do you have existing brand colors, style, or guidelines?
-3. How important is accessibility? (Legal requirement? Ethical choice? Nice-to-have?)
-4. Are there businesses or products whose look and feel you admire?
-
-### For digital products (add):
-5. Will this be used more on mobile or desktop?
-
-### For physical businesses (add):
-5. What should the space/environment feel like? Walk me through a customer visit.
-
-## Quality Tips
-- Design the journey BEFORE the details. Know where people go before deciding what it looks like.
-- For digital: mobile-first is almost always right.
-- For physical: the first 10 seconds of a customer's visit set expectations — what do they see?
-- Accessibility is not optional — it's both ethical and often legally required.
-- Pick an existing design system or reference rather than designing from scratch.
-- Not testing with real users early is the most common and costly mistake.
-
-## Common Mistakes
-- Too many paths at launch — pick 3 and nail them
-- Ignoring accessibility until "later" (it's 10x harder to add)
-- Designing for the builder's preferences instead of the primary user's context
-- Not considering the design filter: does this work for [primary user] in [their context]?
-- Skipping user/customer testing before committing to a design
-</file>
-
-<file path="prompts/sections/09-budget.md">
-# Section: Budget & Resources
-
-## What to Capture
-- Development effort (person-hours or person-weeks)
-- Infrastructure/operations costs (hosting, rent, equipment, databases, CDN)
-- Third-party/external costs (services, vendors, licenses, subscriptions)
-- Total estimate (one-time + monthly recurring)
-
-## Questions to Ask
-1. Is this a solo project or do you have a team?
-2. What's your monthly budget for running this? ($0? $50? $500?)
-3. Are you doing the development yourself or hiring?
-4. Any paid services you already use or plan to use?
-5. What's the maximum you'd spend before deciding this isn't worth it?
-
-## Quality Tips
-- Always calculate Total Cost of Ownership: development + hosting + services + maintenance.
-- Free tiers exist for almost everything. Start there.
-- Development time IS a cost, even if you're not paying yourself.
-- Plan for the cost of 10x growth — will your costs scale linearly or exponentially?
-- Monitoring and logging are often forgotten costs but critical for production.
-
-## Common Mistakes
-- Not accounting for ongoing maintenance/operations time
-- Forgetting recurring costs (domain renewal, subscriptions, supplies, rent)
-- Choosing "enterprise" tools for a solo project
-- Not setting a budget cap (spend $X/month max, then reassess)
-- Ignoring the cost of your own time
-</file>
-
 <file path="prompts/sections/10-timeline.md">
 # Section: Timeline & Milestones
 
@@ -1218,100 +940,6 @@ The design filter sentence should be quoted verbatim whenever a major decision i
 - Feature creep during development (adding "just one more thing")
 - Not defining what "done" means for each milestone
 - Planning too far ahead — detailed plans for 6+ months out are fiction
-</file>
-
-<file path="prompts/sections/11-risks.md">
-# Section: Risks & Mitigations
-
-## What to Capture
-- For each risk: description, category, impact, likelihood, mitigation strategy
-- Categories: technical, resource, timeline, budget, security, other
-
-## Questions to Ask
-1. What's the biggest thing that could go wrong with this project?
-2. What happens if you can't find users in the first month?
-3. Are there any technical unknowns you're worried about?
-4. What if a key dependency breaks or gets discontinued?
-5. What's your plan if this takes 3x longer than expected?
-
-## Quality Tips
-- Every project has at least 3 risks. If you can't find them, you're not looking hard enough.
-- The biggest risk is usually not technical — it's "nobody wants this." Validate demand early.
-- For each risk, have a concrete mitigation, not just "we'll deal with it."
-- Categorize risks: technical (can we build it?), market (do people want it?), resource (do we have the capacity?).
-- Revisit risks monthly. New ones emerge, old ones get resolved.
-
-## Common Mistakes
-- Only listing technical risks (market and resource risks are usually bigger)
-- Vague mitigations ("we'll be careful" is not a plan)
-- Not having a "kill switch" — at what point do you stop and reassess?
-- Ignoring dependency/vendor risks (what if a key supplier, tool, or service disappears?)
-- Not considering the risk of success (what if you go viral and can't handle load?)
-</file>
-
-<file path="prompts/sections/12-implementation-review.md">
-# Section: Implementation Review
-
-This is the final section before handing off to implementation. The goal: **an implementing team or agent should have zero questions.**
-
-## What This Does
-
-After all planning sections are complete, review the plan from the perspective of someone who has to BUILD or EXECUTE it. Identify and resolve any ambiguity, missing decisions, or gaps that would force the implementer to stop and ask questions.
-
-## Review Checklist
-
-### Decisions That Must Be Made (not left open)
-
-For each of these, the plan must have a SPECIFIC answer, not "either X or Y":
-
-**For all projects:**
-1. **Primary deliverable** — What is the first concrete thing that gets built, launched, or opened?
-2. **Scope boundary** — What's explicitly included in v1 and what's not?
-3. **Key vendor/partner choices** — If the plan mentions alternatives, pick one.
-4. **Budget allocation** — How is the budget split across the major areas?
-5. **Success criteria** — How will you know v1 worked? (Tie to the design filter.)
-
-**For digital products (add these):**
-6. **Exact versions** — Which version of each framework/library?
-7. **File structure** — What does the project look like? List actual files and folders.
-8. **Deployment steps** — Specific commands, not just "deploy to Vercel."
-9. **Build tool config** — Specific settings needed.
-10. **Integration method** — For each dependency: URL reference? npm install? copy files?
-
-**For physical businesses/services (add these):**
-6. **Location specifics** — Exact address or area, lease terms, capacity.
-7. **Supplier choices** — Who provides what, with backup options.
-8. **Staffing plan** — How many people, what roles, hire-by dates.
-9. **Permits and licenses** — What's needed and timeline to obtain.
-10. **Opening day checklist** — What must be ready before the first customer.
-
-### Common Gaps That Cause Questions
-
-These are things planners often leave vague but implementers need concrete:
-
-- "Integrate with X" — HOW? Via what method?
-- "Support both X and Y" — Are these separate things or one thing with options?
-- "Optional feature X" — Who decides if it's included?
-- "Use X for [purpose]" — Include it HOW? What's the setup?
-- "Launch by [date]" — What specifically must be done by that date?
-
-### The Test
-
-Read the plan and ask: **"Could I hand this to a junior team member (or AI agent) and they could start executing without messaging me once?"**
-
-If the answer is no, the plan needs more specifics.
-
-## Questions to Ask the User
-
-1. I've reviewed the plan for implementation readiness. Here are the decisions that are still ambiguous: [list them]. Can we resolve these now?
-2. For [specific integration/vendor/partner], how exactly should the implementer proceed?
-3. The plan mentions [X or Y] — which one should we go with?
-
-## Output
-
-After this review, update the plan JSON with:
-- Any decisions that were resolved
-- A new field in overview: `implementationNotes` (array of strings) — specific instructions for the implementer that don't fit in other sections
 </file>
 
 <file path="prompts/tips/best-practices.md">
@@ -2009,6 +1637,378 @@ clean-all: clean clean-output ## Remove all generated files
 - Setting goals that can't be measured
 - Confusing features with goals ("add dark mode" is a feature, not a goal)
 - Writing success metrics as feelings instead of actions
+</file>
+
+<file path="prompts/sections/03-requirements.md">
+# Section: Requirements
+
+## What to Capture
+- Functional requirements (what the system DOES) with priority: must/should/nice
+- Non-functional requirements (performance, accessibility, reliability)
+- Constraints (budget, timeline, team size, tech limitations)
+- Assumptions (what you're taking for granted)
+
+## Questions to Ask
+1. What are the 3-5 things this MUST do on day one? (Must-haves)
+2. What would make it great but isn't essential for launch? (Should-haves)
+3. Any dream features for the future? (Nice-to-haves)
+4. Are there hard constraints? (Budget, deadline, team size, specific tech required)
+5. What are you assuming about your users? (Internet speed, device, tech skills)
+
+## Quality Tips
+- Use MoSCoW prioritization: Must, Should, Could, Won't
+- Every "must" you add delays launch. Be ruthless about what's truly essential.
+- Non-functional requirements (speed, uptime, accessibility) are often forgotten but critical.
+- Constraints are your friends — they force creative, focused solutions.
+- Assumptions should be stated explicitly so they can be validated.
+
+## Common Mistakes
+- Making everything a "must-have" (if everything is priority 1, nothing is)
+- Forgetting accessibility (it's much harder to add later)
+- Not considering offline or low-connectivity scenarios
+- Assuming users have fast internet, modern devices, or ideal conditions
+- Ignoring the primary user's actual context (device, location, comfort level)
+</file>
+
+<file path="prompts/sections/04-architecture.md">
+# Section: Architecture
+
+> **Adapt to the project type.** For software: system architecture, components, data model.
+> For physical businesses/services/events: operational structure, process flow, key systems.
+
+## What to Capture
+- System or business type (web app, mobile app, physical store, service, event, etc.)
+- Structure or pattern (how the parts fit together)
+- Components (name, description, connections between them)
+- Data or information model (what "things" exist and how they relate)
+- Integration points (external services, suppliers, partners, APIs)
+
+## Questions to Ask
+
+### For digital products:
+1. What type of system is this? (Web app? Mobile? API? CLI?)
+2. Does it need real-time features? (Chat, live updates, collaboration)
+3. What data does it store? What are the main entities?
+4. How do those things relate to each other?
+5. Does it need to integrate with external services?
+
+### For physical businesses/services/events:
+1. What's the structure? (Single location? Multiple? Mobile? Online+offline?)
+2. Walk me through the customer journey from discovery to completion.
+3. What are the key operational processes? (Inventory, scheduling, delivery, etc.)
+4. What information do you need to track? (Customers, orders, inventory, bookings?)
+5. What external partners or suppliers are involved?
+
+## Quality Tips
+- Start simple. A straightforward structure is almost always right for v1.
+- Draw the component/process diagram — if you can't draw it, you don't understand it.
+- Every connection between components is a potential failure point. Minimize them.
+- The data/information model is the foundation. Get this wrong and everything suffers.
+- Consider what happens when things go wrong — where are the bottlenecks?
+
+## Common Mistakes
+- Over-engineering: complex architecture for a simple problem
+- No clear data/information model
+- Forgetting about how state or information flows between parts
+- Not thinking about capacity and peak load
+- Ignoring how components depend on each other
+</file>
+
+<file path="prompts/sections/05-tech-stack.md">
+# Section: Tech Stack & Tools
+
+> **Adapt to the project type.** For software: languages, frameworks, databases.
+> For physical businesses/services: operational tools, equipment, software for running the business.
+
+## What to Capture
+- Key tools and technologies (what you'll build with or run on)
+- Why each choice was made (rationale)
+- Key dependencies and vendors
+- Team familiarity with the choices
+
+## Questions to Ask
+
+### For digital products:
+1. Do you or your team have experience with specific languages/frameworks?
+2. Does this need server-side rendering? (SEO-critical content?)
+3. How complex is the data? (Simple key-value? Complex relationships? Full-text search?)
+4. Do you need real-time capabilities?
+5. What's your budget for infrastructure?
+
+### For physical businesses/services:
+1. What tools do you need to operate? (POS system, scheduling software, equipment?)
+2. Do you already use any software for the business? (Accounting, inventory, booking?)
+3. What equipment or physical resources are required?
+4. Do you need a website, social media presence, or online ordering?
+5. What's your budget for tools and equipment?
+
+## Quality Tips
+- Pick boring, proven choices. Innovation should be in your product, not your tools.
+- Match tools to the team. A perfect choice nobody knows how to use is the wrong choice.
+- Every dependency is a liability. Fewer = less maintenance.
+- Always explain WHY, not just WHAT.
+- Consider vendor lock-in — can you switch if needed?
+
+## Common Mistakes
+- Choosing tools because they're trending, not because they fit
+- Not considering the learning curve for the team
+- Over-relying on third-party services for core functionality
+- Ignoring the long-term maintenance cost of each tool
+- Using complex solutions when simple ones would work
+</file>
+
+<file path="prompts/sections/06-hosting.md">
+# Section: Hosting & Operations
+
+> **Adapt to the project type.** For software: hosting, deployment, CI/CD.
+> For physical businesses: location, distribution, logistics.
+
+## What to Capture
+- Where this operates (hosting platform, physical location, distribution channels)
+- How changes are deployed or rolled out
+- Environments or locations (dev/staging/prod, or pilot/launch locations)
+- Domain, address, or access point
+- Estimated monthly operational cost
+
+## Questions to Ask
+
+### For digital products:
+1. Does this need a server or can it be static? (Huge cost difference)
+2. Do you need staging/preview environments for testing?
+3. What's your expected traffic? (10 users/day? 10,000?)
+4. Do you have a domain name in mind?
+5. How important is uptime?
+
+### For physical businesses/services:
+1. Where will this operate? (Fixed location, mobile, online, hybrid?)
+2. How will customers find and access you?
+3. What's the capacity? (Seats, customers/day, orders/hour?)
+4. Do you need specific permits, licenses, or zoning?
+5. What are the operating hours and staffing needs?
+
+## Quality Tips
+- Start small and scale. Don't over-commit on space, hosting, or capacity.
+- For software: static sites are free and fast — use them when possible.
+- For physical: location determines traffic — research foot traffic, competitors nearby.
+- Always have a way to test changes before they affect real customers.
+- Free tiers exist for many hosting platforms. Start there for digital products.
+
+## Common Mistakes
+- Paying for capacity before you have demand
+- No way to test changes safely (deploying/launching untested)
+- Not considering ongoing operational costs
+- Choosing a complex setup when simple would work
+- Ignoring how customers actually get to you
+</file>
+
+<file path="prompts/sections/07-security.md">
+# Section: Security & Compliance
+
+> **Adapt to the project type.** For software: auth, encryption, API security.
+> For physical businesses: access control, data privacy, payment security, permits.
+
+## What to Capture
+- Authentication/access control (who can access what?)
+- Data protection (what sensitive data exists and how is it protected?)
+- Known security risks and mitigations
+- Compliance requirements (GDPR, PCI-DSS, local regulations, etc.)
+
+## Questions to Ask
+
+### For all projects:
+1. Do users/customers need accounts? If so, how do they identify themselves?
+2. Are there different roles with different permissions?
+3. What sensitive data do you handle? (Personal info, payments, health data?)
+4. Does this need to comply with any regulations?
+
+### For digital products (add):
+5. Are there third-party API keys the app needs to manage securely?
+
+### For physical businesses (add):
+5. How is payment handled? (Cash, card, mobile payments?)
+6. Who has access to the premises, inventory, or cash?
+
+## Quality Tips
+- For digital: don't build your own auth — use a provider.
+- For physical: don't skip payment security — use established payment processors.
+- Principle of least privilege: people should only access what they need.
+- If you handle EU user data, you need GDPR compliance.
+- Every project that handles money or personal data has security requirements — even if simple.
+
+## Common Mistakes
+- Assuming "we're too small for security to matter"
+- Not having a plan for when things go wrong (security incident response)
+- Ignoring data privacy regulations until it's too late
+- For digital: storing secrets in frontend code or git repos
+- For physical: no inventory controls or cash handling procedures
+</file>
+
+<file path="prompts/sections/08-design.md">
+# Section: Design & Experience
+
+> **Adapt to the project type.** For software: UI/UX design, responsive strategy.
+> For physical businesses: customer experience, layout, branding.
+
+## What to Capture
+- Design approach or system
+- Key user/customer journeys (the 3-5 most important paths)
+- How the experience adapts to different contexts (devices, locations, situations)
+- Accessibility considerations
+- Brand guidelines (if any)
+
+## Questions to Ask
+
+### For all projects:
+1. What are the 3 most important things a user/customer does? Walk me through each.
+2. Do you have existing brand colors, style, or guidelines?
+3. How important is accessibility? (Legal requirement? Ethical choice? Nice-to-have?)
+4. Are there businesses or products whose look and feel you admire?
+
+### For digital products (add):
+5. Will this be used more on mobile or desktop?
+
+### For physical businesses (add):
+5. What should the space/environment feel like? Walk me through a customer visit.
+
+## Quality Tips
+- Design the journey BEFORE the details. Know where people go before deciding what it looks like.
+- For digital: mobile-first is almost always right.
+- For physical: the first 10 seconds of a customer's visit set expectations — what do they see?
+- Accessibility is not optional — it's both ethical and often legally required.
+- Pick an existing design system or reference rather than designing from scratch.
+- Not testing with real users early is the most common and costly mistake.
+
+## Common Mistakes
+- Too many paths at launch — pick 3 and nail them
+- Ignoring accessibility until "later" (it's 10x harder to add)
+- Designing for the builder's preferences instead of the primary user's context
+- Not considering the design filter: does this work for [primary user] in [their context]?
+- Skipping user/customer testing before committing to a design
+</file>
+
+<file path="prompts/sections/09-budget.md">
+# Section: Budget & Resources
+
+## What to Capture
+- Development effort (person-hours or person-weeks)
+- Infrastructure/operations costs (hosting, rent, equipment, databases, CDN)
+- Third-party/external costs (services, vendors, licenses, subscriptions)
+- Total estimate (one-time + monthly recurring)
+
+## Questions to Ask
+1. Is this a solo project or do you have a team?
+2. What's your monthly budget for running this? ($0? $50? $500?)
+3. Are you doing the development yourself or hiring?
+4. Any paid services you already use or plan to use?
+5. What's the maximum you'd spend before deciding this isn't worth it?
+
+## Quality Tips
+- Always calculate Total Cost of Ownership: development + hosting + services + maintenance.
+- Free tiers exist for almost everything. Start there.
+- Development time IS a cost, even if you're not paying yourself.
+- Plan for the cost of 10x growth — will your costs scale linearly or exponentially?
+- Monitoring and logging are often forgotten costs but critical for production.
+
+## Common Mistakes
+- Not accounting for ongoing maintenance/operations time
+- Forgetting recurring costs (domain renewal, subscriptions, supplies, rent)
+- Choosing "enterprise" tools for a solo project
+- Not setting a budget cap (spend $X/month max, then reassess)
+- Ignoring the cost of your own time
+</file>
+
+<file path="prompts/sections/11-risks.md">
+# Section: Risks & Mitigations
+
+## What to Capture
+- For each risk: description, category, impact, likelihood, mitigation strategy
+- Categories: technical, resource, timeline, budget, security, other
+
+## Questions to Ask
+1. What's the biggest thing that could go wrong with this project?
+2. What happens if you can't find users in the first month?
+3. Are there any technical unknowns you're worried about?
+4. What if a key dependency breaks or gets discontinued?
+5. What's your plan if this takes 3x longer than expected?
+
+## Quality Tips
+- Every project has at least 3 risks. If you can't find them, you're not looking hard enough.
+- The biggest risk is usually not technical — it's "nobody wants this." Validate demand early.
+- For each risk, have a concrete mitigation, not just "we'll deal with it."
+- Categorize risks: technical (can we build it?), market (do people want it?), resource (do we have the capacity?).
+- Revisit risks monthly. New ones emerge, old ones get resolved.
+
+## Common Mistakes
+- Only listing technical risks (market and resource risks are usually bigger)
+- Vague mitigations ("we'll be careful" is not a plan)
+- Not having a "kill switch" — at what point do you stop and reassess?
+- Ignoring dependency/vendor risks (what if a key supplier, tool, or service disappears?)
+- Not considering the risk of success (what if you go viral and can't handle load?)
+</file>
+
+<file path="prompts/sections/12-implementation-review.md">
+# Section: Implementation Review
+
+This is the final section before handing off to implementation. The goal: **an implementing team or agent should have zero questions.**
+
+## What This Does
+
+After all planning sections are complete, review the plan from the perspective of someone who has to BUILD or EXECUTE it. Identify and resolve any ambiguity, missing decisions, or gaps that would force the implementer to stop and ask questions.
+
+## Review Checklist
+
+### Decisions That Must Be Made (not left open)
+
+For each of these, the plan must have a SPECIFIC answer, not "either X or Y":
+
+**For all projects:**
+1. **Primary deliverable** — What is the first concrete thing that gets built, launched, or opened?
+2. **Scope boundary** — What's explicitly included in v1 and what's not?
+3. **Key vendor/partner choices** — If the plan mentions alternatives, pick one.
+4. **Budget allocation** — How is the budget split across the major areas?
+5. **Success criteria** — How will you know v1 worked? (Tie to the design filter.)
+
+**For digital products (add these):**
+6. **Exact versions** — Which version of each framework/library?
+7. **File structure** — What does the project look like? List actual files and folders.
+8. **Deployment steps** — Specific commands, not just "deploy to Vercel."
+9. **Build tool config** — Specific settings needed.
+10. **Integration method** — For each dependency: URL reference? npm install? copy files?
+
+**For physical businesses/services (add these):**
+6. **Location specifics** — Exact address or area, lease terms, capacity.
+7. **Supplier choices** — Who provides what, with backup options.
+8. **Staffing plan** — How many people, what roles, hire-by dates.
+9. **Permits and licenses** — What's needed and timeline to obtain.
+10. **Opening day checklist** — What must be ready before the first customer.
+
+### Common Gaps That Cause Questions
+
+These are things planners often leave vague but implementers need concrete:
+
+- "Integrate with X" — HOW? Via what method?
+- "Support both X and Y" — Are these separate things or one thing with options?
+- "Optional feature X" — Who decides if it's included?
+- "Use X for [purpose]" — Include it HOW? What's the setup?
+- "Launch by [date]" — What specifically must be done by that date?
+
+### The Test
+
+Read the plan and ask: **"Could I hand this to a junior team member (or AI agent) and they could start executing without messaging me once?"**
+
+If the answer is no, the plan needs more specifics.
+
+## Questions to Ask the User
+
+1. I've reviewed the plan for implementation readiness. Here are the decisions that are still ambiguous: [list them]. Can we resolve these now?
+2. For [specific integration/vendor/partner], how exactly should the implementer proceed?
+3. The plan mentions [X or Y] — which one should we go with?
+
+## Output
+
+After this review, update the plan JSON with:
+- Any decisions that were resolved
+- A new field in overview: `implementationNotes` (array of strings) — specific instructions for the implementer that don't fit in other sections
 </file>
 
 <file path="prompts/tips/quality-checklist.md">
@@ -2733,8 +2733,8 @@ Turn your project idea into a structured, comprehensive plan through AI-guided c
 
 ## What It Does
 
-1. **Describe your idea** in plain language
-2. **Answer questions** as the AI guides you through architecture, tech stack, hosting, security, budget, and more
+1. **Describe your idea** in plain language — software, physical business, service, anything
+2. **Answer questions** as the AI guides you through who it's for, architecture, tech stack, budget, and more
 3. **Get a plan** with interactive diagrams, structured JSON, and exportable Markdown
 
 ## Features
@@ -2743,7 +2743,7 @@ Turn your project idea into a structured, comprehensive plan through AI-guided c
 - **Multi-provider LLM support** — OpenAI, Anthropic (Claude), or any OpenAI-compatible API (Ollama, LM Studio, Groq, etc.)
 - **BYOK (Bring Your Own Key)** — API keys stay in your browser, never sent anywhere except your chosen provider
 - **5 AI Personalities** — Friendly Guide, Researcher, Critical Thinker, Technical Architect, Budget Hawk
-- **Structured plan schema** — 11 sections covering the full scope of a software project
+- **Structured plan schema** — 12 sections covering the full scope of any project (software, physical, service)
 - **Tool-calling loop** — The LLM updates the plan progressively via tool calls with automatic continuation
 
 ### Visualization
@@ -2839,11 +2839,12 @@ think-tank/
 
 ## Plan Schema
 
-The structured output covers 11 sections:
+The structured output covers 12 sections:
 
 | Section | Key Fields |
 |---------|-----------|
-| **Overview** | Name, description, problem statement, goals, non-goals, target users, success metrics |
+| **Foundation** | Primary user (description, device, context, comfort anchor, current solution, first success), design filter |
+| **Overview** | Name, description, problem statement, goals, non-goals, success metrics |
 | **Requirements** | Functional (with priority: must/should/nice), non-functional, constraints, assumptions |
 | **Architecture** | System type, pattern, components (with connections), data model (entities/fields/relationships), API design |
 | **Tech Stack** | Frontend (framework/UI/state), backend (language/framework/runtime), database, infrastructure, rationale |

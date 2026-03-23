@@ -28,8 +28,8 @@ Turn your project idea into a structured, comprehensive plan through AI-guided c
 
 ## What It Does
 
-1. **Describe your idea** in plain language
-2. **Answer questions** as the AI guides you through architecture, tech stack, hosting, security, budget, and more
+1. **Describe your idea** in plain language — software, physical business, service, anything
+2. **Answer questions** as the AI guides you through who it's for, architecture, tech stack, budget, and more
 3. **Get a plan** with interactive diagrams, structured JSON, and exportable Markdown
 
 ## Features
@@ -38,7 +38,7 @@ Turn your project idea into a structured, comprehensive plan through AI-guided c
 - **Multi-provider LLM support** — OpenAI, Anthropic (Claude), or any OpenAI-compatible API (Ollama, LM Studio, Groq, etc.)
 - **BYOK (Bring Your Own Key)** — API keys stay in your browser, never sent anywhere except your chosen provider
 - **5 AI Personalities** — Friendly Guide, Researcher, Critical Thinker, Technical Architect, Budget Hawk
-- **Structured plan schema** — 11 sections covering the full scope of a software project
+- **Structured plan schema** — 12 sections covering the full scope of any project (software, physical, service)
 - **Tool-calling loop** — The LLM updates the plan progressively via tool calls with automatic continuation
 
 ### Visualization
@@ -134,11 +134,12 @@ think-tank/
 
 ## Plan Schema
 
-The structured output covers 11 sections:
+The structured output covers 12 sections:
 
 | Section | Key Fields |
 |---------|-----------|
-| **Overview** | Name, description, problem statement, goals, non-goals, target users, success metrics |
+| **Foundation** | Primary user (description, device, context, comfort anchor, current solution, first success), design filter |
+| **Overview** | Name, description, problem statement, goals, non-goals, success metrics |
 | **Requirements** | Functional (with priority: must/should/nice), non-functional, constraints, assumptions |
 | **Architecture** | System type, pattern, components (with connections), data model (entities/fields/relationships), API design |
 | **Tech Stack** | Frontend (framework/UI/state), backend (language/framework/runtime), database, infrastructure, rationale |
