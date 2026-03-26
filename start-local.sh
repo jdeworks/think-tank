@@ -6,15 +6,13 @@
 #    ./start-local.sh                              # Interactive setup menu
 #    ./start-local.sh --idea "My app idea"         # Start with an idea
 #    ./start-local.sh --personality critical        # Choose personality
-#    ./start-local.sh --mode claude                # Use Claude Code (subscription)
+#    ./start-local.sh --agent claude               # Use Claude Code
+#    ./start-local.sh --agent cursor               # Use Cursor agent
 #    ./start-local.sh --mode api                   # Use Anthropic API directly
 #    ./start-local.sh --load plan.json             # Resume a previous plan
 #    ./start-local.sh --no-menu                    # Skip menu, use .env defaults
 #
-#  Modes:
-#    claude  — Runs via Claude Code CLI (uses your subscription, no API key)
-#    api     — Calls Anthropic API directly (requires ANTHROPIC_API_KEY)
-#
+#  Agents: claude, cursor, codex, aider, custom
 #  Personalities: friendly, researcher, critical, architect, budget
 # ─────────────────────────────────────────────────────────────
 set -euo pipefail
@@ -30,7 +28,9 @@ if [ -f .env ]; then
 fi
 
 # Defaults (env / .env can override)
-MODE="${THINK_TANK_MODE:-claude}"
+MODE="${THINK_TANK_MODE:-agent}"
+AGENT="${THINK_TANK_AGENT:-claude}"
+AGENT_CMD="${THINK_TANK_AGENT_CMD:-}"
 PERSONALITY="${THINK_TANK_PERSONALITY:-friendly}"
 OUTPUT_DIR="${THINK_TANK_OUTPUT:-think-tank-output}"
 MODEL="${THINK_TANK_MODEL:-claude-sonnet-4-6}"
@@ -43,13 +43,15 @@ SHOW_MENU=true
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --mode)        MODE="$2"; shift 2 ;;
+    --agent)       MODE="agent"; AGENT="$2"; shift 2 ;;
+    --agent-cmd)   MODE="agent"; AGENT="custom"; AGENT_CMD="$2"; shift 2 ;;
     --personality) PERSONALITY="$2"; shift 2 ;;
     --idea)        IDEA="$2"; shift 2 ;;
     --load)        LOAD_FILE="$2"; shift 2 ;;
     --model)       MODEL="$2"; shift 2 ;;
     --no-menu)     SHOW_MENU=false; shift ;;
     -h|--help)
-      head -17 "$0" | tail -15
+      sed -n '2,16p' "$0" | sed 's/^# *//'
       exit 0 ;;
     *) echo "Unknown option: $1"; exit 1 ;;
   esac
@@ -74,6 +76,67 @@ if [ ! -d node_modules ]; then
   npm install
 fi
 
+# ── Known agents and their commands ──────────────────────────
+# Each entry: display name, binary name, command template
+# The placeholder {PROMPT} is replaced with the actual prompt.
+
+agent_display_name() {
+  case "$1" in
+    claude) echo "Claude Code" ;;
+    cursor) echo "Cursor (agent mode)" ;;
+    codex)  echo "OpenAI Codex CLI" ;;
+    aider)  echo "Aider" ;;
+    custom) echo "Custom ($AGENT_CMD)" ;;
+    *)      echo "$1" ;;
+  esac
+}
+
+agent_binary() {
+  case "$1" in
+    claude) echo "claude" ;;
+    cursor) echo "cursor" ;;
+    codex)  echo "codex" ;;
+    aider)  echo "aider" ;;
+    custom) echo "${AGENT_CMD%% *}" ;;  # first word of custom command
+    *)      echo "$1" ;;
+  esac
+}
+
+# Build the exec command for a given agent + prompt
+agent_exec() {
+  local agent="$1"
+  local prompt="$2"
+
+  case "$agent" in
+    claude)
+      exec claude -p "$prompt"
+      ;;
+    cursor)
+      exec cursor --agent "$prompt"
+      ;;
+    codex)
+      exec codex "$prompt"
+      ;;
+    aider)
+      exec aider --message "$prompt"
+      ;;
+    custom)
+      if [ -z "$AGENT_CMD" ]; then
+        echo "❌ Custom agent requires THINK_TANK_AGENT_CMD in .env or --agent-cmd flag."
+        echo "   Example: THINK_TANK_AGENT_CMD='my-agent --prompt'"
+        exit 1
+      fi
+      # shellcheck disable=SC2086
+      exec $AGENT_CMD "$prompt"
+      ;;
+    *)
+      echo "❌ Unknown agent: $agent"
+      echo "   Supported: claude, cursor, codex, aider, custom"
+      exit 1
+      ;;
+  esac
+}
+
 # ── Interactive setup menu ───────────────────────────────────
 
 print_header() {
@@ -86,14 +149,45 @@ select_mode() {
   echo ""
   echo "  How do you want to run Think Tank?"
   echo ""
-  echo "    1) claude  — Claude Code CLI (uses your subscription, no API key)"
-  echo "    2) api     — Anthropic API (requires ANTHROPIC_API_KEY)"
+  echo "    1) agent  — Via a coding agent CLI (default)"
+  echo "    2) api    — Anthropic API directly (requires ANTHROPIC_API_KEY)"
   echo ""
   local current="$MODE"
   read -rp "  Choose [1/2] (current: $current): " choice
   case "$choice" in
-    1) MODE="claude" ;;
+    1) MODE="agent" ;;
     2) MODE="api" ;;
+    "") ;; # keep default
+    *) echo "  Using default: $current" ;;
+  esac
+}
+
+select_agent() {
+  if [ "$MODE" != "agent" ]; then return; fi
+  echo ""
+  echo "  Which coding agent do you want to use?"
+  echo ""
+  echo "    1) claude  — Claude Code  (claude -p)"
+  echo "    2) cursor  — Cursor       (cursor --agent)"
+  echo "    3) codex   — Codex CLI    (codex)"
+  echo "    4) aider   — Aider        (aider --message)"
+  echo "    5) custom  — Custom command (set in .env or enter below)"
+  echo ""
+  local current="$AGENT"
+  read -rp "  Choose [1-5] (current: $current): " choice
+  case "$choice" in
+    1) AGENT="claude" ;;
+    2) AGENT="cursor" ;;
+    3) AGENT="codex" ;;
+    4) AGENT="aider" ;;
+    5)
+      AGENT="custom"
+      if [ -z "$AGENT_CMD" ]; then
+        read -rp "  Enter command (e.g. 'my-agent --prompt'): " AGENT_CMD
+      else
+        echo "  Using: $AGENT_CMD"
+      fi
+      ;;
     "") ;; # keep default
     *) echo "  Using default: $current" ;;
   esac
@@ -122,6 +216,26 @@ select_personality() {
   esac
 }
 
+select_model() {
+  if [ "$MODE" != "api" ]; then return; fi
+  echo ""
+  echo "  Choose a model (API mode):"
+  echo ""
+  echo "    1) claude-sonnet-4-6            — Fast, great balance (default)"
+  echo "    2) claude-haiku-4-5-20251001    — Cheapest, good for iteration"
+  echo "    3) claude-opus-4-6              — Most capable, slower + expensive"
+  echo ""
+  local current="$MODEL"
+  read -rp "  Choose [1-3] (current: $current): " choice
+  case "$choice" in
+    1) MODEL="claude-sonnet-4-6" ;;
+    2) MODEL="claude-haiku-4-5-20251001" ;;
+    3) MODEL="claude-opus-4-6" ;;
+    "") ;; # keep default
+    *) echo "  Using default: $current" ;;
+  esac
+}
+
 get_idea() {
   if [ -z "$IDEA" ] && [ -z "$LOAD_FILE" ]; then
     echo ""
@@ -129,33 +243,16 @@ get_idea() {
   fi
 }
 
-select_model() {
-  if [ "$MODE" = "api" ]; then
-    echo ""
-    echo "  Choose a model:"
-    echo ""
-    echo "    1) claude-sonnet-4-6   — Fast, great balance (default)"
-    echo "    2) claude-haiku-4-5-20251001    — Cheapest, good for iteration"
-    echo "    3) claude-opus-4-6     — Most capable, slower + expensive"
-    echo ""
-    local current="$MODEL"
-    read -rp "  Choose [1-3] (current: $current): " choice
-    case "$choice" in
-      1) MODEL="claude-sonnet-4-6" ;;
-      2) MODEL="claude-haiku-4-5-20251001" ;;
-      3) MODEL="claude-opus-4-6" ;;
-      "") ;; # keep default
-      *) echo "  Using default: $current" ;;
-    esac
-  fi
-}
-
 confirm_settings() {
   echo ""
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo "  Mode:        $MODE"
+  if [ "$MODE" = "agent" ]; then
+    echo "  Agent:       $(agent_display_name "$AGENT")"
+  else
+    echo "  Mode:        api"
+    echo "  Model:       $MODEL"
+  fi
   echo "  Personality: $PERSONALITY"
-  [ "$MODE" = "api" ] && echo "  Model:       $MODEL"
   [ -n "$IDEA" ] && echo "  Idea:        ${IDEA:0:50}..."
   [ -n "$LOAD_FILE" ] && echo "  Resume from: $LOAD_FILE"
   echo "  Output:      $OUTPUT_DIR/"
@@ -171,60 +268,72 @@ confirm_settings() {
 if [ "$SHOW_MENU" = true ]; then
   print_header
   select_mode
+  select_agent
   select_personality
   select_model
   get_idea
   confirm_settings
 fi
 
-# ── Validate API mode requirements ───────────────────────────
+# ── Validate requirements ────────────────────────────────────
 
 if [ "$MODE" = "api" ]; then
   if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
     echo ""
     echo "❌ API mode requires ANTHROPIC_API_KEY."
     echo "   Set it in .env or: export ANTHROPIC_API_KEY=sk-ant-..."
-    echo "   Or switch to 'claude' mode to use your subscription."
+    echo "   Or use agent mode instead (no API key needed)."
     exit 1
   fi
 fi
 
-if [ "$MODE" = "claude" ]; then
-  if ! command -v claude &>/dev/null; then
+if [ "$MODE" = "agent" ]; then
+  local_bin=$(agent_binary "$AGENT")
+  if ! command -v "$local_bin" &>/dev/null; then
     echo ""
-    echo "❌ Claude Code CLI not found."
-    echo "   Install it: npm install -g @anthropic-ai/claude-code"
-    echo "   Or switch to 'api' mode."
+    echo "❌ $(agent_display_name "$AGENT") not found (looked for: $local_bin)"
+    case "$AGENT" in
+      claude) echo "   Install: npm install -g @anthropic-ai/claude-code" ;;
+      cursor) echo "   Install Cursor and enable the CLI: https://cursor.com" ;;
+      codex)  echo "   Install: npm install -g @openai/codex" ;;
+      aider)  echo "   Install: pip install aider-chat" ;;
+    esac
     exit 1
   fi
 fi
 
-# ── Launch: Claude Code headless mode ────────────────────────
+# ── Build the planning prompt ────────────────────────────────
 
-if [ "$MODE" = "claude" ]; then
-  # Build the prompt for Claude Code
-  PROMPT="Read the CLAUDE.md file in this project directory and follow its planning instructions."
-  PROMPT+=" Use the '$PERSONALITY' personality from prompts/personalities/$PERSONALITY.md."
+build_prompt() {
+  local prompt="Read the CLAUDE.md file in this project directory and follow its planning instructions."
+  prompt+=" Use the '$PERSONALITY' personality from prompts/personalities/$PERSONALITY.md."
 
   if [ -n "$LOAD_FILE" ]; then
-    PROMPT+=" Resume from the existing plan at '$LOAD_FILE'."
+    prompt+=" Resume from the existing plan at '$LOAD_FILE'."
   elif [ -n "$IDEA" ]; then
-    PROMPT+=" The user's project idea is: \"$IDEA\"."
-    PROMPT+=" Start with the foundation section (who is this for?) and work through all sections interactively."
+    prompt+=" The user's project idea is: \"$IDEA\"."
+    prompt+=" Start with the foundation section (who is this for?) and work through all sections interactively."
   else
-    PROMPT+=" Ask the user for their project idea, then start with the foundation section."
+    prompt+=" Ask the user for their project idea, then start with the foundation section."
   fi
 
-  PROMPT+=" Save all outputs (plan.json, plan.md, diagrams) to the $OUTPUT_DIR/ directory."
+  prompt+=" Save all outputs (plan.json, plan.md, diagrams) to the $OUTPUT_DIR/ directory."
+  echo "$prompt"
+}
+
+# ── Launch: Agent mode ───────────────────────────────────────
+
+if [ "$MODE" = "agent" ]; then
+  PROMPT=$(build_prompt)
 
   echo ""
-  echo "🧠 Launching Think Tank via Claude Code..."
+  echo "🧠 Launching Think Tank via $(agent_display_name "$AGENT")..."
   echo ""
 
-  exec claude -p "$PROMPT"
+  agent_exec "$AGENT" "$PROMPT"
 fi
 
-# ── Launch: API mode (existing CLI) ──────────────────────────
+# ── Launch: API mode (Node CLI) ──────────────────────────────
 
 export ANTHROPIC_API_KEY
 export THINK_TANK_MODEL="$MODEL"
