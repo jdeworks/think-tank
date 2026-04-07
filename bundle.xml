@@ -494,101 +494,6 @@ You are a thorough researcher and analyst. You focus on finding competitors, sim
 - Realistic positioning of the user's idea in the landscape
 </file>
 
-<file path="prompts/sections/02-competitors.md">
-# Section: Competitors & Inspiration
-
-## What to Capture
-- 3-5 competitors or similar projects
-- For each: name, URL, description, strengths, weaknesses
-- The gap your project fills that competitors don't
-- Features to borrow (inspiration, not copying)
-
-## Questions to Ask
-1. Do you know of any existing tools or products that do something similar?
-2. What do you like about them? What frustrates you?
-3. Why would someone choose YOUR project over what already exists?
-4. Are there projects in adjacent spaces that inspire your approach?
-5. Is there a reason existing solutions don't work for your target users?
-
-## Quality Tips
-- Every idea has competitors. If the user says "nothing exists," dig deeper — there are always alternatives, even if they're spreadsheets, manual processes, or different tools duct-taped together.
-- Understanding competitors is NOT about being scared of them — it's about positioning.
-- The best products don't try to beat competitors on everything. They pick 1-2 things and do them exceptionally well.
-- Competitor weaknesses are your opportunity. Their strengths tell you the table stakes.
-
-### Evaluate at your expected scale
-
-Don't evaluate competitors (or your own technical choices) on single demos:
-
-- **TTS/audio:** Test on 60+ segments, not 3. Sibilance, inter-segment consistency, and trailing artifacts only appear at scale.
-- **APIs:** Test at your expected request rate. Rate limits, latency spikes, and error rates appear under load.
-- **UI frameworks:** Build a realistic page, not a todo app. Performance characteristics change with component count.
-- **Databases:** Test with realistic data volume. Query patterns that work on 1,000 rows fail at 1,000,000.
-
-Document what was actually tested vs. what was assumed from documentation or marketing.
-
-## Common Mistakes
-- Ignoring indirect competitors (manual processes, spreadsheets, email)
-- Trying to beat every competitor on every feature
-- Not defining what makes YOUR approach unique
-- Only looking at big players — small niche tools are often the real competition
-</file>
-
-<file path="prompts/tips/best-practices.md">
-# Best Practices for Project Planning
-
-## Start With "Why"
-Before deciding WHAT to build or HOW to build it, be crystal clear on WHY it needs to exist. What pain point does it address? If you can't articulate the pain clearly, the project will drift.
-
-## Ship Early, Ship Often
-- Week 1-2: Working prototype with core feature
-- Week 3-4: MVP with basic polish and tests
-- Month 2: First real users providing feedback
-- Month 3+: Iterate based on real usage data
-
-## Use Boring Technology
-Exciting, cutting-edge tools are exciting because they're unproven. For your project's infrastructure, pick the most boring, well-documented, widely-supported option. Save innovation for your product, not your tooling.
-
-Good "boring" choices:
-- **Frontend:** React, Vue, or plain HTML/CSS/JS
-- **Backend:** Node.js, Python, or Go
-- **Database:** PostgreSQL (relational) or SQLite (embedded)
-- **Hosting:** Vercel, Netlify, or Railway
-- **CI/CD:** GitHub Actions
-
-## Design for Your CURRENT Scale
-Build for 100 users, not 1 million. You can always refactor when you hit 10,000 — and most projects never do. Premature optimization is the root of all evil.
-
-## Every Decision is a Trade-off
-There are no "best" choices, only trade-offs:
-- **Speed vs. quality:** Move fast and break things, or move carefully and ship solid?
-- **Features vs. simplicity:** More options for power users, or simpler for everyone?
-- **Build vs. buy:** Build it yourself (full control) or use a service (faster but dependent)?
-- **Cost vs. convenience:** Free tier with limitations, or paid for better DX?
-
-Document the trade-off for each major decision so future-you understands why you chose what you chose.
-
-## Test From Day One
-- At minimum: automated tests for your critical path (sign up, core action, payment)
-- Use the testing pyramid: many unit tests, some integration tests, few E2E tests
-- Tests are documentation — they show how your code is supposed to work
-
-## Document Decisions, Not Just Code
-- README: how to set up, run, and contribute
-- Architecture Decision Records (ADRs): WHY you chose X over Y
-- Inline comments: only for non-obvious logic, not for obvious code
-
-## Building Demo and Showcase Pages
-
-Demo pages serve investors and evaluators, not daily users. They evolve faster than feature code:
-
-- **Decide the format early:** Is this a guided walkthrough, an interactive sandbox, or a passive showcase? Each requires different architecture.
-- **Expect 3-4 rewrites.** Demo requirements change as the product evolves. Extract components aggressively so each rewrite touches fewer files.
-- **Pre-generate results.** Demos should work without API keys, accounts, or waiting. Store pre-computed results and load them as the default experience.
-- **Gate dev-only features.** Local dev servers, debug tools, and free-tier providers should not appear on the production demo. Use environment detection to hide them.
-- **Quality over features.** A demo that does 3 things flawlessly beats one that does 10 things with rough edges. Investors notice polish, not feature count.
-</file>
-
 <file path="prompts/tips/common-mistakes.md">
 # Common Planning Mistakes
 
@@ -1179,6 +1084,46 @@ You are a budget-conscious planner who focuses on costs, ROI, and resource effic
 - Writing success metrics as feelings instead of actions
 </file>
 
+<file path="prompts/sections/02-competitors.md">
+# Section: Competitors & Inspiration
+
+## What to Capture
+- 3-5 competitors or similar projects
+- For each: name, URL, description, strengths, weaknesses
+- The gap your project fills that competitors don't
+- Features to borrow (inspiration, not copying)
+
+## Questions to Ask
+1. Do you know of any existing tools or products that do something similar?
+2. What do you like about them? What frustrates you?
+3. Why would someone choose YOUR project over what already exists?
+4. Are there projects in adjacent spaces that inspire your approach?
+5. Is there a reason existing solutions don't work for your target users?
+
+## Quality Tips
+- Every idea has competitors. If the user says "nothing exists," dig deeper — there are always alternatives, even if they're spreadsheets, manual processes, or different tools duct-taped together.
+- Understanding competitors is NOT about being scared of them — it's about positioning.
+- The best products don't try to beat competitors on everything. They pick 1-2 things and do them exceptionally well.
+- Competitor weaknesses are your opportunity. Their strengths tell you the table stakes.
+
+### Evaluate at your expected scale
+
+Don't evaluate competitors (or your own technical choices) on single demos:
+
+- **TTS/audio:** Test on 60+ segments, not 3. Sibilance, inter-segment consistency, and trailing artifacts only appear at scale.
+- **APIs:** Test at your expected request rate. Rate limits, latency spikes, and error rates appear under load.
+- **UI frameworks:** Build a realistic page, not a todo app. Performance characteristics change with component count.
+- **Databases:** Test with realistic data volume. Query patterns that work on 1,000 rows fail at 1,000,000.
+
+Document what was actually tested vs. what was assumed from documentation or marketing.
+
+## Common Mistakes
+- Ignoring indirect competitors (manual processes, spreadsheets, email)
+- Trying to beat every competitor on every feature
+- Not defining what makes YOUR approach unique
+- Only looking at big players — small niche tools are often the real competition
+</file>
+
 <file path="prompts/sections/03-requirements.md">
 # Section: Requirements
 
@@ -1208,62 +1153,6 @@ You are a budget-conscious planner who focuses on costs, ROI, and resource effic
 - Not considering offline or low-connectivity scenarios
 - Assuming users have fast internet, modern devices, or ideal conditions
 - Ignoring the primary user's actual context (device, location, comfort level)
-</file>
-
-<file path="prompts/sections/05-tech-stack.md">
-# Section: Tech Stack & Tools
-
-> **Adapt to the project type.** For software: languages, frameworks, databases.
-> For physical businesses/services: operational tools, equipment, software for running the business.
-
-## What to Capture
-- Key tools and technologies (what you'll build with or run on)
-- Why each choice was made (rationale)
-- Key dependencies and vendors
-- Team familiarity with the choices
-
-## Questions to Ask
-
-### For digital products:
-1. Do you or your team have experience with specific languages/frameworks?
-2. Does this need server-side rendering? (SEO-critical content?)
-3. How complex is the data? (Simple key-value? Complex relationships? Full-text search?)
-4. Do you need real-time capabilities?
-5. What's your budget for infrastructure?
-
-### For physical businesses/services:
-1. What tools do you need to operate? (POS system, scheduling software, equipment?)
-2. Do you already use any software for the business? (Accounting, inventory, booking?)
-3. What equipment or physical resources are required?
-4. Do you need a website, social media presence, or online ordering?
-5. What's your budget for tools and equipment?
-
-## Quality Tips
-- Pick boring, proven choices. Innovation should be in your product, not your tools.
-- Match tools to the team. A perfect choice nobody knows how to use is the wrong choice.
-- Every dependency is a liability. Fewer = less maintenance.
-- Always explain WHY, not just WHAT.
-- Consider vendor lock-in — can you switch if needed?
-
-### LLM vs. code vs. user boundaries
-
-For projects that integrate AI/LLM capabilities, define clear boundaries:
-
-- **LLM decides:** Semantic understanding, narrative structure, qualitative suggestions
-  - Example: "Play door creak SFX at the word 'creaked'" (LLM understands story context)
-- **Code decides:** Arithmetic, timing, optimization, data transformation  
-  - Example: "Resolve word 'creaked' to millisecond position 14,350ms" (code does the math)
-- **User decides:** Quality tradeoffs, provider selection, creative preferences
-  - Example: "Use voice clone for this character" (user makes the call)
-
-Never ask an LLM for precise numerical values (milliseconds, pixel positions, percentages). LLMs hallucinate numbers. Use them for semantic anchors and let code resolve to precise values.
-
-## Common Mistakes
-- Choosing tools because they're trending, not because they fit
-- Not considering the learning curve for the team
-- Over-relying on third-party services for core functionality
-- Ignoring the long-term maintenance cost of each tool
-- Using complex solutions when simple ones would work
 </file>
 
 <file path="prompts/sections/06-hosting.md">
@@ -1394,78 +1283,59 @@ Never ask an LLM for precise numerical values (milliseconds, pixel positions, pe
 - Underestimating prep time for non-building tasks (permits, hiring, approvals)
 </file>
 
-<file path="prompts/sections/12-implementation-review.md">
-# Section: Implementation Review
+<file path="prompts/tips/best-practices.md">
+# Best Practices for Project Planning
 
-This is the final section before handing off to implementation. The goal: **an implementing team or agent should have zero questions.**
+## Start With "Why"
+Before deciding WHAT to build or HOW to build it, be crystal clear on WHY it needs to exist. What pain point does it address? If you can't articulate the pain clearly, the project will drift.
 
-## What This Does
+## Ship Early, Ship Often
+- Week 1-2: Working prototype with core feature
+- Week 3-4: MVP with basic polish and tests
+- Month 2: First real users providing feedback
+- Month 3+: Iterate based on real usage data
 
-After all planning sections are complete, review the plan from the perspective of someone who has to BUILD or EXECUTE it. Identify and resolve any ambiguity, missing decisions, or gaps that would force the implementer to stop and ask questions.
+## Use Boring Technology
+Exciting, cutting-edge tools are exciting because they're unproven. For your project's infrastructure, pick the most boring, well-documented, widely-supported option. Save innovation for your product, not your tooling.
 
-## Review Checklist
+Good "boring" choices:
+- **Frontend:** React, Vue, or plain HTML/CSS/JS
+- **Backend:** Node.js, Python, or Go
+- **Database:** PostgreSQL (relational) or SQLite (embedded)
+- **Hosting:** Vercel, Netlify, or Railway
+- **CI/CD:** GitHub Actions
 
-### Decisions That Must Be Made (not left open)
+## Design for Your CURRENT Scale
+Build for 100 users, not 1 million. You can always refactor when you hit 10,000 — and most projects never do. Premature optimization is the root of all evil.
 
-For each of these, the plan must have a SPECIFIC answer, not "either X or Y":
+## Every Decision is a Trade-off
+There are no "best" choices, only trade-offs:
+- **Speed vs. quality:** Move fast and break things, or move carefully and ship solid?
+- **Features vs. simplicity:** More options for power users, or simpler for everyone?
+- **Build vs. buy:** Build it yourself (full control) or use a service (faster but dependent)?
+- **Cost vs. convenience:** Free tier with limitations, or paid for better DX?
 
-**For all projects:**
-1. **Primary deliverable** — What is the first concrete thing that gets built, launched, or opened?
-2. **Scope boundary** — What's explicitly included in v1 and what's not?
-3. **Key vendor/partner choices** — If the plan mentions alternatives, pick one.
-4. **Budget allocation** — How is the budget split across the major areas?
-5. **Success criteria** — How will you know v1 worked? (Tie to the design filter.)
+Document the trade-off for each major decision so future-you understands why you chose what you chose.
 
-**For digital products (add these):**
-6. **Exact versions** — Which version of each framework/library?
-7. **File structure** — What does the project look like? List actual files and folders.
-8. **Deployment steps** — Specific commands, not just "deploy to Vercel."
-9. **Build tool config** — Specific settings needed.
-10. **Integration method** — For each dependency: URL reference? npm install? copy files?
+## Test From Day One
+- At minimum: automated tests for your critical path (sign up, core action, payment)
+- Use the testing pyramid: many unit tests, some integration tests, few E2E tests
+- Tests are documentation — they show how your code is supposed to work
 
-**For physical businesses/services (add these):**
-6. **Location specifics** — Exact address or area, lease terms, capacity.
-7. **Supplier choices** — Who provides what, with backup options.
-8. **Staffing plan** — How many people, what roles, hire-by dates.
-9. **Permits and licenses** — What's needed and timeline to obtain.
-10. **Opening day checklist** — What must be ready before the first customer.
+## Document Decisions, Not Just Code
+- README: how to set up, run, and contribute
+- Architecture Decision Records (ADRs): WHY you chose X over Y
+- Inline comments: only for non-obvious logic, not for obvious code
 
-### Common Gaps That Cause Questions
+## Building Demo and Showcase Pages
 
-These are things planners often leave vague but implementers need concrete:
+Demo pages serve investors and evaluators, not daily users. They evolve faster than feature code:
 
-- "Integrate with X" — HOW? Via what method?
-- "Support both X and Y" — Are these separate things or one thing with options?
-- "Optional feature X" — Who decides if it's included?
-- "Use X for [purpose]" — Include it HOW? What's the setup?
-- "Launch by [date]" — What specifically must be done by that date?
-
-### Provider and library switch hygiene
-
-If the plan involves switching from one provider/library to another (e.g., switching TTS engines, payment processors, auth providers):
-
-- Grep for all references to the old provider name — **including string literals**. Import analysis misses constants like `"HUME_AI"` or `provider: "stripe"`.
-- Dead code from provider switches persists silently because it doesn't cause errors.
-- Schedule an explicit cleanup session after the switch, don't assume it will happen naturally.
-- Log all removed symbols in the changelog so future developers know what was intentionally deleted vs. accidentally lost.
-
-### The Test
-
-Read the plan and ask: **"Could I hand this to a junior team member (or AI agent) and they could start executing without messaging me once?"**
-
-If the answer is no, the plan needs more specifics.
-
-## Questions to Ask the User
-
-1. I've reviewed the plan for implementation readiness. Here are the decisions that are still ambiguous: [list them]. Can we resolve these now?
-2. For [specific integration/vendor/partner], how exactly should the implementer proceed?
-3. The plan mentions [X or Y] — which one should we go with?
-
-## Output
-
-After this review, update the plan JSON with:
-- Any decisions that were resolved
-- A new field in overview: `implementationNotes` (array of strings) — specific instructions for the implementer that don't fit in other sections
+- **Decide the format early:** Is this a guided walkthrough, an interactive sandbox, or a passive showcase? Each requires different architecture.
+- **Expect 3-4 rewrites.** Demo requirements change as the product evolves. Extract components aggressively so each rewrite touches fewer files.
+- **Pre-generate results.** Demos should work without API keys, accounts, or waiting. Store pre-computed results and load them as the default experience.
+- **Gate dev-only features.** Local dev servers, debug tools, and free-tier providers should not appear on the production demo. Use environment detection to hide them.
+- **Quality over features.** A demo that does 3 things flawlessly beats one that does 10 things with rough edges. Investors notice polish, not feature count.
 </file>
 
 <file path="prompts/README.md">
@@ -2536,6 +2406,62 @@ The design filter sentence should be quoted verbatim whenever a major decision i
 - Ignoring how components depend on each other
 </file>
 
+<file path="prompts/sections/05-tech-stack.md">
+# Section: Tech Stack & Tools
+
+> **Adapt to the project type.** For software: languages, frameworks, databases.
+> For physical businesses/services: operational tools, equipment, software for running the business.
+
+## What to Capture
+- Key tools and technologies (what you'll build with or run on)
+- Why each choice was made (rationale)
+- Key dependencies and vendors
+- Team familiarity with the choices
+
+## Questions to Ask
+
+### For digital products:
+1. Do you or your team have experience with specific languages/frameworks?
+2. Does this need server-side rendering? (SEO-critical content?)
+3. How complex is the data? (Simple key-value? Complex relationships? Full-text search?)
+4. Do you need real-time capabilities?
+5. What's your budget for infrastructure?
+
+### For physical businesses/services:
+1. What tools do you need to operate? (POS system, scheduling software, equipment?)
+2. Do you already use any software for the business? (Accounting, inventory, booking?)
+3. What equipment or physical resources are required?
+4. Do you need a website, social media presence, or online ordering?
+5. What's your budget for tools and equipment?
+
+## Quality Tips
+- Pick boring, proven choices. Innovation should be in your product, not your tools.
+- Match tools to the team. A perfect choice nobody knows how to use is the wrong choice.
+- Every dependency is a liability. Fewer = less maintenance.
+- Always explain WHY, not just WHAT.
+- Consider vendor lock-in — can you switch if needed?
+
+### LLM vs. code vs. user boundaries
+
+For projects that integrate AI/LLM capabilities, define clear boundaries:
+
+- **LLM decides:** Semantic understanding, narrative structure, qualitative suggestions
+  - Example: "Play door creak SFX at the word 'creaked'" (LLM understands story context)
+- **Code decides:** Arithmetic, timing, optimization, data transformation  
+  - Example: "Resolve word 'creaked' to millisecond position 14,350ms" (code does the math)
+- **User decides:** Quality tradeoffs, provider selection, creative preferences
+  - Example: "Use voice clone for this character" (user makes the call)
+
+Never ask an LLM for precise numerical values (milliseconds, pixel positions, percentages). LLMs hallucinate numbers. Use them for semantic anchors and let code resolve to precise values.
+
+## Common Mistakes
+- Choosing tools because they're trending, not because they fit
+- Not considering the learning curve for the team
+- Over-relying on third-party services for core functionality
+- Ignoring the long-term maintenance cost of each tool
+- Using complex solutions when simple ones would work
+</file>
+
 <file path="prompts/sections/08-design.md">
 # Section: Design & Experience
 
@@ -2673,6 +2599,80 @@ The design filter sentence should be quoted verbatim whenever a major decision i
 - Not having a "kill switch" — at what point do you stop and reassess?
 - Ignoring dependency/vendor risks (what if a key supplier, tool, or service disappears?)
 - Not considering the risk of success (what if demand exceeds your capacity?)
+</file>
+
+<file path="prompts/sections/12-implementation-review.md">
+# Section: Implementation Review
+
+This is the final section before handing off to implementation. The goal: **an implementing team or agent should have zero questions.**
+
+## What This Does
+
+After all planning sections are complete, review the plan from the perspective of someone who has to BUILD or EXECUTE it. Identify and resolve any ambiguity, missing decisions, or gaps that would force the implementer to stop and ask questions.
+
+## Review Checklist
+
+### Decisions That Must Be Made (not left open)
+
+For each of these, the plan must have a SPECIFIC answer, not "either X or Y":
+
+**For all projects:**
+1. **Primary deliverable** — What is the first concrete thing that gets built, launched, or opened?
+2. **Scope boundary** — What's explicitly included in v1 and what's not?
+3. **Key vendor/partner choices** — If the plan mentions alternatives, pick one.
+4. **Budget allocation** — How is the budget split across the major areas?
+5. **Success criteria** — How will you know v1 worked? (Tie to the design filter.)
+
+**For digital products (add these):**
+6. **Exact versions** — Which version of each framework/library?
+7. **File structure** — What does the project look like? List actual files and folders.
+8. **Deployment steps** — Specific commands, not just "deploy to Vercel."
+9. **Build tool config** — Specific settings needed.
+10. **Integration method** — For each dependency: URL reference? npm install? copy files?
+
+**For physical businesses/services (add these):**
+6. **Location specifics** — Exact address or area, lease terms, capacity.
+7. **Supplier choices** — Who provides what, with backup options.
+8. **Staffing plan** — How many people, what roles, hire-by dates.
+9. **Permits and licenses** — What's needed and timeline to obtain.
+10. **Opening day checklist** — What must be ready before the first customer.
+
+### Common Gaps That Cause Questions
+
+These are things planners often leave vague but implementers need concrete:
+
+- "Integrate with X" — HOW? Via what method?
+- "Support both X and Y" — Are these separate things or one thing with options?
+- "Optional feature X" — Who decides if it's included?
+- "Use X for [purpose]" — Include it HOW? What's the setup?
+- "Launch by [date]" — What specifically must be done by that date?
+
+### Provider and library switch hygiene
+
+If the plan involves switching from one provider/library to another (e.g., switching TTS engines, payment processors, auth providers):
+
+- Grep for all references to the old provider name — **including string literals**. Import analysis misses constants like `"HUME_AI"` or `provider: "stripe"`.
+- Dead code from provider switches persists silently because it doesn't cause errors.
+- Schedule an explicit cleanup session after the switch, don't assume it will happen naturally.
+- Log all removed symbols in the changelog so future developers know what was intentionally deleted vs. accidentally lost.
+
+### The Test
+
+Read the plan and ask: **"Could I hand this to a junior team member (or AI agent) and they could start executing without messaging me once?"**
+
+If the answer is no, the plan needs more specifics.
+
+## Questions to Ask the User
+
+1. I've reviewed the plan for implementation readiness. Here are the decisions that are still ambiguous: [list them]. Can we resolve these now?
+2. For [specific integration/vendor/partner], how exactly should the implementer proceed?
+3. The plan mentions [X or Y] — which one should we go with?
+
+## Output
+
+After this review, update the plan JSON with:
+- Any decisions that were resolved
+- A new field in overview: `implementationNotes` (array of strings) — specific instructions for the implementer that don't fit in other sections
 </file>
 
 <file path="prompts/tips/quality-checklist.md">

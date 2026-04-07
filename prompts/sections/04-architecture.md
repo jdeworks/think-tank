@@ -34,6 +34,13 @@
 4. What information do you need to track? (Customers, orders, inventory, bookings?)
 5. What external partners or suppliers are involved?
 
+### For games and real-time applications:
+1. How will you handle variable frame rates? (Fixed timestep? Delta-time? What about integer rounding in timers/cooldowns?)
+2. Does it need multiplayer or networking? (Local co-op? P2P? Server-authoritative? How many concurrent players?)
+3. What's the state architecture? (ECS? Scene graph? State machines for game modes?)
+4. How will you separate game logic from rendering? (Can game rules run without a canvas?)
+5. What's the expected codebase size? (LOC budget? Extraction strategy when files grow?)
+
 ## Quality Tips
 - Start simple. A straightforward structure is almost always right for v1.
 - Draw the component/process diagram — if you can't draw it, you don't understand it.

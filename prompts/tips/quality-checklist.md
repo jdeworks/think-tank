@@ -28,6 +28,7 @@ until foundation is complete.
 - [ ] Hosting/operations has a cost estimate (even if $0)
 - [ ] Security/compliance has been addressed (even if minimal — say so explicitly)
 - [ ] At least 3 risks identified with concrete mitigations
+- [ ] For software: codebase complexity is anticipated (LOC estimate, file count, growth areas)
 - [ ] Timeline has phases with specific deliverables
 
 ## Clarity
