@@ -2347,65 +2347,6 @@ Non-goals should exclude things requiring more than the primary user has.
 The design filter sentence should be quoted verbatim whenever a major decision is being evaluated.
 </file>
 
-<file path="prompts/sections/04-architecture.md">
-# Section: Architecture
-
-> **Adapt to the project type.** For web/mobile apps: system architecture, components, data model.
-> For developer tools/CLIs/APIs: command structure, plugin model, distribution, integration points.
-> For physical businesses/services/events: operational structure, process flow, key systems.
-
-## What to Capture
-- System or business type (web app, mobile app, physical store, service, event, etc.)
-- Structure or pattern (how the parts fit together)
-- Components (name, description, connections between them)
-- Data or information model (what "things" exist and how they relate)
-- Integration points (external services, suppliers, partners, APIs)
-
-## Questions to Ask
-
-### For web/mobile apps:
-1. What type of system is this? (Web app? Mobile? PWA? Hybrid?)
-2. Does it need real-time features? (Chat, live updates, collaboration)
-3. What data does it store? What are the main entities?
-4. How do those things relate to each other?
-5. Does it need to integrate with external services?
-
-### For developer tools, CLIs, and APIs:
-1. What's the command/endpoint structure? (Subcommands? REST resources? GraphQL schema?)
-2. How is it distributed? (npm global? Homebrew? Docker? Binary download? API hosted where?)
-3. Does it need local state or config between runs? (Config files? Cache? Database?)
-4. Does it support plugins or extensions?
-5. What existing tools or APIs does it integrate with?
-
-### For physical businesses/services/events:
-1. What's the structure? (Single location? Multiple? Mobile? Online+offline?)
-2. Walk me through the customer journey from discovery to completion.
-3. What are the key operational processes? (Inventory, scheduling, delivery, etc.)
-4. What information do you need to track? (Customers, orders, inventory, bookings?)
-5. What external partners or suppliers are involved?
-
-### For games and real-time applications:
-1. How will you handle variable frame rates? (Fixed timestep? Delta-time? What about integer rounding in timers/cooldowns?)
-2. Does it need multiplayer or networking? (Local co-op? P2P? Server-authoritative? How many concurrent players?)
-3. What's the state architecture? (ECS? Scene graph? State machines for game modes?)
-4. How will you separate game logic from rendering? (Can game rules run without a canvas?)
-5. What's the expected codebase size? (LOC budget? Extraction strategy when files grow?)
-
-## Quality Tips
-- Start simple. A straightforward structure is almost always right for v1.
-- Draw the component/process diagram — if you can't draw it, you don't understand it.
-- Every connection between components is a potential failure point. Minimize them.
-- The data/information model is the foundation. Get this wrong and everything suffers.
-- Consider what happens when things go wrong — where are the bottlenecks?
-
-## Common Mistakes
-- Over-engineering: complex architecture for a simple problem
-- No clear data/information model
-- Forgetting about how state or information flows between parts
-- Not thinking about capacity and peak load
-- Ignoring how components depend on each other
-</file>
-
 <file path="prompts/sections/05-tech-stack.md">
 # Section: Tech Stack & Tools
 
@@ -2673,68 +2614,6 @@ If the answer is no, the plan needs more specifics.
 After this review, update the plan JSON with:
 - Any decisions that were resolved
 - A new field in overview: `implementationNotes` (array of strings) — specific instructions for the implementer that don't fit in other sections
-</file>
-
-<file path="prompts/tips/quality-checklist.md">
-# Quality Checklist
-
-Use this to verify a plan is complete and high-quality before finalizing.
-
-## Gate 0 — Foundation Completeness
-### This gate runs FIRST. All other checks are blocked until this passes.
-
-- [ ] **Primary user description** is a specific person or role scenario
-      (NOT a demographic category like "developers" or "small businesses")
-- [ ] **Device/context** is specified (not "any device" or unspecified)
-- [ ] **Comfort level** is anchored to a named tool, app, or process
-      (NOT abstract labels like "non-technical" or "tech-savvy")
-- [ ] **First success** is a concrete observable action (NOT a feeling)
-- [ ] **Design filter sentence** is present:
-      "If [person], [context], cannot [action] without help, [consequence]."
-
-If ANY of the above fail, report ONLY the foundation gap. Do not review other sections
-until foundation is complete.
-
-## Completeness
-- [ ] All planning sections have meaningful content (not just filler)
-- [ ] Implementation review has been done
-- [ ] Overview has specific goals AND non-goals
-- [ ] At least 3 competitors or alternatives analyzed with strengths AND weaknesses
-- [ ] Requirements are prioritized (must/should/nice)
-- [ ] Architecture/structure has components or processes with connections
-- [ ] Key tool/technology choices each have a rationale (WHY, not just WHAT)
-- [ ] Hosting/operations has a cost estimate (even if $0)
-- [ ] Security/compliance has been addressed (even if minimal — say so explicitly)
-- [ ] At least 3 risks identified with concrete mitigations
-- [ ] For software: codebase complexity is anticipated (LOC estimate, file count, growth areas)
-- [ ] Timeline has phases with specific deliverables
-
-## Clarity
-- [ ] A non-technical person could read the overview and understand the project
-- [ ] No unexplained jargon or acronyms
-- [ ] Goals are measurable (numbers or observable outcomes, not feelings)
-- [ ] "Done" is defined for each milestone
-
-## Realism
-- [ ] Timeline accounts for the team size, availability, and external dependencies
-- [ ] Budget includes ALL costs (setup + ongoing operations + your time)
-- [ ] First version scope is genuinely minimal (could be ready in weeks, not months)
-- [ ] Risks include non-technical ones (market, resource, legal, logistics)
-
-## Actionability
-- [ ] Someone could start building/executing from this plan tomorrow
-- [ ] First task of Phase 1 is clear and specific
-- [ ] Key choices are concrete (specific tools/vendors/partners, not vague categories)
-- [ ] Information model is defined enough to start tracking data
-
-## Implementation Readiness
-- [ ] The design filter sentence is actionable — every decision can be tested against it
-- [ ] The primary user's device/context is unambiguous
-- [ ] The primary user's first success action is testable
-- [ ] Every "X or Y" choice has been resolved to a single answer
-- [ ] For digital products: exact versions, file structure, build/deploy commands specified
-- [ ] For physical projects: location specifics, supplier choices, permits, opening checklist
-- [ ] Test: "Could someone implement this with zero follow-up questions?"
 </file>
 
 <file path="src/components/chat/MessageBubble.tsx">
@@ -3063,6 +2942,127 @@ function applyPlanUpdate(plan: ProjectPlan, section: string, data: Record<string
 function savePlan(plan: ProjectPlan, outputDir: string)
 ⋮----
 // ── Run ───────────────────────────────────────────────────────────────
+</file>
+
+<file path="prompts/sections/04-architecture.md">
+# Section: Architecture
+
+> **Adapt to the project type.** For web/mobile apps: system architecture, components, data model.
+> For developer tools/CLIs/APIs: command structure, plugin model, distribution, integration points.
+> For physical businesses/services/events: operational structure, process flow, key systems.
+
+## What to Capture
+- System or business type (web app, mobile app, physical store, service, event, etc.)
+- Structure or pattern (how the parts fit together)
+- Components (name, description, connections between them)
+- Data or information model (what "things" exist and how they relate)
+- Integration points (external services, suppliers, partners, APIs)
+
+## Questions to Ask
+
+### For web/mobile apps:
+1. What type of system is this? (Web app? Mobile? PWA? Hybrid?)
+2. Does it need real-time features? (Chat, live updates, collaboration)
+3. What data does it store? What are the main entities?
+4. How do those things relate to each other?
+5. Does it need to integrate with external services?
+
+### For developer tools, CLIs, and APIs:
+1. What's the command/endpoint structure? (Subcommands? REST resources? GraphQL schema?)
+2. How is it distributed? (npm global? Homebrew? Docker? Binary download? API hosted where?)
+3. Does it need local state or config between runs? (Config files? Cache? Database?)
+4. Does it support plugins or extensions?
+5. What existing tools or APIs does it integrate with?
+
+### For physical businesses/services/events:
+1. What's the structure? (Single location? Multiple? Mobile? Online+offline?)
+2. Walk me through the customer journey from discovery to completion.
+3. What are the key operational processes? (Inventory, scheduling, delivery, etc.)
+4. What information do you need to track? (Customers, orders, inventory, bookings?)
+5. What external partners or suppliers are involved?
+
+### For games and real-time applications:
+1. How will you handle variable frame rates? (Fixed timestep? Delta-time? What about integer rounding in timers/cooldowns?)
+2. Does it need multiplayer or networking? (Local co-op? P2P? Server-authoritative? How many concurrent players?)
+3. What's the state architecture? (ECS? Scene graph? State machines for game modes?)
+4. How will you separate game logic from rendering? (Can game rules run without a canvas?)
+5. What's the expected codebase size? (LOC budget? Extraction strategy when files grow?)
+
+## Quality Tips
+- Start simple. A straightforward structure is almost always right for v1.
+- Draw the component/process diagram — if you can't draw it, you don't understand it.
+- Every connection between components is a potential failure point. Minimize them.
+- The data/information model is the foundation. Get this wrong and everything suffers.
+- Consider what happens when things go wrong — where are the bottlenecks?
+
+## Common Mistakes
+- Over-engineering: complex architecture for a simple problem
+- No clear data/information model
+- Forgetting about how state or information flows between parts
+- Not thinking about capacity and peak load
+- Ignoring how components depend on each other
+</file>
+
+<file path="prompts/tips/quality-checklist.md">
+# Quality Checklist
+
+Use this to verify a plan is complete and high-quality before finalizing.
+
+## Gate 0 — Foundation Completeness
+### This gate runs FIRST. All other checks are blocked until this passes.
+
+- [ ] **Primary user description** is a specific person or role scenario
+      (NOT a demographic category like "developers" or "small businesses")
+- [ ] **Device/context** is specified (not "any device" or unspecified)
+- [ ] **Comfort level** is anchored to a named tool, app, or process
+      (NOT abstract labels like "non-technical" or "tech-savvy")
+- [ ] **First success** is a concrete observable action (NOT a feeling)
+- [ ] **Design filter sentence** is present:
+      "If [person], [context], cannot [action] without help, [consequence]."
+
+If ANY of the above fail, report ONLY the foundation gap. Do not review other sections
+until foundation is complete.
+
+## Completeness
+- [ ] All planning sections have meaningful content (not just filler)
+- [ ] Implementation review has been done
+- [ ] Overview has specific goals AND non-goals
+- [ ] At least 3 competitors or alternatives analyzed with strengths AND weaknesses
+- [ ] Requirements are prioritized (must/should/nice)
+- [ ] Architecture/structure has components or processes with connections
+- [ ] Key tool/technology choices each have a rationale (WHY, not just WHAT)
+- [ ] Hosting/operations has a cost estimate (even if $0)
+- [ ] Security/compliance has been addressed (even if minimal — say so explicitly)
+- [ ] At least 3 risks identified with concrete mitigations
+- [ ] For software: codebase complexity is anticipated (LOC estimate, file count, growth areas)
+- [ ] Timeline has phases with specific deliverables
+
+## Clarity
+- [ ] A non-technical person could read the overview and understand the project
+- [ ] No unexplained jargon or acronyms
+- [ ] Goals are measurable (numbers or observable outcomes, not feelings)
+- [ ] "Done" is defined for each milestone
+
+## Realism
+- [ ] Timeline accounts for the team size, availability, and external dependencies
+- [ ] Budget includes ALL costs (setup + ongoing operations + your time)
+- [ ] First version scope is genuinely minimal (could be ready in weeks, not months)
+- [ ] Risks include non-technical ones (market, resource, legal, logistics)
+
+## Actionability
+- [ ] Someone could start building/executing from this plan tomorrow
+- [ ] First task of Phase 1 is clear and specific
+- [ ] Key choices are concrete (specific tools/vendors/partners, not vague categories)
+- [ ] Information model is defined enough to start tracking data
+
+## Implementation Readiness
+- [ ] The design filter sentence is actionable — every decision can be tested against it
+- [ ] The primary user's device/context is unambiguous
+- [ ] The primary user's first success action is testable
+- [ ] Every "X or Y" choice has been resolved to a single answer
+- [ ] For digital products: exact versions, file structure, build/deploy commands specified
+- [ ] For physical projects: location specifics, supplier choices, permits, opening checklist
+- [ ] Test: "Could someone implement this with zero follow-up questions?"
 </file>
 
 <file path="src/components/chat/ChatPanel.tsx">
