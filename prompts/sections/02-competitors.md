@@ -19,6 +19,17 @@
 - The best products don't try to beat competitors on everything. They pick 1-2 things and do them exceptionally well.
 - Competitor weaknesses are your opportunity. Their strengths tell you the table stakes.
 
+### Evaluate at your expected scale
+
+Don't evaluate competitors (or your own technical choices) on single demos:
+
+- **TTS/audio:** Test on 60+ segments, not 3. Sibilance, inter-segment consistency, and trailing artifacts only appear at scale.
+- **APIs:** Test at your expected request rate. Rate limits, latency spikes, and error rates appear under load.
+- **UI frameworks:** Build a realistic page, not a todo app. Performance characteristics change with component count.
+- **Databases:** Test with realistic data volume. Query patterns that work on 1,000 rows fail at 1,000,000.
+
+Document what was actually tested vs. what was assumed from documentation or marketing.
+
 ## Common Mistakes
 - Ignoring indirect competitors (manual processes, spreadsheets, email)
 - Trying to beat every competitor on every feature

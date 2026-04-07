@@ -43,6 +43,15 @@ These are things planners often leave vague but implementers need concrete:
 - "Use X for [purpose]" — Include it HOW? What's the setup?
 - "Launch by [date]" — What specifically must be done by that date?
 
+### Provider and library switch hygiene
+
+If the plan involves switching from one provider/library to another (e.g., switching TTS engines, payment processors, auth providers):
+
+- Grep for all references to the old provider name — **including string literals**. Import analysis misses constants like `"HUME_AI"` or `provider: "stripe"`.
+- Dead code from provider switches persists silently because it doesn't cause errors.
+- Schedule an explicit cleanup session after the switch, don't assume it will happen naturally.
+- Log all removed symbols in the changelog so future developers know what was intentionally deleted vs. accidentally lost.
+
 ### The Test
 
 Read the plan and ask: **"Could I hand this to a junior team member (or AI agent) and they could start executing without messaging me once?"**

@@ -32,6 +32,19 @@
 - Always explain WHY, not just WHAT.
 - Consider vendor lock-in — can you switch if needed?
 
+### LLM vs. code vs. user boundaries
+
+For projects that integrate AI/LLM capabilities, define clear boundaries:
+
+- **LLM decides:** Semantic understanding, narrative structure, qualitative suggestions
+  - Example: "Play door creak SFX at the word 'creaked'" (LLM understands story context)
+- **Code decides:** Arithmetic, timing, optimization, data transformation  
+  - Example: "Resolve word 'creaked' to millisecond position 14,350ms" (code does the math)
+- **User decides:** Quality tradeoffs, provider selection, creative preferences
+  - Example: "Use voice clone for this character" (user makes the call)
+
+Never ask an LLM for precise numerical values (milliseconds, pixel positions, percentages). LLMs hallucinate numbers. Use them for semantic anchors and let code resolve to precise values.
+
 ## Common Mistakes
 - Choosing tools because they're trending, not because they fit
 - Not considering the learning curve for the team

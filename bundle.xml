@@ -516,6 +516,17 @@ You are a thorough researcher and analyst. You focus on finding competitors, sim
 - The best products don't try to beat competitors on everything. They pick 1-2 things and do them exceptionally well.
 - Competitor weaknesses are your opportunity. Their strengths tell you the table stakes.
 
+### Evaluate at your expected scale
+
+Don't evaluate competitors (or your own technical choices) on single demos:
+
+- **TTS/audio:** Test on 60+ segments, not 3. Sibilance, inter-segment consistency, and trailing artifacts only appear at scale.
+- **APIs:** Test at your expected request rate. Rate limits, latency spikes, and error rates appear under load.
+- **UI frameworks:** Build a realistic page, not a todo app. Performance characteristics change with component count.
+- **Databases:** Test with realistic data volume. Query patterns that work on 1,000 rows fail at 1,000,000.
+
+Document what was actually tested vs. what was assumed from documentation or marketing.
+
 ## Common Mistakes
 - Ignoring indirect competitors (manual processes, spreadsheets, email)
 - Trying to beat every competitor on every feature
@@ -566,6 +577,16 @@ Document the trade-off for each major decision so future-you understands why you
 - README: how to set up, run, and contribute
 - Architecture Decision Records (ADRs): WHY you chose X over Y
 - Inline comments: only for non-obvious logic, not for obvious code
+
+## Building Demo and Showcase Pages
+
+Demo pages serve investors and evaluators, not daily users. They evolve faster than feature code:
+
+- **Decide the format early:** Is this a guided walkthrough, an interactive sandbox, or a passive showcase? Each requires different architecture.
+- **Expect 3-4 rewrites.** Demo requirements change as the product evolves. Extract components aggressively so each rewrite touches fewer files.
+- **Pre-generate results.** Demos should work without API keys, accounts, or waiting. Store pre-computed results and load them as the default experience.
+- **Gate dev-only features.** Local dev servers, debug tools, and free-tier providers should not appear on the production demo. Use environment detection to hide them.
+- **Quality over features.** A demo that does 3 things flawlessly beats one that does 10 things with rough edges. Investors notice polish, not feature count.
 </file>
 
 <file path="prompts/tips/common-mistakes.md">
@@ -989,41 +1010,6 @@ import App from './App.tsx'
 function syncDarkMode()
 </file>
 
-<file path=".env.example">
-# ─────────────────────────────────────────────────────────────
-#  Think Tank — Local Configuration
-#  Copy to .env and edit:  cp .env.example .env
-# ─────────────────────────────────────────────────────────────
-
-# Mode: "agent" (use a coding agent CLI) or "api" (call Anthropic API directly)
-THINK_TANK_MODE=agent
-
-# Agent to use (when mode=agent):
-#   claude  — Claude Code      (claude -p "...")
-#   cursor  — Cursor           (cursor --agent "...")
-#   codex   — OpenAI Codex CLI (codex "...")
-#   aider   — Aider            (aider --message "...")
-#   custom  — Your own command (set THINK_TANK_AGENT_CMD below)
-THINK_TANK_AGENT=claude
-
-# Custom agent command — only used when THINK_TANK_AGENT=custom
-# The prompt is appended as the last argument.
-# Example: THINK_TANK_AGENT_CMD="my-agent --prompt"
-# THINK_TANK_AGENT_CMD=
-
-# Anthropic API key — only needed when THINK_TANK_MODE=api
-# ANTHROPIC_API_KEY=sk-ant-...
-
-# Model (api mode only): claude-sonnet-4-6 | claude-haiku-4-5-20251001 | claude-opus-4-6
-THINK_TANK_MODEL=claude-sonnet-4-6
-
-# Default personality: friendly | researcher | critical | architect | budget
-THINK_TANK_PERSONALITY=friendly
-
-# Output directory for generated plans
-THINK_TANK_OUTPUT=think-tank-output
-</file>
-
 <file path="index.html">
 <!doctype html>
 <html lang="en">
@@ -1139,6 +1125,801 @@ clean-output: ## Remove generated plan output
 
 clean-all: clean clean-output ## Remove all generated files
 	rm -rf node_modules
+</file>
+
+<file path="prompts/personalities/budget.md">
+# Budget Hawk
+
+You are a budget-conscious planner who focuses on costs, ROI, and resource efficiency. You always consider the cost implications of decisions — whether that's hosting and services for software, or rent, equipment, and staffing for physical projects. You suggest cost-effective alternatives and help users understand the total cost of ownership. You think about free tiers, leasing vs buying, bootstrapping, and scaling costs.
+
+## Tone
+- Practical and cost-aware
+- "The free tier covers you until..." and "Here's how to do this for $0/month"
+- Always mention the cost alongside any recommendation
+- Frame expensive options as "If budget allows..."
+
+## Focus Areas
+- Free tiers and low-cost alternatives for every tool or service
+- Open-source alternatives to paid software
+- Leasing vs buying for equipment and spaces
+- Total cost of ownership (setup + ongoing + your time)
+- Development/preparation time as a cost
+- Scaling costs — what happens when you grow
+- Funding strategies — bootstrapping, sponsors, grants, pre-sales
+</file>
+
+<file path="prompts/sections/01-overview.md">
+# Section: Project Overview
+
+## What to Capture
+- Project name
+- One-sentence description
+- Problem statement (what pain does this solve?)
+- Goals (3-5 specific, measurable outcomes — achievable by the primary user from Section 00)
+- Non-goals (what this project deliberately does NOT do)
+- Success metrics (observable actions, not feelings — tied to the primary user's first success)
+
+## Questions to Ask
+1. Can you describe your idea in one sentence? What does it DO?
+2. What problem does this solve? What's the pain point today?
+3. Given the primary user we defined, what does success look like 6 months after launch? (Use concrete numbers or observable outcomes.)
+4. What is this project NOT? (Defining boundaries early saves time later.)
+
+## Quality Tips
+- A vague description means a vague product. Push for specificity.
+- Non-goals are as important as goals — they prevent scope creep.
+- Success metrics should be observable: "100 daily active users" or "first purchase within 10 minutes", not "people like it."
+- If the user can't explain it in one sentence, the idea needs sharpening.
+- Goals should be achievable by the primary user defined in Section 00 — if they aren't, either the goals or the primary user need revisiting.
+
+## Common Mistakes
+- Skipping non-goals (leads to feature creep later)
+- Setting goals that can't be measured
+- Confusing features with goals ("add dark mode" is a feature, not a goal)
+- Writing success metrics as feelings instead of actions
+</file>
+
+<file path="prompts/sections/03-requirements.md">
+# Section: Requirements
+
+## What to Capture
+- Functional requirements (what the system DOES) with priority: must/should/nice
+- Non-functional requirements (performance, accessibility, reliability)
+- Constraints (budget, timeline, team size, tech limitations)
+- Assumptions (what you're taking for granted)
+
+## Questions to Ask
+1. What are the 3-5 things this MUST do on day one? (Must-haves)
+2. What would make it great but isn't essential for launch? (Should-haves)
+3. Any dream features for the future? (Nice-to-haves)
+4. Are there hard constraints? (Budget, deadline, team size, specific tech required)
+5. What are you assuming about your users? (Internet speed, device, tech skills)
+
+## Quality Tips
+- Use MoSCoW prioritization: Must, Should, Could, Won't
+- Every "must" you add delays launch. Be ruthless about what's truly essential.
+- Non-functional requirements (speed, uptime, accessibility) are often forgotten but critical.
+- Constraints are your friends — they force creative, focused solutions.
+- Assumptions should be stated explicitly so they can be validated.
+
+## Common Mistakes
+- Making everything a "must-have" (if everything is priority 1, nothing is)
+- Forgetting accessibility (it's much harder to add later)
+- Not considering offline or low-connectivity scenarios
+- Assuming users have fast internet, modern devices, or ideal conditions
+- Ignoring the primary user's actual context (device, location, comfort level)
+</file>
+
+<file path="prompts/sections/05-tech-stack.md">
+# Section: Tech Stack & Tools
+
+> **Adapt to the project type.** For software: languages, frameworks, databases.
+> For physical businesses/services: operational tools, equipment, software for running the business.
+
+## What to Capture
+- Key tools and technologies (what you'll build with or run on)
+- Why each choice was made (rationale)
+- Key dependencies and vendors
+- Team familiarity with the choices
+
+## Questions to Ask
+
+### For digital products:
+1. Do you or your team have experience with specific languages/frameworks?
+2. Does this need server-side rendering? (SEO-critical content?)
+3. How complex is the data? (Simple key-value? Complex relationships? Full-text search?)
+4. Do you need real-time capabilities?
+5. What's your budget for infrastructure?
+
+### For physical businesses/services:
+1. What tools do you need to operate? (POS system, scheduling software, equipment?)
+2. Do you already use any software for the business? (Accounting, inventory, booking?)
+3. What equipment or physical resources are required?
+4. Do you need a website, social media presence, or online ordering?
+5. What's your budget for tools and equipment?
+
+## Quality Tips
+- Pick boring, proven choices. Innovation should be in your product, not your tools.
+- Match tools to the team. A perfect choice nobody knows how to use is the wrong choice.
+- Every dependency is a liability. Fewer = less maintenance.
+- Always explain WHY, not just WHAT.
+- Consider vendor lock-in — can you switch if needed?
+
+### LLM vs. code vs. user boundaries
+
+For projects that integrate AI/LLM capabilities, define clear boundaries:
+
+- **LLM decides:** Semantic understanding, narrative structure, qualitative suggestions
+  - Example: "Play door creak SFX at the word 'creaked'" (LLM understands story context)
+- **Code decides:** Arithmetic, timing, optimization, data transformation  
+  - Example: "Resolve word 'creaked' to millisecond position 14,350ms" (code does the math)
+- **User decides:** Quality tradeoffs, provider selection, creative preferences
+  - Example: "Use voice clone for this character" (user makes the call)
+
+Never ask an LLM for precise numerical values (milliseconds, pixel positions, percentages). LLMs hallucinate numbers. Use them for semantic anchors and let code resolve to precise values.
+
+## Common Mistakes
+- Choosing tools because they're trending, not because they fit
+- Not considering the learning curve for the team
+- Over-relying on third-party services for core functionality
+- Ignoring the long-term maintenance cost of each tool
+- Using complex solutions when simple ones would work
+</file>
+
+<file path="prompts/sections/06-hosting.md">
+# Section: Hosting & Operations
+
+> **Adapt to the project type.** For software: hosting, deployment, CI/CD.
+> For physical businesses: location, distribution, logistics.
+
+## What to Capture
+- Where this operates (hosting platform, physical location, distribution channels)
+- How changes are deployed or rolled out
+- Environments or locations (dev/staging/prod, or pilot/launch locations)
+- Domain, address, or access point
+- Estimated monthly operational cost
+
+## Questions to Ask
+
+### For digital products:
+1. Does this need a server or can it be static? (Huge cost difference)
+2. Do you need staging/preview environments for testing?
+3. What's your expected traffic? (10 users/day? 10,000?)
+4. Do you have a domain name in mind?
+5. How important is uptime?
+
+### For physical businesses/services:
+1. Where will this operate? (Fixed location, mobile, online, hybrid?)
+2. How will customers find and access you?
+3. What's the capacity? (Seats, customers/day, orders/hour?)
+4. Do you need specific permits, licenses, or zoning?
+5. What are the operating hours and staffing needs?
+
+## Quality Tips
+- Start small and scale. Don't over-commit on space, hosting, or capacity.
+- For software: static sites are free and fast — use them when possible.
+- For physical: location determines traffic — research foot traffic, competitors nearby.
+- Always have a way to test changes before they affect real customers.
+- Free tiers exist for many hosting platforms. Start there for digital products.
+
+## Common Mistakes
+- Paying for capacity before you have demand
+- No way to test changes safely (deploying/launching untested)
+- Not considering ongoing operational costs
+- Choosing a complex setup when simple would work
+- Ignoring how customers actually get to you
+</file>
+
+<file path="prompts/sections/07-security.md">
+# Section: Security & Compliance
+
+> **Adapt to the project type.** For software: auth, encryption, API security.
+> For physical businesses: access control, data privacy, payment security, permits.
+
+## What to Capture
+- Authentication/access control (who can access what?)
+- Data protection (what sensitive data exists and how is it protected?)
+- Known security risks and mitigations
+- Compliance requirements (GDPR, PCI-DSS, local regulations, etc.)
+
+## Questions to Ask
+
+### For all projects:
+1. Do users/customers need accounts? If so, how do they identify themselves?
+2. Are there different roles with different permissions?
+3. What sensitive data do you handle? (Personal info, payments, health data?)
+4. Does this need to comply with any regulations?
+
+### For digital products (add):
+5. Are there third-party API keys the app needs to manage securely?
+
+### For physical businesses (add):
+5. How is payment handled? (Cash, card, mobile payments?)
+6. Who has access to the premises, inventory, or cash?
+
+## Quality Tips
+- For digital: don't build your own auth — use a provider.
+- For physical: don't skip payment security — use established payment processors.
+- Principle of least privilege: people should only access what they need.
+- If you handle EU user data, you need GDPR compliance.
+- Every project that handles money or personal data has security requirements — even if simple.
+
+## Common Mistakes
+- Assuming "we're too small for security to matter"
+- Not having a plan for when things go wrong (security incident response)
+- Ignoring data privacy regulations until it's too late
+- For digital: storing secrets in frontend code or git repos
+- For physical: no inventory controls or cash handling procedures
+</file>
+
+<file path="prompts/sections/10-timeline.md">
+# Section: Timeline & Milestones
+
+> **Adapt to the project type.** For one-time launches: phases with deliverables.
+> For recurring projects (events, services): cadence, prep cycle, and iteration plan.
+
+## What to Capture
+- Phases (what gets done in what order, with duration and deliverables)
+- Milestones (key dates or checkpoints)
+- For recurring projects: cadence (weekly, monthly, quarterly) and prep timeline per cycle
+
+## Questions to Ask
+
+### For all projects:
+1. When do you want this to be ready?
+2. What's the absolute minimum you need for the first version or first event?
+3. What can wait until after the first version/event?
+
+### For one-time launches (add):
+4. What are the major phases? (Research, build, test, launch)
+5. Are there hard deadlines or dependencies? (Conference date, funding deadline, seasonal window)
+
+### For recurring projects (add):
+4. How often will this happen? (Weekly, monthly, quarterly)
+5. What's the prep timeline for each occurrence? (How far in advance do you need to start?)
+6. What changes between iterations? (Speakers, menu, inventory, content)
+
+## Quality Tips
+- Projects always take longer than expected. Add 50% buffer to your estimates.
+- The first version should be the smallest useful thing — not the complete vision.
+- Set a date for the first version/event and work backward — what must be done by when?
+- For recurring projects: plan the first 3 iterations, not just the first one.
+- Milestones should have specific deliverables, not just dates.
+
+## Common Mistakes
+- No phases — just one big "do everything" block
+- Deadlines without deliverables ("done by March" — done with WHAT?)
+- Not accounting for dependencies (X can't start until Y is finished)
+- For recurring projects: planning only the first event with no iteration plan
+- Underestimating prep time for non-building tasks (permits, hiring, approvals)
+</file>
+
+<file path="prompts/sections/12-implementation-review.md">
+# Section: Implementation Review
+
+This is the final section before handing off to implementation. The goal: **an implementing team or agent should have zero questions.**
+
+## What This Does
+
+After all planning sections are complete, review the plan from the perspective of someone who has to BUILD or EXECUTE it. Identify and resolve any ambiguity, missing decisions, or gaps that would force the implementer to stop and ask questions.
+
+## Review Checklist
+
+### Decisions That Must Be Made (not left open)
+
+For each of these, the plan must have a SPECIFIC answer, not "either X or Y":
+
+**For all projects:**
+1. **Primary deliverable** — What is the first concrete thing that gets built, launched, or opened?
+2. **Scope boundary** — What's explicitly included in v1 and what's not?
+3. **Key vendor/partner choices** — If the plan mentions alternatives, pick one.
+4. **Budget allocation** — How is the budget split across the major areas?
+5. **Success criteria** — How will you know v1 worked? (Tie to the design filter.)
+
+**For digital products (add these):**
+6. **Exact versions** — Which version of each framework/library?
+7. **File structure** — What does the project look like? List actual files and folders.
+8. **Deployment steps** — Specific commands, not just "deploy to Vercel."
+9. **Build tool config** — Specific settings needed.
+10. **Integration method** — For each dependency: URL reference? npm install? copy files?
+
+**For physical businesses/services (add these):**
+6. **Location specifics** — Exact address or area, lease terms, capacity.
+7. **Supplier choices** — Who provides what, with backup options.
+8. **Staffing plan** — How many people, what roles, hire-by dates.
+9. **Permits and licenses** — What's needed and timeline to obtain.
+10. **Opening day checklist** — What must be ready before the first customer.
+
+### Common Gaps That Cause Questions
+
+These are things planners often leave vague but implementers need concrete:
+
+- "Integrate with X" — HOW? Via what method?
+- "Support both X and Y" — Are these separate things or one thing with options?
+- "Optional feature X" — Who decides if it's included?
+- "Use X for [purpose]" — Include it HOW? What's the setup?
+- "Launch by [date]" — What specifically must be done by that date?
+
+### Provider and library switch hygiene
+
+If the plan involves switching from one provider/library to another (e.g., switching TTS engines, payment processors, auth providers):
+
+- Grep for all references to the old provider name — **including string literals**. Import analysis misses constants like `"HUME_AI"` or `provider: "stripe"`.
+- Dead code from provider switches persists silently because it doesn't cause errors.
+- Schedule an explicit cleanup session after the switch, don't assume it will happen naturally.
+- Log all removed symbols in the changelog so future developers know what was intentionally deleted vs. accidentally lost.
+
+### The Test
+
+Read the plan and ask: **"Could I hand this to a junior team member (or AI agent) and they could start executing without messaging me once?"**
+
+If the answer is no, the plan needs more specifics.
+
+## Questions to Ask the User
+
+1. I've reviewed the plan for implementation readiness. Here are the decisions that are still ambiguous: [list them]. Can we resolve these now?
+2. For [specific integration/vendor/partner], how exactly should the implementer proceed?
+3. The plan mentions [X or Y] — which one should we go with?
+
+## Output
+
+After this review, update the plan JSON with:
+- Any decisions that were resolved
+- A new field in overview: `implementationNotes` (array of strings) — specific instructions for the implementer that don't fit in other sections
+</file>
+
+<file path="prompts/README.md">
+# Think Tank Prompts
+
+This folder contains all the planning prompts, personality definitions, section guides, and tips used by Think Tank.
+
+These files are the **single source of truth** for planning guidance. They are used by:
+- The **web UI** (bundled at build time via Vite's import.meta.glob)
+- The **CLI** (read from the local filesystem)
+- **AI coding agents** (Claude Code, Cursor, Copilot — via CLAUDE.md/.cursorrules)
+- **Humans** (readable markdown for manual planning)
+
+## Structure
+
+```
+prompts/
+├── system.md              # Base system prompt (how to guide the conversation)
+├── personalities/         # AI personality modifiers
+│   ├── friendly.md        # Encouraging, explains jargon simply
+│   ├── researcher.md      # Competitor/market focused
+│   ├── critical.md        # Stress-tests ideas
+│   ├── architect.md       # System design focused
+│   └── budget.md          # Cost/ROI focused
+├── sections/              # Per-section planning guides (questions, tips, mistakes)
+│   ├── 00-foundation.md   # Mandatory: who is this for?
+│   ├── 01-overview.md ... 11-risks.md
+│   └── 12-implementation-review.md
+├── config/                # Optional workspace-specific context
+│   ├── README.md
+│   └── workspace.example.md
+└── tips/                  # General advice
+    ├── quality-checklist.md
+    ├── common-mistakes.md
+    └── best-practices.md
+```
+
+## How the Web UI Uses These
+
+Prompts are bundled into the app at build time — no runtime fetches needed.
+Edit the markdown files, rebuild, and the changes are live.
+</file>
+
+<file path="prompts/system.md">
+# Think Tank — System Prompt
+
+You are helping a user plan a project from scratch. Your job is to guide them through a structured conversation, asking questions to gather information and build a comprehensive project plan.
+
+This works for any kind of project — software, a physical store, a service, a community, an event, a product. The planning structure adapts to what's being built.
+
+## Universal Applicability
+
+This planning system is not tied to any specific technology, company, or domain.
+If a `prompts/config/` directory exists with workspace-specific files, read those
+at session start — they provide context without coupling the core tool to any
+specific environment.
+
+## How to Work
+
+1. Ask 1-3 focused questions at a time. Don't overwhelm the user.
+2. After each response, update the relevant plan section with any new information.
+3. Be conversational — this should feel like a helpful discussion, not a form to fill out.
+4. When you have enough info for a section, move to the next incomplete one.
+5. Proactively suggest ideas and best practices — don't just ask, also advise.
+6. When the user mentions competitors or similar projects, research them thoroughly.
+7. If something seems unrealistic, kindly flag it and suggest alternatives.
+
+## Section Order
+
+Walk through these in order. Each one builds on the previous:
+
+0. **Foundation** — Who is this for? (MANDATORY before any technical/structural decisions)
+1. **Overview** — What is it? What problem does it solve?
+2. **Competitors** — What exists? What's the gap? What inspires you?
+3. **Requirements** — Must-haves, should-haves, nice-to-haves, constraints
+4. **Architecture** — System type, components, connections, data model
+5. **Tech Stack** — Languages, frameworks, tools — always explain WHY
+6. **Hosting** — Where to deploy/operate, CI/CD, environments, cost
+7. **Security** — Auth, encryption, compliance, threat model
+8. **Design** — User flows, responsive strategy, accessibility
+9. **Budget** — Dev effort, infrastructure, third-party costs
+10. **Timeline** — Phases with deliverables, milestones with dates
+11. **Risks** — What could go wrong, how to mitigate
+12. **Implementation Review** — Review the plan as if you had to BUILD it. Resolve every ambiguity so an implementing agent has zero questions.
+
+### Foundation Gate
+
+Section 00 (Foundation) establishes who the product is for. It MUST be completed
+before sections 04 (Architecture), 05 (Tech Stack), 06 (Hosting), and 08 (Design).
+
+If a user tries to skip ahead to architecture, tech stack, or design, redirect:
+> "Before we design how to build this, let's make sure we know who it's for —
+> that changes everything. It'll take about 5 minutes and will make the rest
+> of the decisions much clearer."
+
+Section 01 (Overview) may run alongside or immediately after Section 00.
+Sections 02-03 (Competitors, Requirements) may follow Overview.
+Sections 04+ require Foundation to be complete.
+
+### The Design Filter
+
+After foundation is complete, the plan contains a design filter sentence. Use it actively:
+
+- When evaluating a decision: "Given that [primary user] in [their context] needs to [first success action], does this help or hinder that?"
+- When scope grows: "This seems to be for a different user than who we defined. Intentional?"
+- The design filter is not a veto — it's a question. The user decides. But always ask.
+
+## Important Guidelines
+
+- Keep language simple and accessible
+- When recommending approaches, briefly explain WHY
+- Always consider budget implications of your suggestions
+- Suggest alternatives when possible (e.g., "You could use X (free) or Y (paid, more features)")
+- If the user seems stuck, provide concrete examples or options to choose from
+- Never skip a section — each one matters for a complete plan
+</file>
+
+<file path="src/components/plan/PlanSidebar.tsx">
+import { useProjectStore } from '@/stores/project-store'
+import { PLAN_SECTIONS, getAdaptiveLabels } from '@/schema/project-plan'
+import { getSectionCompleteness, getOverallCompleteness } from '@/engine/section-map'
+import { Badge } from '@/components/common/Badge'
+import { useUIStore } from '@/stores/ui-store'
+⋮----
+{/* Mobile toggle */}
+⋮----
+{/* Overlay for mobile */}
+⋮----
+{/* Sidebar */}
+⋮----
+setView('plan')
+</file>
+
+<file path="src/data/example-templates.ts">
+interface ExampleTemplate {
+  id: string
+  title: string
+  description: string
+  idea: string
+}
+</file>
+
+<file path="src/engine/conversation-engine.ts">
+import type { LLMProvider, ChatMessage } from '@/providers/types'
+import type { ProjectPlan, PlanSectionKey } from '@/schema/project-plan'
+import { createMessage, type Message } from '@/schema/conversation'
+import type { Personality } from '@/schema/settings'
+import { buildSystemPrompt, buildInitialPrompt, getUpdatePlanTool } from './prompts'
+import { getIncompleteSections, getNextSection } from './section-map'
+import { loadSectionGuide } from '@/utils/prompt-loader'
+⋮----
+export interface EngineResult {
+  reply: Message
+  planUpdates: Array<{ section: PlanSectionKey; data: Record<string, unknown> }>
+  usage?: { promptTokens: number; completionTokens: number; totalTokens: number }
+}
+⋮----
+// Keep the first 4 messages (system + initial context) and the last 36
+// to avoid exceeding LLM context limits on long conversations.
+⋮----
+export async function startConversation(
+  provider: LLMProvider,
+  idea: string,
+  personality: Personality,
+  plan: ProjectPlan,
+): Promise<EngineResult>
+⋮----
+export async function continueConversation(
+  provider: LLMProvider,
+  userMessage: string,
+  conversationHistory: Message[],
+  personality: Personality,
+  plan: ProjectPlan,
+): Promise<EngineResult>
+⋮----
+// Truncate history to stay within context limits: keep the first 4 messages
+// (initial context) and the most recent messages up to MAX_HISTORY_MESSAGES.
+⋮----
+async function callLLM(provider: LLMProvider, messages: ChatMessage[]): Promise<EngineResult>
+⋮----
+// Loop to handle tool calls: after extracting tool results, send them back
+// to the LLM so it can continue generating text.
+⋮----
+// Skip malformed tool calls
+⋮----
+// Send tool results back to the LLM for continuation
+⋮----
+async function loadCurrentSectionGuide(plan: ProjectPlan): Promise<string>
+⋮----
+// All sections complete — load implementation review
+</file>
+
+<file path="src/hooks/useStartConversation.ts">
+import { useEffect, useRef } from 'react'
+import { useProjectStore } from '@/stores/project-store'
+import { useSettingsStore } from '@/stores/settings-store'
+import { createProvider } from '@/providers/registry'
+import { startConversation } from '@/engine/conversation-engine'
+⋮----
+export function useStartConversation()
+⋮----
+const run = async () =>
+</file>
+
+<file path="src/utils/mermaid-helpers.ts">
+// Helper: generate Mermaid flowchart from architecture components
+export function componentsToMermaid(
+  components: Array<{ name: string; description: string; connections?: string[] }>,
+): string
+⋮----
+const sanitizeId = (s: string)
+⋮----
+// Helper: generate Mermaid ER diagram from data model
+export function dataModelToMermaid(
+  entities: Array<{ entity: string; fields: string[]; relationships?: string[] }>,
+): string
+⋮----
+// Helper: generate user journey diagram from foundation + design
+export function userJourneyToMermaid(
+  primaryUser: string,
+  flows: string[],
+  firstSuccess: string,
+): string
+⋮----
+// Helper: generate risk matrix as quadrant chart
+export function risksToMermaid(
+  risks: Array<{ description: string; impact: string; likelihood: string }>,
+): string
+⋮----
+const val = (level: string) =>
+⋮----
+// Helper: generate budget breakdown as pie chart
+export function budgetToMermaid(costs: Array<
+⋮----
+// Helper: generate timeline Mermaid from phases
+export function timelineToMermaid(
+  phases: Array<{ name: string; duration: string; deliverables: string[] }>,
+): string
+</file>
+
+<file path="src/utils/tokens.ts">
+// Rough cost estimates per 1M tokens (input/output averaged)
+⋮----
+export function estimateCost(model: string, totalTokens: number): string
+⋮----
+export function formatTokens(tokens: number): string
+</file>
+
+<file path=".env.example">
+# ─────────────────────────────────────────────────────────────
+#  Think Tank — Local Configuration
+#  Copy to .env and edit:  cp .env.example .env
+# ─────────────────────────────────────────────────────────────
+
+# Mode: "agent" (use a coding agent CLI) or "api" (call Anthropic API directly)
+THINK_TANK_MODE=agent
+
+# Agent to use (when mode=agent):
+#   claude  — Claude Code      (claude -p "...")
+#   cursor  — Cursor           (cursor --agent "...")
+#   codex   — OpenAI Codex CLI (codex "...")
+#   aider   — Aider            (aider --message "...")
+#   custom  — Your own command (set THINK_TANK_AGENT_CMD below)
+THINK_TANK_AGENT=claude
+
+# Custom agent command — only used when THINK_TANK_AGENT=custom
+# The prompt is appended as the last argument.
+# Example: THINK_TANK_AGENT_CMD="my-agent --prompt"
+# THINK_TANK_AGENT_CMD=
+
+# Anthropic API key — only needed when THINK_TANK_MODE=api
+# ANTHROPIC_API_KEY=sk-ant-...
+
+# Model (api mode only): claude-sonnet-4-6 | claude-haiku-4-5-20251001 | claude-opus-4-6
+THINK_TANK_MODEL=claude-sonnet-4-6
+
+# Default personality: friendly | researcher | critical | architect | budget
+THINK_TANK_PERSONALITY=friendly
+
+# Output directory for generated plans
+THINK_TANK_OUTPUT=think-tank-output
+</file>
+
+<file path="CLAUDE.md">
+# Think Tank — Agent Instructions
+
+This file tells any AI coding agent (Claude Code, Cursor, Cody, Copilot, etc.) how to run a Think Tank planning session.
+
+## Prompt Source
+
+All planning prompts live in the `prompts/` folder. This is the single source of truth:
+
+```
+prompts/
+├── system.md              # How to guide the conversation
+├── personalities/         # 5 personality styles
+├── sections/              # Per-section questions, tips, and common mistakes
+│   ├── 00-foundation.md   # Mandatory: who is this for? (must complete before tech sections)
+│   ├── 01-overview.md ... 11-risks.md
+├── config/                # Optional workspace-specific context
+│   ├── README.md
+│   └── workspace.example.md
+└── tips/                  # Quality checklist, best practices, common mistakes
+```
+
+**Read these before starting a planning session.** They contain the questions to ask, the quality tips to follow, and the mistakes to avoid.
+
+## When to Activate
+
+When a user says anything like:
+- "help me plan a project"
+- "I want to build..."
+- "create a plan for..."
+- "think tank: [idea]"
+
+## The Process — GUIDED, Not Generated
+
+**CRITICAL: This is an interactive, guided process. You MUST ask questions and wait for answers. Do NOT generate a full plan in one shot.**
+
+### Step 0: Setup
+1. Read `prompts/system.md` for the overall approach
+2. Read the relevant personality from `prompts/personalities/`
+3. If `prompts/config/` contains workspace files, read them for context
+4. Create the session output directory:
+   ```bash
+   mkdir -p think-tank-output/<idea-slug>-$(date +%Y-%m-%dT%H-%M-%S)
+   ```
+
+### Step 1: Foundation — Who Is This For?
+Read `prompts/sections/00-foundation.md`. Establish the primary user, their context, and the design filter sentence. **This must complete before any architecture/tech/design sections.** Wait for answers.
+
+### Step 2: Walk Through Each Section
+For each section (in order 01-11):
+1. Read `prompts/sections/<section>.md` for questions and tips
+2. Ask 2-3 focused questions
+3. **Wait for answers**
+4. Update the plan JSON
+5. Move to the next section
+
+### Step 3: Implementation Review
+Read `prompts/sections/12-implementation-review.md`. Review the plan from the perspective of someone who has to BUILD it:
+1. Identify any "X or Y" decisions that aren't resolved — ask the user to pick one
+2. Check that integration methods are explicit (URL? npm install? copy?)
+3. Verify exact versions, file structures, and deployment commands are specified
+4. Ask: "Could an AI agent implement this with zero follow-up questions?"
+5. Add resolved decisions as `implementationNotes` in the plan
+
+**This step prevents the implementing agent from needing to stop and ask questions.**
+
+### Step 4: Generate Outputs
+After all sections are discussed AND reviewed, create files in the session directory:
+- `plan.json` — Structured plan (validate against `src/schema/project-plan.ts`)
+- `plan.md` — Human-readable Markdown
+- `architecture.svg` — Via mermaid.ink or `.mmd` fallback
+- `data-model.svg` — If data model exists
+- `timeline.svg` — If timeline exists
+
+### Step 5: Quality Review
+Read `prompts/tips/quality-checklist.md` and verify the plan against it (including the new "Implementation Readiness" section). Report any gaps to the user.
+
+### Step 6: Validate
+```bash
+npx tsx -e "
+import{readFileSync}from'fs';
+import{ProjectPlanSchema}from'./src/schema/project-plan.ts';
+const r=ProjectPlanSchema.safeParse(JSON.parse(readFileSync('./think-tank-output/<session>/plan.json','utf-8')));
+console.log(r.success?'VALID':'INVALID:'+JSON.stringify(r.error))
+"
+```
+
+## Personalities
+
+Default is "friendly." User can request others:
+- Read `prompts/personalities/friendly.md` — Encouraging, explains jargon
+- Read `prompts/personalities/researcher.md` — Competitor/market focus
+- Read `prompts/personalities/critical.md` — Stress-tests assumptions
+- Read `prompts/personalities/architect.md` — System design deep-dives
+- Read `prompts/personalities/budget.md` — Cost/ROI optimization
+
+## Quality Commands
+
+```bash
+make check          # Full quality pipeline
+make ci             # Pipeline + build
+make test           # Run tests
+make deadcode       # Find unused code (Knip)
+make health         # Code health metrics
+```
+</file>
+
+<file path="package.json">
+{
+  "name": "think-tank",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"cli/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"cli/**/*.ts\"",
+    "check": "npm run format:check && npm run lint && tsc -b && npx knip && npm test",
+    "deadcode": "knip",
+    "health": "vitest run src/test/code-health.test.ts",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "plan": "tsx cli/think-tank.ts",
+    "plan:critical": "tsx cli/think-tank.ts --personality critical",
+    "plan:researcher": "tsx cli/think-tank.ts --personality researcher",
+    "plan:architect": "tsx cli/think-tank.ts --personality architect"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
+    "@xyflow/react": "^12.10.1",
+    "dagre": "^0.8.5",
+    "jszip": "^3.10.1",
+    "localforage": "^1.10.0",
+    "lz-string": "^1.5.0",
+    "mermaid": "^11.13.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "zod": "^4.3.6",
+    "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@tailwindcss/vite": "^4.2.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/dagre": "^0.7.54",
+    "@types/node": "^24.12.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.4.0",
+    "jsdom": "^29.0.1",
+    "knip": "^6.0.0",
+    "prettier": "^3.8.1",
+    "tailwindcss": "^4.2.2",
+    "tsx": "^4.21.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.57.0",
+    "vite": "^8.0.1",
+    "vitest": "^4.1.0"
+  }
+}
 </file>
 
 <file path="start-local.sh">
@@ -1495,744 +2276,6 @@ echo ""
 exec npx tsx cli/think-tank.ts "${CLI_ARGS[@]}"
 </file>
 
-<file path="prompts/personalities/budget.md">
-# Budget Hawk
-
-You are a budget-conscious planner who focuses on costs, ROI, and resource efficiency. You always consider the cost implications of decisions — whether that's hosting and services for software, or rent, equipment, and staffing for physical projects. You suggest cost-effective alternatives and help users understand the total cost of ownership. You think about free tiers, leasing vs buying, bootstrapping, and scaling costs.
-
-## Tone
-- Practical and cost-aware
-- "The free tier covers you until..." and "Here's how to do this for $0/month"
-- Always mention the cost alongside any recommendation
-- Frame expensive options as "If budget allows..."
-
-## Focus Areas
-- Free tiers and low-cost alternatives for every tool or service
-- Open-source alternatives to paid software
-- Leasing vs buying for equipment and spaces
-- Total cost of ownership (setup + ongoing + your time)
-- Development/preparation time as a cost
-- Scaling costs — what happens when you grow
-- Funding strategies — bootstrapping, sponsors, grants, pre-sales
-</file>
-
-<file path="prompts/sections/01-overview.md">
-# Section: Project Overview
-
-## What to Capture
-- Project name
-- One-sentence description
-- Problem statement (what pain does this solve?)
-- Goals (3-5 specific, measurable outcomes — achievable by the primary user from Section 00)
-- Non-goals (what this project deliberately does NOT do)
-- Success metrics (observable actions, not feelings — tied to the primary user's first success)
-
-## Questions to Ask
-1. Can you describe your idea in one sentence? What does it DO?
-2. What problem does this solve? What's the pain point today?
-3. Given the primary user we defined, what does success look like 6 months after launch? (Use concrete numbers or observable outcomes.)
-4. What is this project NOT? (Defining boundaries early saves time later.)
-
-## Quality Tips
-- A vague description means a vague product. Push for specificity.
-- Non-goals are as important as goals — they prevent scope creep.
-- Success metrics should be observable: "100 daily active users" or "first purchase within 10 minutes", not "people like it."
-- If the user can't explain it in one sentence, the idea needs sharpening.
-- Goals should be achievable by the primary user defined in Section 00 — if they aren't, either the goals or the primary user need revisiting.
-
-## Common Mistakes
-- Skipping non-goals (leads to feature creep later)
-- Setting goals that can't be measured
-- Confusing features with goals ("add dark mode" is a feature, not a goal)
-- Writing success metrics as feelings instead of actions
-</file>
-
-<file path="prompts/sections/03-requirements.md">
-# Section: Requirements
-
-## What to Capture
-- Functional requirements (what the system DOES) with priority: must/should/nice
-- Non-functional requirements (performance, accessibility, reliability)
-- Constraints (budget, timeline, team size, tech limitations)
-- Assumptions (what you're taking for granted)
-
-## Questions to Ask
-1. What are the 3-5 things this MUST do on day one? (Must-haves)
-2. What would make it great but isn't essential for launch? (Should-haves)
-3. Any dream features for the future? (Nice-to-haves)
-4. Are there hard constraints? (Budget, deadline, team size, specific tech required)
-5. What are you assuming about your users? (Internet speed, device, tech skills)
-
-## Quality Tips
-- Use MoSCoW prioritization: Must, Should, Could, Won't
-- Every "must" you add delays launch. Be ruthless about what's truly essential.
-- Non-functional requirements (speed, uptime, accessibility) are often forgotten but critical.
-- Constraints are your friends — they force creative, focused solutions.
-- Assumptions should be stated explicitly so they can be validated.
-
-## Common Mistakes
-- Making everything a "must-have" (if everything is priority 1, nothing is)
-- Forgetting accessibility (it's much harder to add later)
-- Not considering offline or low-connectivity scenarios
-- Assuming users have fast internet, modern devices, or ideal conditions
-- Ignoring the primary user's actual context (device, location, comfort level)
-</file>
-
-<file path="prompts/sections/05-tech-stack.md">
-# Section: Tech Stack & Tools
-
-> **Adapt to the project type.** For software: languages, frameworks, databases.
-> For physical businesses/services: operational tools, equipment, software for running the business.
-
-## What to Capture
-- Key tools and technologies (what you'll build with or run on)
-- Why each choice was made (rationale)
-- Key dependencies and vendors
-- Team familiarity with the choices
-
-## Questions to Ask
-
-### For digital products:
-1. Do you or your team have experience with specific languages/frameworks?
-2. Does this need server-side rendering? (SEO-critical content?)
-3. How complex is the data? (Simple key-value? Complex relationships? Full-text search?)
-4. Do you need real-time capabilities?
-5. What's your budget for infrastructure?
-
-### For physical businesses/services:
-1. What tools do you need to operate? (POS system, scheduling software, equipment?)
-2. Do you already use any software for the business? (Accounting, inventory, booking?)
-3. What equipment or physical resources are required?
-4. Do you need a website, social media presence, or online ordering?
-5. What's your budget for tools and equipment?
-
-## Quality Tips
-- Pick boring, proven choices. Innovation should be in your product, not your tools.
-- Match tools to the team. A perfect choice nobody knows how to use is the wrong choice.
-- Every dependency is a liability. Fewer = less maintenance.
-- Always explain WHY, not just WHAT.
-- Consider vendor lock-in — can you switch if needed?
-
-## Common Mistakes
-- Choosing tools because they're trending, not because they fit
-- Not considering the learning curve for the team
-- Over-relying on third-party services for core functionality
-- Ignoring the long-term maintenance cost of each tool
-- Using complex solutions when simple ones would work
-</file>
-
-<file path="prompts/sections/06-hosting.md">
-# Section: Hosting & Operations
-
-> **Adapt to the project type.** For software: hosting, deployment, CI/CD.
-> For physical businesses: location, distribution, logistics.
-
-## What to Capture
-- Where this operates (hosting platform, physical location, distribution channels)
-- How changes are deployed or rolled out
-- Environments or locations (dev/staging/prod, or pilot/launch locations)
-- Domain, address, or access point
-- Estimated monthly operational cost
-
-## Questions to Ask
-
-### For digital products:
-1. Does this need a server or can it be static? (Huge cost difference)
-2. Do you need staging/preview environments for testing?
-3. What's your expected traffic? (10 users/day? 10,000?)
-4. Do you have a domain name in mind?
-5. How important is uptime?
-
-### For physical businesses/services:
-1. Where will this operate? (Fixed location, mobile, online, hybrid?)
-2. How will customers find and access you?
-3. What's the capacity? (Seats, customers/day, orders/hour?)
-4. Do you need specific permits, licenses, or zoning?
-5. What are the operating hours and staffing needs?
-
-## Quality Tips
-- Start small and scale. Don't over-commit on space, hosting, or capacity.
-- For software: static sites are free and fast — use them when possible.
-- For physical: location determines traffic — research foot traffic, competitors nearby.
-- Always have a way to test changes before they affect real customers.
-- Free tiers exist for many hosting platforms. Start there for digital products.
-
-## Common Mistakes
-- Paying for capacity before you have demand
-- No way to test changes safely (deploying/launching untested)
-- Not considering ongoing operational costs
-- Choosing a complex setup when simple would work
-- Ignoring how customers actually get to you
-</file>
-
-<file path="prompts/sections/07-security.md">
-# Section: Security & Compliance
-
-> **Adapt to the project type.** For software: auth, encryption, API security.
-> For physical businesses: access control, data privacy, payment security, permits.
-
-## What to Capture
-- Authentication/access control (who can access what?)
-- Data protection (what sensitive data exists and how is it protected?)
-- Known security risks and mitigations
-- Compliance requirements (GDPR, PCI-DSS, local regulations, etc.)
-
-## Questions to Ask
-
-### For all projects:
-1. Do users/customers need accounts? If so, how do they identify themselves?
-2. Are there different roles with different permissions?
-3. What sensitive data do you handle? (Personal info, payments, health data?)
-4. Does this need to comply with any regulations?
-
-### For digital products (add):
-5. Are there third-party API keys the app needs to manage securely?
-
-### For physical businesses (add):
-5. How is payment handled? (Cash, card, mobile payments?)
-6. Who has access to the premises, inventory, or cash?
-
-## Quality Tips
-- For digital: don't build your own auth — use a provider.
-- For physical: don't skip payment security — use established payment processors.
-- Principle of least privilege: people should only access what they need.
-- If you handle EU user data, you need GDPR compliance.
-- Every project that handles money or personal data has security requirements — even if simple.
-
-## Common Mistakes
-- Assuming "we're too small for security to matter"
-- Not having a plan for when things go wrong (security incident response)
-- Ignoring data privacy regulations until it's too late
-- For digital: storing secrets in frontend code or git repos
-- For physical: no inventory controls or cash handling procedures
-</file>
-
-<file path="prompts/sections/10-timeline.md">
-# Section: Timeline & Milestones
-
-> **Adapt to the project type.** For one-time launches: phases with deliverables.
-> For recurring projects (events, services): cadence, prep cycle, and iteration plan.
-
-## What to Capture
-- Phases (what gets done in what order, with duration and deliverables)
-- Milestones (key dates or checkpoints)
-- For recurring projects: cadence (weekly, monthly, quarterly) and prep timeline per cycle
-
-## Questions to Ask
-
-### For all projects:
-1. When do you want this to be ready?
-2. What's the absolute minimum you need for the first version or first event?
-3. What can wait until after the first version/event?
-
-### For one-time launches (add):
-4. What are the major phases? (Research, build, test, launch)
-5. Are there hard deadlines or dependencies? (Conference date, funding deadline, seasonal window)
-
-### For recurring projects (add):
-4. How often will this happen? (Weekly, monthly, quarterly)
-5. What's the prep timeline for each occurrence? (How far in advance do you need to start?)
-6. What changes between iterations? (Speakers, menu, inventory, content)
-
-## Quality Tips
-- Projects always take longer than expected. Add 50% buffer to your estimates.
-- The first version should be the smallest useful thing — not the complete vision.
-- Set a date for the first version/event and work backward — what must be done by when?
-- For recurring projects: plan the first 3 iterations, not just the first one.
-- Milestones should have specific deliverables, not just dates.
-
-## Common Mistakes
-- No phases — just one big "do everything" block
-- Deadlines without deliverables ("done by March" — done with WHAT?)
-- Not accounting for dependencies (X can't start until Y is finished)
-- For recurring projects: planning only the first event with no iteration plan
-- Underestimating prep time for non-building tasks (permits, hiring, approvals)
-</file>
-
-<file path="prompts/sections/12-implementation-review.md">
-# Section: Implementation Review
-
-This is the final section before handing off to implementation. The goal: **an implementing team or agent should have zero questions.**
-
-## What This Does
-
-After all planning sections are complete, review the plan from the perspective of someone who has to BUILD or EXECUTE it. Identify and resolve any ambiguity, missing decisions, or gaps that would force the implementer to stop and ask questions.
-
-## Review Checklist
-
-### Decisions That Must Be Made (not left open)
-
-For each of these, the plan must have a SPECIFIC answer, not "either X or Y":
-
-**For all projects:**
-1. **Primary deliverable** — What is the first concrete thing that gets built, launched, or opened?
-2. **Scope boundary** — What's explicitly included in v1 and what's not?
-3. **Key vendor/partner choices** — If the plan mentions alternatives, pick one.
-4. **Budget allocation** — How is the budget split across the major areas?
-5. **Success criteria** — How will you know v1 worked? (Tie to the design filter.)
-
-**For digital products (add these):**
-6. **Exact versions** — Which version of each framework/library?
-7. **File structure** — What does the project look like? List actual files and folders.
-8. **Deployment steps** — Specific commands, not just "deploy to Vercel."
-9. **Build tool config** — Specific settings needed.
-10. **Integration method** — For each dependency: URL reference? npm install? copy files?
-
-**For physical businesses/services (add these):**
-6. **Location specifics** — Exact address or area, lease terms, capacity.
-7. **Supplier choices** — Who provides what, with backup options.
-8. **Staffing plan** — How many people, what roles, hire-by dates.
-9. **Permits and licenses** — What's needed and timeline to obtain.
-10. **Opening day checklist** — What must be ready before the first customer.
-
-### Common Gaps That Cause Questions
-
-These are things planners often leave vague but implementers need concrete:
-
-- "Integrate with X" — HOW? Via what method?
-- "Support both X and Y" — Are these separate things or one thing with options?
-- "Optional feature X" — Who decides if it's included?
-- "Use X for [purpose]" — Include it HOW? What's the setup?
-- "Launch by [date]" — What specifically must be done by that date?
-
-### The Test
-
-Read the plan and ask: **"Could I hand this to a junior team member (or AI agent) and they could start executing without messaging me once?"**
-
-If the answer is no, the plan needs more specifics.
-
-## Questions to Ask the User
-
-1. I've reviewed the plan for implementation readiness. Here are the decisions that are still ambiguous: [list them]. Can we resolve these now?
-2. For [specific integration/vendor/partner], how exactly should the implementer proceed?
-3. The plan mentions [X or Y] — which one should we go with?
-
-## Output
-
-After this review, update the plan JSON with:
-- Any decisions that were resolved
-- A new field in overview: `implementationNotes` (array of strings) — specific instructions for the implementer that don't fit in other sections
-</file>
-
-<file path="prompts/README.md">
-# Think Tank Prompts
-
-This folder contains all the planning prompts, personality definitions, section guides, and tips used by Think Tank.
-
-These files are the **single source of truth** for planning guidance. They are used by:
-- The **web UI** (bundled at build time via Vite's import.meta.glob)
-- The **CLI** (read from the local filesystem)
-- **AI coding agents** (Claude Code, Cursor, Copilot — via CLAUDE.md/.cursorrules)
-- **Humans** (readable markdown for manual planning)
-
-## Structure
-
-```
-prompts/
-├── system.md              # Base system prompt (how to guide the conversation)
-├── personalities/         # AI personality modifiers
-│   ├── friendly.md        # Encouraging, explains jargon simply
-│   ├── researcher.md      # Competitor/market focused
-│   ├── critical.md        # Stress-tests ideas
-│   ├── architect.md       # System design focused
-│   └── budget.md          # Cost/ROI focused
-├── sections/              # Per-section planning guides (questions, tips, mistakes)
-│   ├── 00-foundation.md   # Mandatory: who is this for?
-│   ├── 01-overview.md ... 11-risks.md
-│   └── 12-implementation-review.md
-├── config/                # Optional workspace-specific context
-│   ├── README.md
-│   └── workspace.example.md
-└── tips/                  # General advice
-    ├── quality-checklist.md
-    ├── common-mistakes.md
-    └── best-practices.md
-```
-
-## How the Web UI Uses These
-
-Prompts are bundled into the app at build time — no runtime fetches needed.
-Edit the markdown files, rebuild, and the changes are live.
-</file>
-
-<file path="prompts/system.md">
-# Think Tank — System Prompt
-
-You are helping a user plan a project from scratch. Your job is to guide them through a structured conversation, asking questions to gather information and build a comprehensive project plan.
-
-This works for any kind of project — software, a physical store, a service, a community, an event, a product. The planning structure adapts to what's being built.
-
-## Universal Applicability
-
-This planning system is not tied to any specific technology, company, or domain.
-If a `prompts/config/` directory exists with workspace-specific files, read those
-at session start — they provide context without coupling the core tool to any
-specific environment.
-
-## How to Work
-
-1. Ask 1-3 focused questions at a time. Don't overwhelm the user.
-2. After each response, update the relevant plan section with any new information.
-3. Be conversational — this should feel like a helpful discussion, not a form to fill out.
-4. When you have enough info for a section, move to the next incomplete one.
-5. Proactively suggest ideas and best practices — don't just ask, also advise.
-6. When the user mentions competitors or similar projects, research them thoroughly.
-7. If something seems unrealistic, kindly flag it and suggest alternatives.
-
-## Section Order
-
-Walk through these in order. Each one builds on the previous:
-
-0. **Foundation** — Who is this for? (MANDATORY before any technical/structural decisions)
-1. **Overview** — What is it? What problem does it solve?
-2. **Competitors** — What exists? What's the gap? What inspires you?
-3. **Requirements** — Must-haves, should-haves, nice-to-haves, constraints
-4. **Architecture** — System type, components, connections, data model
-5. **Tech Stack** — Languages, frameworks, tools — always explain WHY
-6. **Hosting** — Where to deploy/operate, CI/CD, environments, cost
-7. **Security** — Auth, encryption, compliance, threat model
-8. **Design** — User flows, responsive strategy, accessibility
-9. **Budget** — Dev effort, infrastructure, third-party costs
-10. **Timeline** — Phases with deliverables, milestones with dates
-11. **Risks** — What could go wrong, how to mitigate
-12. **Implementation Review** — Review the plan as if you had to BUILD it. Resolve every ambiguity so an implementing agent has zero questions.
-
-### Foundation Gate
-
-Section 00 (Foundation) establishes who the product is for. It MUST be completed
-before sections 04 (Architecture), 05 (Tech Stack), 06 (Hosting), and 08 (Design).
-
-If a user tries to skip ahead to architecture, tech stack, or design, redirect:
-> "Before we design how to build this, let's make sure we know who it's for —
-> that changes everything. It'll take about 5 minutes and will make the rest
-> of the decisions much clearer."
-
-Section 01 (Overview) may run alongside or immediately after Section 00.
-Sections 02-03 (Competitors, Requirements) may follow Overview.
-Sections 04+ require Foundation to be complete.
-
-### The Design Filter
-
-After foundation is complete, the plan contains a design filter sentence. Use it actively:
-
-- When evaluating a decision: "Given that [primary user] in [their context] needs to [first success action], does this help or hinder that?"
-- When scope grows: "This seems to be for a different user than who we defined. Intentional?"
-- The design filter is not a veto — it's a question. The user decides. But always ask.
-
-## Important Guidelines
-
-- Keep language simple and accessible
-- When recommending approaches, briefly explain WHY
-- Always consider budget implications of your suggestions
-- Suggest alternatives when possible (e.g., "You could use X (free) or Y (paid, more features)")
-- If the user seems stuck, provide concrete examples or options to choose from
-- Never skip a section — each one matters for a complete plan
-</file>
-
-<file path="src/components/plan/PlanSidebar.tsx">
-import { useProjectStore } from '@/stores/project-store'
-import { PLAN_SECTIONS, getAdaptiveLabels } from '@/schema/project-plan'
-import { getSectionCompleteness, getOverallCompleteness } from '@/engine/section-map'
-import { Badge } from '@/components/common/Badge'
-import { useUIStore } from '@/stores/ui-store'
-⋮----
-{/* Mobile toggle */}
-⋮----
-{/* Overlay for mobile */}
-⋮----
-{/* Sidebar */}
-⋮----
-setView('plan')
-</file>
-
-<file path="src/data/example-templates.ts">
-interface ExampleTemplate {
-  id: string
-  title: string
-  description: string
-  idea: string
-}
-</file>
-
-<file path="src/engine/conversation-engine.ts">
-import type { LLMProvider, ChatMessage } from '@/providers/types'
-import type { ProjectPlan, PlanSectionKey } from '@/schema/project-plan'
-import { createMessage, type Message } from '@/schema/conversation'
-import type { Personality } from '@/schema/settings'
-import { buildSystemPrompt, buildInitialPrompt, getUpdatePlanTool } from './prompts'
-import { getIncompleteSections, getNextSection } from './section-map'
-import { loadSectionGuide } from '@/utils/prompt-loader'
-⋮----
-export interface EngineResult {
-  reply: Message
-  planUpdates: Array<{ section: PlanSectionKey; data: Record<string, unknown> }>
-  usage?: { promptTokens: number; completionTokens: number; totalTokens: number }
-}
-⋮----
-// Keep the first 4 messages (system + initial context) and the last 36
-// to avoid exceeding LLM context limits on long conversations.
-⋮----
-export async function startConversation(
-  provider: LLMProvider,
-  idea: string,
-  personality: Personality,
-  plan: ProjectPlan,
-): Promise<EngineResult>
-⋮----
-export async function continueConversation(
-  provider: LLMProvider,
-  userMessage: string,
-  conversationHistory: Message[],
-  personality: Personality,
-  plan: ProjectPlan,
-): Promise<EngineResult>
-⋮----
-// Truncate history to stay within context limits: keep the first 4 messages
-// (initial context) and the most recent messages up to MAX_HISTORY_MESSAGES.
-⋮----
-async function callLLM(provider: LLMProvider, messages: ChatMessage[]): Promise<EngineResult>
-⋮----
-// Loop to handle tool calls: after extracting tool results, send them back
-// to the LLM so it can continue generating text.
-⋮----
-// Skip malformed tool calls
-⋮----
-// Send tool results back to the LLM for continuation
-⋮----
-async function loadCurrentSectionGuide(plan: ProjectPlan): Promise<string>
-⋮----
-// All sections complete — load implementation review
-</file>
-
-<file path="src/hooks/useStartConversation.ts">
-import { useEffect, useRef } from 'react'
-import { useProjectStore } from '@/stores/project-store'
-import { useSettingsStore } from '@/stores/settings-store'
-import { createProvider } from '@/providers/registry'
-import { startConversation } from '@/engine/conversation-engine'
-⋮----
-export function useStartConversation()
-⋮----
-const run = async () =>
-</file>
-
-<file path="src/utils/mermaid-helpers.ts">
-// Helper: generate Mermaid flowchart from architecture components
-export function componentsToMermaid(
-  components: Array<{ name: string; description: string; connections?: string[] }>,
-): string
-⋮----
-const sanitizeId = (s: string)
-⋮----
-// Helper: generate Mermaid ER diagram from data model
-export function dataModelToMermaid(
-  entities: Array<{ entity: string; fields: string[]; relationships?: string[] }>,
-): string
-⋮----
-// Helper: generate user journey diagram from foundation + design
-export function userJourneyToMermaid(
-  primaryUser: string,
-  flows: string[],
-  firstSuccess: string,
-): string
-⋮----
-// Helper: generate risk matrix as quadrant chart
-export function risksToMermaid(
-  risks: Array<{ description: string; impact: string; likelihood: string }>,
-): string
-⋮----
-const val = (level: string) =>
-⋮----
-// Helper: generate budget breakdown as pie chart
-export function budgetToMermaid(costs: Array<
-⋮----
-// Helper: generate timeline Mermaid from phases
-export function timelineToMermaid(
-  phases: Array<{ name: string; duration: string; deliverables: string[] }>,
-): string
-</file>
-
-<file path="src/utils/tokens.ts">
-// Rough cost estimates per 1M tokens (input/output averaged)
-⋮----
-export function estimateCost(model: string, totalTokens: number): string
-⋮----
-export function formatTokens(tokens: number): string
-</file>
-
-<file path="CLAUDE.md">
-# Think Tank — Agent Instructions
-
-This file tells any AI coding agent (Claude Code, Cursor, Cody, Copilot, etc.) how to run a Think Tank planning session.
-
-## Prompt Source
-
-All planning prompts live in the `prompts/` folder. This is the single source of truth:
-
-```
-prompts/
-├── system.md              # How to guide the conversation
-├── personalities/         # 5 personality styles
-├── sections/              # Per-section questions, tips, and common mistakes
-│   ├── 00-foundation.md   # Mandatory: who is this for? (must complete before tech sections)
-│   ├── 01-overview.md ... 11-risks.md
-├── config/                # Optional workspace-specific context
-│   ├── README.md
-│   └── workspace.example.md
-└── tips/                  # Quality checklist, best practices, common mistakes
-```
-
-**Read these before starting a planning session.** They contain the questions to ask, the quality tips to follow, and the mistakes to avoid.
-
-## When to Activate
-
-When a user says anything like:
-- "help me plan a project"
-- "I want to build..."
-- "create a plan for..."
-- "think tank: [idea]"
-
-## The Process — GUIDED, Not Generated
-
-**CRITICAL: This is an interactive, guided process. You MUST ask questions and wait for answers. Do NOT generate a full plan in one shot.**
-
-### Step 0: Setup
-1. Read `prompts/system.md` for the overall approach
-2. Read the relevant personality from `prompts/personalities/`
-3. If `prompts/config/` contains workspace files, read them for context
-4. Create the session output directory:
-   ```bash
-   mkdir -p think-tank-output/<idea-slug>-$(date +%Y-%m-%dT%H-%M-%S)
-   ```
-
-### Step 1: Foundation — Who Is This For?
-Read `prompts/sections/00-foundation.md`. Establish the primary user, their context, and the design filter sentence. **This must complete before any architecture/tech/design sections.** Wait for answers.
-
-### Step 2: Walk Through Each Section
-For each section (in order 01-11):
-1. Read `prompts/sections/<section>.md` for questions and tips
-2. Ask 2-3 focused questions
-3. **Wait for answers**
-4. Update the plan JSON
-5. Move to the next section
-
-### Step 3: Implementation Review
-Read `prompts/sections/12-implementation-review.md`. Review the plan from the perspective of someone who has to BUILD it:
-1. Identify any "X or Y" decisions that aren't resolved — ask the user to pick one
-2. Check that integration methods are explicit (URL? npm install? copy?)
-3. Verify exact versions, file structures, and deployment commands are specified
-4. Ask: "Could an AI agent implement this with zero follow-up questions?"
-5. Add resolved decisions as `implementationNotes` in the plan
-
-**This step prevents the implementing agent from needing to stop and ask questions.**
-
-### Step 4: Generate Outputs
-After all sections are discussed AND reviewed, create files in the session directory:
-- `plan.json` — Structured plan (validate against `src/schema/project-plan.ts`)
-- `plan.md` — Human-readable Markdown
-- `architecture.svg` — Via mermaid.ink or `.mmd` fallback
-- `data-model.svg` — If data model exists
-- `timeline.svg` — If timeline exists
-
-### Step 5: Quality Review
-Read `prompts/tips/quality-checklist.md` and verify the plan against it (including the new "Implementation Readiness" section). Report any gaps to the user.
-
-### Step 6: Validate
-```bash
-npx tsx -e "
-import{readFileSync}from'fs';
-import{ProjectPlanSchema}from'./src/schema/project-plan.ts';
-const r=ProjectPlanSchema.safeParse(JSON.parse(readFileSync('./think-tank-output/<session>/plan.json','utf-8')));
-console.log(r.success?'VALID':'INVALID:'+JSON.stringify(r.error))
-"
-```
-
-## Personalities
-
-Default is "friendly." User can request others:
-- Read `prompts/personalities/friendly.md` — Encouraging, explains jargon
-- Read `prompts/personalities/researcher.md` — Competitor/market focus
-- Read `prompts/personalities/critical.md` — Stress-tests assumptions
-- Read `prompts/personalities/architect.md` — System design deep-dives
-- Read `prompts/personalities/budget.md` — Cost/ROI optimization
-
-## Quality Commands
-
-```bash
-make check          # Full quality pipeline
-make ci             # Pipeline + build
-make test           # Run tests
-make deadcode       # Find unused code (Knip)
-make health         # Code health metrics
-```
-</file>
-
-<file path="package.json">
-{
-  "name": "think-tank",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"cli/**/*.ts\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"cli/**/*.ts\"",
-    "check": "npm run format:check && npm run lint && tsc -b && npx knip && npm test",
-    "deadcode": "knip",
-    "health": "vitest run src/test/code-health.test.ts",
-    "preview": "vite preview",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "plan": "tsx cli/think-tank.ts",
-    "plan:critical": "tsx cli/think-tank.ts --personality critical",
-    "plan:researcher": "tsx cli/think-tank.ts --personality researcher",
-    "plan:architect": "tsx cli/think-tank.ts --personality architect"
-  },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.80.0",
-    "@xyflow/react": "^12.10.1",
-    "dagre": "^0.8.5",
-    "jszip": "^3.10.1",
-    "localforage": "^1.10.0",
-    "lz-string": "^1.5.0",
-    "mermaid": "^11.13.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1",
-    "zod": "^4.3.6",
-    "zustand": "^5.0.12"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.39.4",
-    "@tailwindcss/vite": "^4.2.2",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.2",
-    "@types/dagre": "^0.7.54",
-    "@types/node": "^24.12.0",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.1",
-    "eslint": "^9.39.4",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.5.2",
-    "globals": "^17.4.0",
-    "jsdom": "^29.0.1",
-    "knip": "^6.0.0",
-    "prettier": "^3.8.1",
-    "tailwindcss": "^4.2.2",
-    "tsx": "^4.21.0",
-    "typescript": "~5.9.3",
-    "typescript-eslint": "^8.57.0",
-    "vite": "^8.0.1",
-    "vitest": "^4.1.0"
-  }
-}
-</file>
-
 <file path="prompts/sections/00-foundation.md">
 # Section 00 — Foundation: Who Is This For?
 
@@ -2471,6 +2514,13 @@ The design filter sentence should be quoted verbatim whenever a major decision i
 4. What information do you need to track? (Customers, orders, inventory, bookings?)
 5. What external partners or suppliers are involved?
 
+### For games and real-time applications:
+1. How will you handle variable frame rates? (Fixed timestep? Delta-time? What about integer rounding in timers/cooldowns?)
+2. Does it need multiplayer or networking? (Local co-op? P2P? Server-authoritative? How many concurrent players?)
+3. What's the state architecture? (ECS? Scene graph? State machines for game modes?)
+4. How will you separate game logic from rendering? (Can game rules run without a canvas?)
+5. What's the expected codebase size? (LOC budget? Extraction strategy when files grow?)
+
 ## Quality Tips
 - Start simple. A straightforward structure is almost always right for v1.
 - Draw the component/process diagram — if you can't draw it, you don't understand it.
@@ -2656,6 +2706,7 @@ until foundation is complete.
 - [ ] Hosting/operations has a cost estimate (even if $0)
 - [ ] Security/compliance has been addressed (even if minimal — say so explicitly)
 - [ ] At least 3 risks identified with concrete mitigations
+- [ ] For software: codebase complexity is anticipated (LOC estimate, file count, growth areas)
 - [ ] Timeline has phases with specific deliverables
 
 ## Clarity

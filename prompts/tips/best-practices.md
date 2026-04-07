@@ -40,3 +40,13 @@ Document the trade-off for each major decision so future-you understands why you
 - README: how to set up, run, and contribute
 - Architecture Decision Records (ADRs): WHY you chose X over Y
 - Inline comments: only for non-obvious logic, not for obvious code
+
+## Building Demo and Showcase Pages
+
+Demo pages serve investors and evaluators, not daily users. They evolve faster than feature code:
+
+- **Decide the format early:** Is this a guided walkthrough, an interactive sandbox, or a passive showcase? Each requires different architecture.
+- **Expect 3-4 rewrites.** Demo requirements change as the product evolves. Extract components aggressively so each rewrite touches fewer files.
+- **Pre-generate results.** Demos should work without API keys, accounts, or waiting. Store pre-computed results and load them as the default experience.
+- **Gate dev-only features.** Local dev servers, debug tools, and free-tier providers should not appear on the production demo. Use environment detection to hide them.
+- **Quality over features.** A demo that does 3 things flawlessly beats one that does 10 things with rough edges. Investors notice polish, not feature count.
