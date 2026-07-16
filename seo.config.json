@@ -1,0 +1,29 @@
+{
+  "siteName": "Think Tank",
+  "baseUrl": "https://jdeworks.github.io/think-tank/",
+  "publishDir": "docs",
+  "sitemap": "sitemap.xml",
+  "pages": [
+    {
+      "file": "index.html",
+      "route": "",
+      "title": "Think Tank – AI-Guided Project Planning in Your Browser",
+      "description": "Turn a project idea into a structured plan through AI-guided conversation — requirements, architecture, tech stack, budget, timeline, and risks, all in your browser.",
+      "schema": {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Think Tank",
+        "url": "https://jdeworks.github.io/think-tank/",
+        "description": "Turn a project idea into a structured plan through AI-guided conversation — requirements, architecture, tech stack, budget, timeline, and risks, all in your browser.",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Any operating system with a modern web browser",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    }
+  ]
+}
