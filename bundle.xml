@@ -149,38 +149,6 @@ start-local.sh
 <files>
 This section contains the contents of the repository's files.
 
-<file path="seo.config.json">
-{
-  "siteName": "Think Tank",
-  "baseUrl": "https://jdeworks.github.io/think-tank/",
-  "publishDir": "docs",
-  "sitemap": "sitemap.xml",
-  "pages": [
-    {
-      "file": "index.html",
-      "route": "",
-      "title": "Think Tank – AI-Guided Project Planning in Your Browser",
-      "description": "Turn a project idea into a structured plan through AI-guided conversation — requirements, architecture, tech stack, budget, timeline, and risks, all in your browser.",
-      "schema": {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Think Tank",
-        "url": "https://jdeworks.github.io/think-tank/",
-        "description": "Turn a project idea into a structured plan through AI-guided conversation — requirements, architecture, tech stack, budget, timeline, and risks, all in your browser.",
-        "applicationCategory": "BusinessApplication",
-        "operatingSystem": "Any operating system with a modern web browser",
-        "isAccessibleForFree": true,
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD"
-        }
-      }
-    }
-  ]
-}
-</file>
-
 <file path="cli/README.md">
 # Think Tank — Local CLI Instructions
 
@@ -950,63 +918,6 @@ import App from './App.tsx'
 function syncDarkMode()
 </file>
 
-<file path="index.html">
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a" />
-    <link rel="icon" type="image/svg+xml" href="/think-tank/favicon.svg" />
-  <!-- SEO:START -->
-  <title>Think Tank – AI-Guided Project Planning in Your Browser</title>
-  <meta name="description" content="Turn a project idea into a structured plan through AI-guided conversation — requirements, architecture, tech stack, budget, timeline, and risks, all in your browser.">
-  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
-  <link rel="canonical" href="https://jdeworks.github.io/think-tank/">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Think Tank">
-  <meta property="og:title" content="Think Tank – AI-Guided Project Planning in Your Browser">
-  <meta property="og:description" content="Turn a project idea into a structured plan through AI-guided conversation — requirements, architecture, tech stack, budget, timeline, and risks, all in your browser.">
-  <meta property="og:url" content="https://jdeworks.github.io/think-tank/">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Think Tank – AI-Guided Project Planning in Your Browser">
-  <meta name="twitter:description" content="Turn a project idea into a structured plan through AI-guided conversation — requirements, architecture, tech stack, budget, timeline, and risks, all in your browser.">
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "Think Tank",
-    "url": "https://jdeworks.github.io/think-tank/",
-    "description": "Turn a project idea into a structured plan through AI-guided conversation — requirements, architecture, tech stack, budget, timeline, and risks, all in your browser.",
-    "applicationCategory": "BusinessApplication",
-    "operatingSystem": "Any operating system with a modern web browser",
-    "isAccessibleForFree": true,
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    }
-  }
-  </script>
-  <!-- SEO:END -->
-  </head>
-  <body>
-    <div id="root">
-      <h1>Think Tank</h1>
-      <p>
-        Think Tank turns a project idea into a structured plan through an AI-guided
-        conversation — covering requirements, architecture, tech stack, budget,
-        timeline, and risks — right in your browser.
-      </p>
-      <p><a href="https://github.com/jdeworks/think-tank">Source code on GitHub</a></p>
-    </div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
-</file>
-
 <file path="Makefile">
 .PHONY: help install dev build test lint format check clean plan ci deadcode health
 
@@ -1102,6 +1013,38 @@ clean-output: ## Remove generated plan output
 
 clean-all: clean clean-output ## Remove all generated files
 	rm -rf node_modules
+</file>
+
+<file path="seo.config.json">
+{
+  "siteName": "Think Tank",
+  "baseUrl": "https://jdeworks.github.io/think-tank/",
+  "publishDir": "docs",
+  "sitemap": "sitemap.xml",
+  "pages": [
+    {
+      "file": "index.html",
+      "route": "",
+      "title": "Think Tank – AI-Guided Project Planning in Your Browser",
+      "description": "Turn a project idea into a structured plan through AI-guided conversation: requirements, architecture, tech stack, budget, timeline, and risks, all in your browser.",
+      "schema": {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Think Tank",
+        "url": "https://jdeworks.github.io/think-tank/",
+        "description": "Turn a project idea into a structured plan through AI-guided conversation: requirements, architecture, tech stack, budget, timeline, and risks, all in your browser.",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Any operating system with a modern web browser",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    }
+  ]
+}
 </file>
 
 <file path="prompts/personalities/budget.md">
@@ -1796,6 +1739,63 @@ make test           # Run tests
 make deadcode       # Find unused code (Knip)
 make health         # Code health metrics
 ```
+</file>
+
+<file path="index.html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a" />
+    <link rel="icon" type="image/svg+xml" href="/think-tank/favicon.svg" />
+  <!-- SEO:START -->
+  <title>Think Tank – AI-Guided Project Planning in Your Browser</title>
+  <meta name="description" content="Turn a project idea into a structured plan through AI-guided conversation: requirements, architecture, tech stack, budget, timeline, and risks, all in your browser.">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <link rel="canonical" href="https://jdeworks.github.io/think-tank/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Think Tank">
+  <meta property="og:title" content="Think Tank – AI-Guided Project Planning in Your Browser">
+  <meta property="og:description" content="Turn a project idea into a structured plan through AI-guided conversation: requirements, architecture, tech stack, budget, timeline, and risks, all in your browser.">
+  <meta property="og:url" content="https://jdeworks.github.io/think-tank/">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Think Tank – AI-Guided Project Planning in Your Browser">
+  <meta name="twitter:description" content="Turn a project idea into a structured plan through AI-guided conversation: requirements, architecture, tech stack, budget, timeline, and risks, all in your browser.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Think Tank",
+    "url": "https://jdeworks.github.io/think-tank/",
+    "description": "Turn a project idea into a structured plan through AI-guided conversation: requirements, architecture, tech stack, budget, timeline, and risks, all in your browser.",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Any operating system with a modern web browser",
+    "isAccessibleForFree": true,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+  <!-- SEO:END -->
+  </head>
+  <body>
+    <div id="root">
+      <h1>Think Tank</h1>
+      <p>
+        Think Tank turns a project idea into a structured plan through an AI-guided
+        conversation covering requirements, architecture, tech stack, budget,
+        timeline, and risks, right in your browser.
+      </p>
+      <p><a href="https://github.com/jdeworks/think-tank">Source code on GitHub</a></p>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
 </file>
 
 <file path="package.json">
